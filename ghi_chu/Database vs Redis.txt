@@ -1,0 +1,21 @@
+Database vs Redis
+
+E tìm hiểu cách lưu refreshToken và accesToken khi thực hiện login thì có 2 cách lưu ở database:
+Cách 1: database
+Cách 2: redis
+Theo mọi người nên lưu theo cách nào ạ
+
+cmt 1
+- Redis nếu hệ thống với lượng truy cập cao, cần phản hồi nhanh và xử lý một lượng lớn token. Nó cung cấp TTL giúp quản lý expried token đơn giản hơn và khả năng mở rộng cũng tốt hơn
+- Dùng Database thì thân thiện hơn, dễ làm hơn và đảm bảo toàn vẹn dữ liệu hơn vì redis lưu trong ram
+
+cmt 2
+K nên lưu token ở database , chỉ cần lưu 1 cái uuid tương ứng với mỗi refreshtoken xuống db để handle cơ chế invalidate token thôi, nhớ bỏ cái uuid này vô claim của nó .
+
+cmt 3
+Dựa theo mình biết, có thể không đúng hoàn toàn:
+Cách 1: nếu bạn sử dụng JWT (stateless) thì không nên store token vào database. Hoặc server tự generate token mỗi khi user login thì bạn có thể lưu token.
+Cách 2: accessToken thì gán lên cookies, còn refreshToken cache session ở Redis
+=> Nếu sử dụng JWT stateless:
+AccessToken: Trả về client (có thể trong header hoặc cookie)
+RefreshToken: Lưu trong Redis, vì Redis có tốc độ truy cập nhanh và dễ scale
