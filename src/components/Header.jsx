@@ -1,10 +1,12 @@
 // components/Header.jsx
 import React, { useState } from "react";
-import LoginModal from "./LoginModal"; // Import LoginModal
+import { useDispatch } from "react-redux";
+import { openLoginModal } from "../redux/slices/modalSlice";
 
 const Header = () => {
   const [dropDownOpen, setDropDownOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State cho modal
+  const dispatch = useDispatch();
+
   const menuItems = [
     { label: "Phim", hasDropdown: true },
     { label: "Góc Điện Ảnh", hasDropdown: true },
@@ -68,7 +70,7 @@ const Header = () => {
 
           {/* Login Button */}
           <button
-            onClick={() => setIsLoginModalOpen(true)} // Mở modal
+            onClick={() => dispatch(openLoginModal())}
             className="bg-gray-700 text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors"
           >
             Đăng Nhập
@@ -83,12 +85,6 @@ const Header = () => {
           </button>
         </div>
       </div>
-
-      {/* Login Modal */}
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-      />
     </header>
   );
 };

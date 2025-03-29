@@ -1,8 +1,12 @@
 // components/LoginModal.jsx
 import React, { useState } from "react";
-import { validateLogin } from "../utils/validation"; // Import validation
+import { useSelector, useDispatch } from "react-redux";
+import { closeLoginModal, openRegisterModal } from "../redux/slices/modalSlice";
+import { validateLogin } from "../utils/Validation"; // Import validateLogin
 
-const LoginModal = ({ isOpen, onClose }) => {
+const LoginModal = () => {
+  const { isLoginOpen } = useSelector((state) => state.modal);
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -16,21 +20,20 @@ const LoginModal = ({ isOpen, onClose }) => {
       return;
     }
 
-    // Logic đăng nhập (giả lập)
     console.log("Đăng nhập với:", { email, password });
     setErrors({});
     setEmail("");
     setPassword("");
-    onClose(); // Đóng modal sau khi đăng nhập thành công
+    dispatch(closeLoginModal());
   };
 
-  if (!isOpen) return null;
+  if (!isLoginOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md relative">
         <button
-          onClick={onClose}
+          onClick={() => dispatch(closeLoginModal())}
           className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
         >
           <svg
@@ -105,9 +108,12 @@ const LoginModal = ({ isOpen, onClose }) => {
         </form>
         <p className="text-center text-gray-600 mt-4">
           Chưa có tài khoản?{" "}
-          <a href="#" className="text-orange-500 hover:underline">
-            Tham Gia
-          </a>
+          <button
+            onClick={() => dispatch(openRegisterModal())}
+            className="text-orange-500 hover:underline"
+          >
+            Đăng ký
+          </button>
         </p>
       </div>
     </div>
