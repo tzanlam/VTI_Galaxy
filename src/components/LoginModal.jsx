@@ -2,13 +2,15 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeLoginModal, openRegisterModal } from "../redux/slices/modalSlice";
-import { validateLogin } from "../utils/Validation"; // Import validateLogin
+import { validateLogin } from "../utils/Validation";
+import { IoIosEyeOff, IoMdEye } from "react-icons/io";
 
 const LoginModal = () => {
   const { isLoginOpen } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleSubmit = (e) => {
@@ -77,7 +79,7 @@ const LoginModal = () => {
               <p className="text-red-500 text-sm mt-1">{errors.email}</p>
             )}
           </div>
-          <div className="mb-6">
+          <div className="mb-6 relative">
             <label
               htmlFor="password"
               className="block text-gray-700 font-semibold mb-2"
@@ -85,16 +87,27 @@ const LoginModal = () => {
               Mật khẩu
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               id="password"
               value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
                 setErrors((prev) => ({ ...prev, password: "" }));
               }}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 pr-12 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" // Tăng pr-10 thành pr-12
               placeholder="Nhập mật khẩu"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-7 transform translate-y-1/2 text-gray-600 flex items-center justify-center"
+            >
+              {showPassword ? (
+                <IoMdEye className="w-6 h-6" />
+              ) : (
+                <IoIosEyeOff className="w-6 h-6" />
+              )}
+            </button>
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password}</p>
             )}

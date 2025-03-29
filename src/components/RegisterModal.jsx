@@ -1,12 +1,14 @@
 // components/RegisterModal.jsx
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeRegisterModal, openLoginModal } from "../redux/slices/modalSlice";
-import { validateRegister } from "../utils/Validation"; // Import validateRegister
+import { validateRegister } from "../utils/Validation";
+import { IoIosEyeOff, IoMdEye } from "react-icons/io";
 
 const RegisterModal = () => {
   const { isRegisterOpen } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
+  const dateInputRef = useRef(null);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -25,6 +27,13 @@ const RegisterModal = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
+  const handleDateFieldClick = () => {
+    // Programmatically focus and open the date picker when the entire field is clicked
+    if (dateInputRef.current) {
+      dateInputRef.current.showPicker();
+    }
   };
 
   const handleSubmit = (e) => {
@@ -169,14 +178,21 @@ const RegisterModal = () => {
             >
               Ngày sinh
             </label>
-            <input
-              type="date"
-              id="dob"
-              name="dob"
-              value={formData.dob}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
+            <div
+              className="relative cursor-pointer"
+              onClick={handleDateFieldClick}
+            >
+              <input
+                type="date"
+                id="dob"
+                name="dob"
+                ref={dateInputRef}
+                value={formData.dob}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 cursor-pointer"
+              />
+              <div className="absolute inset-0" />
+            </div>
             {errors.dob && (
               <p className="text-red-500 text-sm mt-1">{errors.dob}</p>
             )}
@@ -194,15 +210,19 @@ const RegisterModal = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 pr-12 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               placeholder="Nhập mật khẩu"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-10 text-gray-600"
+              className="absolute right-3 top-7 transform translate-y-1/2 text-gray-600 flex items-center justify-center"
             >
-              {showPassword ? "Ẩn" : "Hiện"}
+              {showPassword ? (
+                <IoMdEye className="w-6 h-6" />
+              ) : (
+                <IoIosEyeOff className="w-6 h-6" />
+              )}
             </button>
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -221,15 +241,19 @@ const RegisterModal = () => {
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 pr-12 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               placeholder="Xác nhận mật khẩu"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-10 text-gray-600"
+              className="absolute right-3 top-7 transform translate-y-1/2 text-gray-600 flex items-center justify-center"
             >
-              {showConfirmPassword ? "Ẩn" : "Hiện"}
+              {showConfirmPassword ? (
+                <IoMdEye className="w-6 h-6" />
+              ) : (
+                <IoIosEyeOff className="w-6 h-6" />
+              )}
             </button>
             {errors.confirmPassword && (
               <p className="text-red-500 text-sm mt-1">
