@@ -1,3 +1,4 @@
+// moviesData.js
 import snowWhite from "../assets/show-white.jpg";
 import lastStop from "../assets/last-stop.jpg";
 import quyNhapTrang from "../assets/quy-nhap-trang.jpg";
@@ -45,6 +46,35 @@ export const movies = [
     showtimes: [
       { day: "Thứ Tư", times: ["13:00", "17:00", "21:00"] },
       { day: "Thứ Năm", times: ["12:00", "16:00", "20:00"] },
+    ],
+  },
+  // Bạn có thể thêm các phim khác như "Quỷ Nhập Tràng" hoặc "Mickey 17" nếu muốn
+  {
+    id: 4,
+    title: "Quỷ Nhập Tràng",
+    image: quyNhapTrang,
+    rating: 8.0,
+    genre: "Kinh dị",
+    duration: "110 phút",
+    description: "Một câu chuyện ma quái đầy ám ảnh.",
+    trailerUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    showtimes: [
+      { day: "Thứ Sáu", times: ["14:00", "18:00", "22:00"] },
+      { day: "Thứ Bảy", times: ["13:00", "17:00", "21:00"] },
+    ],
+  },
+  {
+    id: 5,
+    title: "Mickey 17",
+    image: mickey17,
+    rating: 8.5,
+    genre: "Khoa học viễn tưởng",
+    duration: "130 phút",
+    description: "Một cuộc phiêu lưu ngoài không gian đầy kịch tính.",
+    trailerUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    showtimes: [
+      { day: "Chủ Nhật", times: ["11:00", "15:00", "19:00"] },
+      { day: "Thứ Hai", times: ["12:00", "16:00", "20:00"] },
     ],
   },
 ];
