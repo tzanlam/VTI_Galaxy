@@ -1,5 +1,5 @@
-// MovieDetails.js
-import React from "react";
+// components/MovieDetails.jsx
+import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { movies } from "../data/moviesData"; // Import dữ liệu từ moviesData.js
 
@@ -7,11 +7,22 @@ const MovieDetails = () => {
   const { id } = useParams(); // Lấy id từ URL
   const navigate = useNavigate();
 
+  // Tìm phim với ID từ tham số URL
   const movie = movies.find((m) => m.id === parseInt(id));
 
-  if (!movie) {
-    return <div className="text-center py-12">Phim không tồn tại!</div>;
-  }
+  // Kiểm tra và chuyển hướng nếu không tìm thấy phim
+  useEffect(() => {
+    if (!movie) {
+      navigate("/error", {
+        state: {
+          message: "Phim bạn đang tìm kiếm không tồn tại hoặc đã bị gỡ bỏ.",
+        },
+      });
+    }
+  }, [movie, navigate]);
+
+  // Tránh render trong khi chuyển hướng
+  if (!movie) return null;
 
   return (
     <div>
