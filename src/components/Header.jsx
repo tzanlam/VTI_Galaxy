@@ -1,14 +1,17 @@
-// Header.jsx
+// components/Header.jsx
 import React, { useState } from "react";
+import LoginModal from "./LoginModal"; // Import LoginModal
 
 const Header = () => {
   const [dropDownOpen, setDropDownOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // State cho modal
   const menuItems = [
     { label: "Phim", hasDropdown: true },
     { label: "Góc Điện Ảnh", hasDropdown: true },
     { label: "Sự kiện", hasDropdown: true },
     { label: "Rạp/giá vé", hasDropdown: true },
   ];
+
   return (
     <header className="bg-white shadow-md">
       <div className="container mx-auto flex items-center justify-between py-8 px-6">
@@ -43,8 +46,9 @@ const Header = () => {
           </a>
         </nav>
 
-        {/* Search and Join Button */}
+        {/* Search, Login, and Join Button */}
         <div className="flex items-center space-x-4">
+          {/* Search Icon */}
           <button className="text-gray-700 hover:text-orange-500">
             <svg
               className="w-6 h-6"
@@ -61,7 +65,17 @@ const Header = () => {
               ></path>
             </svg>
           </button>
-          <button className="bg-orange-500 text-white px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-orange-600">
+
+          {/* Login Button */}
+          <button
+            onClick={() => setIsLoginModalOpen(true)} // Mở modal
+            className="bg-gray-700 text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors"
+          >
+            Đăng Nhập
+          </button>
+
+          {/* Join Button */}
+          <button className="bg-orange-500 text-white px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-orange-600 transition-colors">
             <span>Tham Gia</span>
             <span className="bg-yellow-400 text-orange-500 px-2 py-1 rounded-full text-xs">
               G STAR
@@ -69,6 +83,12 @@ const Header = () => {
           </button>
         </div>
       </div>
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+      />
     </header>
   );
 };

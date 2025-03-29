@@ -1,16 +1,23 @@
+// routes/RouterConfig.js
 import React from "react";
-import HomePage from "../pages/Homepage";
-import MovieDetails from "../components/MovieDetails";
 import { createBrowserRouter } from "react-router-dom";
+import HomePage from "../pages/HomePage"; // Đảm bảo đường dẫn đúng
+import MovieDetails from "../components/MovieDetails"; // Đảm bảo đường dẫn đúng
+import Layout from "../components/Layout"; // Import Layout
 
 const router = createBrowserRouter([
   {
-    path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/movie/:id",
-    element: <MovieDetails />,
+    element: <Layout />, // Layout bao bọc tất cả các route
+    children: [
+      {
+        path: "/",
+        element: <HomePage />,
+      },
+      {
+        path: "/movie/:id",
+        element: <MovieDetails />,
+      },
+    ],
   },
 ]);
 
