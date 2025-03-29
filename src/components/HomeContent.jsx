@@ -1,40 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import snowWhite from "../assets/show-white.jpg";
-import lastStop from "../assets/last-stop.jpg";
-import quyNhapTrang from "../assets/quy-nhap-trang.jpg";
-import mickey17 from "../assets/mickey-17.jpg";
+import TrailerModal from "./TrailerModal";
+import { movies } from "../data/moviesData"; // Import dữ liệu
 
 const HomeContent = () => {
-  const movies = [
-    {
-      id: 1,
-      title: "Nàng Bạch Tuyết",
-      image: snowWhite,
-      rating: 7.7,
-      genre: "Gia đình",
-      duration: "120 phút",
-      description: "Một câu chuyện cổ tích về nàng công chúa và bảy chú lùn.",
-      showtimes: [
-        { day: "Thứ Hai", times: ["10:00", "14:00", "18:00"] },
-        { day: "Thứ Ba", times: ["11:00", "15:00", "19:00"] },
-      ],
-    },
-    {
-      id: 2,
-      title: "Nhà Ga Ma Chô",
-      image: lastStop,
-      rating: 7.8,
-      genre: "Kinh dị",
-      duration: "95 phút",
-      description: "Một hành trình kinh dị tại nhà ga bị bỏ hoang.",
-      showtimes: [
-        { day: "Thứ Tư", times: ["13:00", "17:00", "21:00"] },
-        { day: "Thứ Năm", times: ["12:00", "16:00", "20:00"] },
-      ],
-    },
-    // Thêm các phim khác nếu cần...
-  ];
+  const [selectedTrailer, setSelectedTrailer] = useState(null);
+
+  const openTrailer = (trailerUrl) => {
+    setSelectedTrailer(trailerUrl);
+  };
+
+  const closeTrailer = () => {
+    setSelectedTrailer(null);
+  };
 
   return (
     <div className="container mx-auto px-24 py-12">
@@ -69,7 +47,10 @@ const HomeContent = () => {
                 >
                   Mua Vé
                 </Link>
-                <button className="bg-gray-700 text-white px-10 py-2 rounded-md hover:bg-gray-600 transition-colors">
+                <button
+                  onClick={() => openTrailer(movie.trailerUrl)}
+                  className="bg-gray-700 text-white px-10 py-2 rounded-md hover:bg-gray-600 transition-colors"
+                >
                   Trailer
                 </button>
               </div>
@@ -92,6 +73,8 @@ const HomeContent = () => {
           Xem Thêm
         </button>
       </div>
+
+      <TrailerModal trailerUrl={selectedTrailer} onClose={closeTrailer} />
     </div>
   );
 };
