@@ -4,6 +4,7 @@ import snowWhite from "../assets/show-white.jpg";
 import lastStop from "../assets/last-stop.jpg";
 import quyNhapTrang from "../assets/quy-nhap-trang.jpg";
 import mickey17 from "../assets/mickey-17.jpg";
+import OP from "../assets/one-piece.jpg";
 
 const MovieDetails = () => {
   const { id } = useParams(); // Lấy id từ URL
@@ -36,7 +37,33 @@ const MovieDetails = () => {
         { day: "Thứ Năm", times: ["12:00", "16:00", "20:00"] },
       ],
     },
+    {
+      id: 3,
+      title: "One Piece",
+      image: OP,
+      rating: 7.8,
+      genre: "Kinh dị",
+      duration: "95 phút",
+      description: "Một hành trình kinh dị tại nhà ga bị bỏ hoang.",
+      showtimes: [
+        { day: "Thứ Tư", times: ["13:00", "17:00", "21:00"] },
+        { day: "Thứ Năm", times: ["12:00", "16:00", "20:00"] },
+      ],
+    },
     // Thêm các phim khác nếu cần...
+    {
+      id: 3,
+      title: "Nhà Ga Ma Chô",
+      image: lastStop,
+      rating: 7.8,
+      genre: "Kinh dị",
+      duration: "95 phút",
+      description: "Một hành trình kinh dị tại nhà ga bị bỏ hoang.",
+      showtimes: [
+        { day: "Thứ Tư", times: ["13:00", "17:00", "21:00"] },
+        { day: "Thứ Năm", times: ["12:00", "16:00", "20:00"] },
+      ],
+    },
   ];
 
   const movie = movies.find((m) => m.id === parseInt(id));
