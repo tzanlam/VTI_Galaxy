@@ -1,7 +1,7 @@
-// components/Header.jsx
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { openLoginModal } from "../redux/slices/modalSlice";
+import logo3 from "../assets/logo3.png"; // Ensure this path is correct
 
 const Header = () => {
   const [dropDownOpen, setDropDownOpen] = useState(false);
@@ -20,9 +20,13 @@ const Header = () => {
         {/* Logo */}
         <div className="flex items-center">
           <img
-            src="https://via.placeholder.com/150x50?text=Galaxy+Cinema"
+            src={logo3}
             alt="Galaxy Cinema Logo"
-            className="h-10"
+            className="h-14 w-auto object-contain" // Added w-auto and object-contain for better responsiveness
+            onError={(e) => {
+              e.target.src = "/path/to/fallback-image.jpg"; // Optional: fallback image
+              console.error("Error loading logo image");
+            }}
           />
         </div>
 
