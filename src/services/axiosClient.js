@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8080/hotel", // Đảm bảo khớp với backend
+  baseURL: "http://localhost:8082/phimmuoitam", // Đảm bảo khớp với backend
   timeout: 5000,
   headers: { "Content-Type": "application/json" },
 });

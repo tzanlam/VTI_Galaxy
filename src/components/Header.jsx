@@ -1,18 +1,12 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openLoginModal } from "../redux/slices/modalSlice";
+import UserMenu from "./UserMenu";
 import logo3 from "../assets/logo3.png"; // Ensure this path is correct
 
 const Header = () => {
-  const [dropDownOpen, setDropDownOpen] = useState(false);
   const dispatch = useDispatch();
-
-  const menuItems = [
-    { label: "Phim", hasDropdown: true },
-    { label: "Góc Điện Ảnh", hasDropdown: true },
-    { label: "Sự kiện", hasDropdown: true },
-    { label: "Rạp/giá vé", hasDropdown: true },
-  ];
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
   return (
     <header className="bg-white shadow-md">
@@ -22,9 +16,9 @@ const Header = () => {
           <img
             src={logo3}
             alt="Galaxy Cinema Logo"
-            className="h-14 w-auto object-contain" // Added w-auto and object-contain for better responsiveness
+            className="h-14 w-auto object-contain"
             onError={(e) => {
-              e.target.src = "/path/to/fallback-image.jpg"; // Optional: fallback image
+              e.target.src = "/path/to/fallback-image.jpg";
               console.error("Error loading logo image");
             }}
           />
@@ -52,7 +46,7 @@ const Header = () => {
           </a>
         </nav>
 
-        {/* Search, Login, and Join Button */}
+        {/* Search, Login/UserMenu */}
         <div className="flex items-center space-x-4">
           {/* Search Icon */}
           <button className="text-gray-700 hover:text-orange-500">
@@ -72,21 +66,27 @@ const Header = () => {
             </svg>
           </button>
 
-          {/* Login Button */}
-          <button
-            onClick={() => dispatch(openLoginModal())}
-            className="bg-gray-700 text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors"
-          >
-            Đăng Nhập
-          </button>
+          {isLoggedIn ? (
+            <UserMenu />
+          ) : (
+            <>
+              {/* Login Button */}
+              <button
+                onClick={() => dispatch(openLoginModal())}
+                className="bg-gray-700 text-white px-4 py-2 rounded-full hover:bg-gray-800 transition-colors"
+              >
+                Đăng Nhập
+              </button>
 
-          {/* Join Button */}
-          <button className="bg-orange-500 text-white px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-orange-600 transition-colors">
-            <span>Tham Gia</span>
-            <span className="bg-yellow-400 text-orange-500 px-2 py-1 rounded-full text-xs">
-              G STAR
-            </span>
-          </button>
+              {/* Join Button */}
+              <button className="bg-orange-500 text-white px-4 py-2 rounded-full flex items-center space-x-2 hover:bg-orange-600 transition-colors">
+                <span>Tham Gia</span>
+                <span className="bg-yellow-400 text-orange-500 px-2 py-1 rounded-full text-xs">
+                  G STAR
+                </span>
+              </button>
+            </>
+          )}
         </div>
       </div>
     </header>
