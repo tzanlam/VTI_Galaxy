@@ -2,10 +2,10 @@ import axios from 'axios';
 
 
 export const ROOT_URL = "localhost";
-export const API_URL_IMAGE = `http://${ROOT_URL}:8080/api/images/`;
+export const API_URL_IMAGE = `http://${ROOT_URL}:8082/api/images/`;
 
-const API_URL = `http://${ROOT_URL}:8080/api`; // Replace with your API URL
-axios.defaults.baseURL = `http://${ROOT_URL}:8080`; // Replace with your backend API's base URL
+const API_URL = `http://${ROOT_URL}:8082/phimmuoitam`; // Replace with your API URL
+axios.defaults.baseURL = `http://${ROOT_URL}:8082`; // Replace with your backend API's base URL
 
 // Add the following lines to set the CORS headers
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'; // Replace '*' with the allowed origin(s) of your backend API

@@ -2,8 +2,14 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeLoginModal, openRegisterModal } from "../redux/slices/modalSlice";
+import {
+  loginStart,
+  loginSuccess,
+  loginFailure,
+} from "../redux/slices/authSlice";
 import { validateLogin } from "../utils/Validation";
 import { IoIosEyeOff, IoMdEye } from "react-icons/io";
+import avatar from "../assets/profile-avatar.jpg";
 
 const LoginModal = () => {
   const { isLoginOpen } = useSelector((state) => state.modal);
@@ -12,6 +18,19 @@ const LoginModal = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Simulated user data
+  const simulateLogin = () => {
+    // In a real app, this would be an API call
+    return {
+      fullName: "Nguyễn Văn A",
+      email: "nguyenvana@gmail.com",
+      password: "123456",
+      avatar: { avatar }, // Using placeholder for demo
+      points: 2500,
+      id: "user123",
+    };
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -22,11 +41,24 @@ const LoginModal = () => {
       return;
     }
 
-    console.log("Đăng nhập với:", { email, password });
-    setErrors({});
-    setEmail("");
-    setPassword("");
-    dispatch(closeLoginModal());
+    dispatch(loginStart());
+
+    try {
+      // Simulate API call
+      const userData = simulateLogin();
+      console.log("Đăng nhập với:", { email, password });
+
+      // Simulate successful login after a short delay
+      setTimeout(() => {
+        dispatch(loginSuccess(userData));
+        setErrors({});
+        setEmail("");
+        setPassword("");
+        dispatch(closeLoginModal());
+      }, 500);
+    } catch (error) {
+      dispatch(loginFailure("Đăng nhập thất bại. Vui lòng thử lại."));
+    }
   };
 
   if (!isLoginOpen) return null;
@@ -94,7 +126,7 @@ const LoginModal = () => {
                 setPassword(e.target.value);
                 setErrors((prev) => ({ ...prev, password: "" }));
               }}
-              className="w-full px-4 py-2 pr-12 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500" // Tăng pr-10 thành pr-12
+              className="w-full px-4 py-2 pr-12 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               placeholder="Nhập mật khẩu"
             />
             <button
