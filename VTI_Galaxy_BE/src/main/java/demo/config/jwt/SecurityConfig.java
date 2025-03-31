@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
                                 "/registerUser",
+                                "/login",
                                 "/postImg").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);
