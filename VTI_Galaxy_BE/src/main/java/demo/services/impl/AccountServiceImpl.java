@@ -44,7 +44,8 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto registerAdmin(AccountRequest request) {
         try {
             Account account = request.adminAccount();
-            return new AccountDto(accountRepository.save(account));
+            accountRepository.save(account);
+            return new AccountDto((account));
         }catch (Exception e) {
             throw new RuntimeException("Create account failed");
         }
@@ -54,7 +55,8 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto registerUser(AccountRequest request) {
         try{
             Account account = request.userAccount();
-            return new AccountDto(accountRepository.save(account));
+            accountRepository.save(account);
+            return new AccountDto(account);
         }catch (Exception e) {
             throw new RuntimeException("Create account failed");
         }
@@ -67,7 +69,8 @@ public class AccountServiceImpl implements AccountService {
         );
         try{
             request.updateAccount(account);
-            return new AccountDto(accountRepository.save(account));
+            accountRepository.save(account);
+            return new AccountDto(account);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -80,7 +83,8 @@ public class AccountServiceImpl implements AccountService {
         );
         try{
             account.setEmail(email);
-            return new AccountDto(accountRepository.save(account));
+            accountRepository.save(account);
+            return new AccountDto(account);
         }catch (Exception e) {
             throw new RuntimeException("Update email failed");
         }
@@ -94,7 +98,8 @@ public class AccountServiceImpl implements AccountService {
         PasswordEncoder encoder = new BCryptPasswordEncoder();
         try{
             account.setPassword(encoder.encode(password));
-            return new AccountDto(accountRepository.save(account));
+            accountRepository.save(account);
+            return new AccountDto(account);
         }catch (Exception e) {
             throw new RuntimeException("Update password failed");
         }
@@ -107,6 +112,7 @@ public class AccountServiceImpl implements AccountService {
         );
         try{
             account.setStatus(ActiveStatus.DELETED);
+            accountRepository.save(account);
             return new AccountDto(account);
         }catch (Exception e) {
             throw new RuntimeException("Delete account failed");
