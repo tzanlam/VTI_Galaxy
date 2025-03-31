@@ -5,7 +5,6 @@ import demo.modal.entity.Account;
 import lombok.Data;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.multipart.MultipartFile;
 
 import static demo.support.MethodSupport.*;
 
@@ -13,7 +12,7 @@ import static demo.support.MethodSupport.*;
 public class AccountRequest {
     private String fullName;
     private String phoneNumber;
-    private MultipartFile fileAvatar;
+    private String fileAvatar;
     private String email;
     private String password;
     private String dateOfBirth;
