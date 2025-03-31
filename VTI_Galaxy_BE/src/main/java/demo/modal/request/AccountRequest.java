@@ -25,6 +25,7 @@ public class AccountRequest {
         adminAccount.setPhoneNumber(phoneNumber);
         adminAccount.setEmail(email);
         adminAccount.setPassword(passwordEncoder.encode(password));
+        adminAccount.setAvatar(null);
         adminAccount.setPosition(Account.Position.ADMIN);
         adminAccount.setConfirmCode(randomConfirmationCode());
         adminAccount.setGender(convertStringToEnum(Account.Gender.class, gender));
@@ -36,6 +37,7 @@ public class AccountRequest {
         Account userAccount = new Account();
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         userAccount.setFullName(fullName);
+        userAccount.setAvatar(null);
         userAccount.setPhoneNumber(phoneNumber);
         userAccount.setEmail(email);
         userAccount.setPassword(passwordEncoder.encode(password));
