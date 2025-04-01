@@ -1,21 +1,19 @@
-// components/UserMenu.jsx
 import React, { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
-import { toast } from "react-toastify";
-import avatar from "../assets/profile-avatar.jpg";
+import defaultAvatar from "../assets/profile-avatar.jpg"; // Make sure this path is correct
 
 const UserMenu = () => {
-  const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+  const { user } = useSelector((state) => state.auth);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
-  // Close dropdown when clicking outside
+  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
       }
     };
 
@@ -26,54 +24,34 @@ const UserMenu = () => {
   }, []);
 
   const handleLogout = () => {
-    // Remove token from localStorage
-    localStorage.removeItem("token");
-
-    // Update Redux state
     dispatch(logout());
-
-    // Close dropdown
-    setIsDropdownOpen(false);
-
-    // Show success message
-    toast.success("Đăng xuất thành công!");
+    setIsMenuOpen(false);
   };
 
-  if (!user) return null;
-
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative" ref={menuRef}>
       <button
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full py-1 px-3"
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        className="flex items-center space-x-2 focus:outline-none"
       >
-        <div className="relative">
-          <img
-            src={user.avatar || "/api/placeholder/40/40"}
-            alt="Avatar"
-            className="w-8 h-8 rounded-full object-cover border-2 border-orange-500"
-            onError={(e) => {
-              e.target.src = "/api/placeholder/40/40"; // Fallback image if user avatar fails to load
-            }}
-          />
-        </div>
-        <div className="flex flex-col items-start">
-          <span className="font-medium text-sm">
-            {user.fullName || "Người dùng"}
-          </span>
-          <div className="flex items-center space-x-1">
-            <span className="text-xs text-gray-600">{user.points || 0}</span>
-            <span className="text-xs text-orange-500 font-semibold">điểm</span>
-          </div>
-        </div>
+        <img
+          src={user?.avatar || defaultAvatar}
+          alt="User Profile"
+          className="h-10 w-10 rounded-full object-cover border-2 border-orange-500"
+          onError={(e) => {
+            e.target.src = defaultAvatar;
+          }}
+        />
+        <span className="text-gray-700 hidden md:block">
+          {user?.fullName || "Thành viên"}
+        </span>
         <svg
-          className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
-            isDropdownOpen ? "transform rotate-180" : ""
-          }`}
+          className={`w-4 h-4 text-gray-700 transform ${
+            isMenuOpen ? "rotate-180" : ""
+          } transition-transform`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
             strokeLinecap="round"
@@ -84,25 +62,29 @@ const UserMenu = () => {
         </svg>
       </button>
 
-      {/* Dropdown Menu */}
-      {isDropdownOpen && (
+      {isMenuOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
           <a
-            href="#account"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100"
+            href="/profile"
+            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
-            Tài khoản của tôi
+            Thông tin tài khoản
           </a>
           <a
-            href="#history"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-100"
+            href="/tickets"
+            className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
           >
-            Lịch sử giao dịch
+            Vé của tôi
           </a>
-          <hr className="my-1" />
+          {user?.points && (
+            <div className="px-4 py-2 border-t border-gray-100">
+              <p className="text-sm text-gray-500">G-Star Points</p>
+              <p className="font-semibold text-orange-500">{user.points}</p>
+            </div>
+          )}
           <button
             onClick={handleLogout}
-            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-orange-100"
+            className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 border-t border-gray-100"
           >
             Đăng xuất
           </button>

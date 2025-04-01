@@ -1,136 +1,95 @@
-import React, { useEffect, useState } from "react";
+// // components/HomeContent.jsx
+// import React, { useState, Suspense } from "react";
+// import { Link } from "react-router-dom";
+// import TrailerModal from "./TrailerModal";
+// import { movies } from "../data/moviesData";
 
-const CreativeLoading = ({ loading = true }) => {
-  const [progress, setProgress] = useState(0);
-  const [animationPhase, setAnimationPhase] = useState(0);
+// // Lazy load CreativeLoading
+// const CreativeLoading = React.lazy(() => import("./CreativeLoading"));
 
-  useEffect(() => {
-    if (!loading) return;
+// const HomeContent = () => {
+//   const [selectedTrailer, setSelectedTrailer] = useState(null);
+//   const [isLoading, setIsLoading] = useState(true); // Giả lập trạng thái loading
 
-    // Simulate loading progress
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 2;
-      });
-    }, 120);
+//   // Giả lập việc tải dữ liệu
+//   setTimeout(() => setIsLoading(false), 2000); // Sau 2 giây, dữ liệu "tải" xong
 
-    // Cycle through animation phases
-    const phaseInterval = setInterval(() => {
-      setAnimationPhase((prev) => (prev + 1) % 4);
-    }, 1000);
+//   const openTrailer = (trailerUrl) => {
+//     setSelectedTrailer(trailerUrl);
+//   };
 
-    return () => {
-      clearInterval(interval);
-      clearInterval(phaseInterval);
-    };
-  }, [loading]);
+//   const closeTrailer = () => {
+//     setSelectedTrailer(null);
+//   };
 
-  if (!loading) return null;
+//   if (isLoading) {
+//     return (
+//       <Suspense fallback={<div>Đang tải...</div>}>
+//         <CreativeLoading loading={true} />
+//       </Suspense>
+//     );
+//   }
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-50">
-      <div className="relative w-64 h-64">
-        {/* Animated Cinema Ticket */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative bg-white rounded-lg w-56 h-32 overflow-hidden shadow-lg transform rotate-6 animate-pulse">
-            {/* Ticket Top */}
-            <div className="h-3/4 p-4 bg-gradient-to-r from-orange-400 to-orange-600">
-              <div className="flex justify-between">
-                <div className="text-white font-bold">GALAXY</div>
-                <div className="text-white text-xs">Cinema</div>
-              </div>
+//   return (
+//     <div className="container mx-auto px-24 py-12">
+//       <div className="mb-8">
+//         <h2 className="text-3xl font-bold text-gray-800 text-center">
+//           Phim Đang Chiếu
+//         </h2>
+//         <p className="text-gray-600 text-center mt-2">
+//           Khám phá những bộ phim hot nhất hiện nay
+//         </p>
+//       </div>
+//       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+//         {movies.map((movie) => (
+//           <div
+//             key={movie.id}
+//             className="group relative rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+//           >
+//             <div className="relative">
+//               <img
+//                 src={movie.image}
+//                 alt={movie.title}
+//                 className="w-full h-[450px] object-cover transition-transform duration-300 group-hover:scale-110"
+//               />
+//               <div className="absolute top-3 right-3 bg-yellow-400 text-black px-2 py-1 rounded-full text-sm font-bold z-10">
+//                 {movie.rating}
+//               </div>
+//               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 gap-4 z-10">
+//                 <Link
+//                   to={`/movie/${movie.id}`}
+//                   className="bg-orange-500 text-white px-8 py-2 rounded-md hover:bg-orange-600 transition-colors"
+//                 >
+//                   Mua Vé
+//                 </Link>
+//                 <button
+//                   onClick={() => openTrailer(movie.trailerUrl)}
+//                   className="bg-gray-700 text-white px-10 py-2 rounded-md hover:bg-gray-600 transition-colors"
+//                 >
+//                   Trailer
+//                 </button>
+//               </div>
+//             </div>
+//             <div className="p-4 bg-white relative z-0">
+//               <h3 className="text-lg font-semibold text-gray-800 truncate group-hover:text-orange-500 transition-colors">
+//                 {movie.title}
+//               </h3>
+//               <div className="text-sm text-gray-600 mt-1 flex justify-between">
+//                 <span>{movie.genre}</span>
+//                 <span>{movie.duration}</span>
+//               </div>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//       <div className="mt-10 text-center">
+//         <button className="bg-gray-800 text-white px-6 py-3 rounded-full hover:bg-orange-500 transition-colors duration-300">
+//           Xem Thêm
+//         </button>
+//       </div>
+//       <TrailerModal trailerUrl={selectedTrailer} onClose={closeTrailer} />
+//     </div>
+//   );
+// };
 
-              {/* Seat Animation */}
-              <div className="mt-4 flex justify-center space-x-1">
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className={`w-4 h-4 rounded-sm border border-white ${
-                      animationPhase === i % 4 ? "bg-white" : "bg-transparent"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Ticket Bottom */}
-            <div className="h-1/4 bg-gray-100 border-t border-dashed border-gray-400 flex items-center justify-center">
-              <div className="text-orange-500 text-xs font-semibold">
-                {progress < 100 ? `${progress}%` : "Ready!"}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Orbital Loading Animation */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-64 h-64 rounded-full border-4 border-transparent border-t-orange-500 animate-spin" />
-          <div
-            className="absolute w-48 h-48 rounded-full border-4 border-transparent border-l-orange-300 animate-spin"
-            style={{ animationDirection: "reverse", animationDuration: "3s" }}
-          />
-          <div
-            className="absolute w-32 h-32 rounded-full border-4 border-transparent border-b-orange-600 animate-spin"
-            style={{ animationDuration: "2s" }}
-          />
-        </div>
-
-        {/* Popcorn Animation */}
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-          <div className="relative w-24 h-24">
-            {/* Popcorn Bucket */}
-            <div className="absolute bottom-0 w-20 h-14 bg-gradient-to-b from-red-500 to-red-600 rounded-b-lg left-1/2 transform -translate-x-1/2"></div>
-
-            {/* Popcorn Pieces */}
-            {[...Array(12)].map((_, i) => {
-              const randomLeft = 4 + Math.random() * 16;
-              const delay = Math.random() * 2;
-              const duration = 1 + Math.random() * 1;
-
-              return (
-                <div
-                  key={i}
-                  className="absolute bottom-10 w-3 h-3 bg-yellow-100 rounded-full"
-                  style={{
-                    left: `${randomLeft}px`,
-                    animation: `pop-up ${duration}s ease-out ${delay}s infinite`,
-                    opacity: animationPhase % 2 === 0 ? 1 : 0.7,
-                  }}
-                />
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <p className="mt-8 text-white font-medium">Đang tải dữ liệu...</p>
-      <p className="mt-2 text-orange-300 text-sm animate-pulse">
-        Mời bạn thưởng thức bắp trước khi phim bắt đầu
-      </p>
-
-      {/* CSS Animation */}
-      <style jsx>{`
-        @keyframes pop-up {
-          0% {
-            transform: translateY(0);
-            opacity: 0;
-          }
-          50% {
-            transform: translateY(-30px);
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(-40px);
-            opacity: 0;
-          }
-        }
-      `}</style>
-    </div>
-  );
-};
-
-export default CreativeLoading;
+// export default HomeContent;
