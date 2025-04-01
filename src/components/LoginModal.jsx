@@ -41,7 +41,7 @@ const LoginModal = () => {
           loginSuccess({
             email,
             fullName: response.fullName || "Thành viên",
-            id: response.accountId,
+            id: response.accountId || response.id,
             avatar: response.image,
           })
         );

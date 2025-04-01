@@ -8,8 +8,13 @@ const axiosClient = axios.create({
 
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    if (token && !config.url.includes("/login") && !config.url.includes("/register")) {
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (
+      token &&
+      !config.url.includes("/login") &&
+      !config.url.includes("/register")
+    ) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -22,22 +27,13 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response) {
       const { status, data } = error.response;
-      const url = error.config.url;
-
-      if (url.includes("/register")) {
-        if (status === 400) {
-          const errorMessage = typeof data === "string" && data.trim().length > 0
-            ? data
-            : "Đăng ký thất bại. Vui lòng kiểm tra thông tin.";
-          return Promise.reject(new Error(errorMessage));
-        } else if (status === 500) {
-          return Promise.reject(new Error("Lỗi server. Vui lòng thử lại sau."));
-        }
+      if (status === 400 || status === 401) {
+        return Promise.reject(new Error(data || "Email hoặc mật khẩu không đúng"));
       }
-    } else if (error.request) {
-      return Promise.reject(new Error("Không thể kết nối đến server."));
     }
-    return Promise.reject(new Error("Đã xảy ra lỗi không xác định."));
+    return Promise.reject(
+      new Error(error.message || "Đã xảy ra lỗi không xác định")
+    );
   }
 );
 

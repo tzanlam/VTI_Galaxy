@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../redux/slices/authSlice";
-import defaultAvatar from "../assets/profile-avatar.jpg"; // Make sure this path is correct
+import { logout as logoutAction } from "../redux/slices/authSlice";
+import { logout as logoutService } from "../services/authService"; // Import logout from authService
+import defaultAvatar from "../assets/profile-avatar.jpg";
 
 const UserMenu = () => {
   const dispatch = useDispatch();
@@ -9,22 +10,19 @@ const UserMenu = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutAction()); // Clear Redux state
+    logoutService(); // Clear localStorage
     setIsMenuOpen(false);
   };
 
