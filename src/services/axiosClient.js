@@ -1,8 +1,7 @@
-// src/services/axiosClient.js
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8082/phimmuoitam", // Đảm bảo khớp với backend
+  baseURL: "http://localhost:8082",
   timeout: 5000,
   headers: { "Content-Type": "application/json" },
 });
@@ -23,23 +22,21 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response) {
       const { status, data } = error.response;
-      console.log("Response Error:", { status, data }); // Log chi tiết để debug
+      const url = error.config.url;
 
-      if (error.config.url.includes("/login")) {
+      if (url.includes("/register")) {
         if (status === 400) {
-          return Promise.reject(new Error("Thông tin không hợp lệ. Vui lòng kiểm tra lại."));
-        } else if (status === 401) {
-          return Promise.reject(new Error(data.message || "Email hoặc mật khẩu không đúng."));
+          const errorMessage = typeof data === "string" && data.trim().length > 0
+            ? data
+            : "Đăng ký thất bại. Vui lòng kiểm tra thông tin.";
+          return Promise.reject(new Error(errorMessage));
         } else if (status === 500) {
-          return Promise.reject(new Error(data.message || "Lỗi server. Vui lòng thử lại sau."));
+          return Promise.reject(new Error("Lỗi server. Vui lòng thử lại sau."));
         }
       }
-      return Promise.reject(new Error(`Lỗi từ server: ${status} - ${data.message || "Không rõ chi tiết"}`));
     } else if (error.request) {
-      console.log("Request Error:", error.request);
-      return Promise.reject(new Error("Không thể kết nối đến server. Kiểm tra backend hoặc mạng."));
+      return Promise.reject(new Error("Không thể kết nối đến server."));
     }
-    console.log("Unknown Error:", error);
     return Promise.reject(new Error("Đã xảy ra lỗi không xác định."));
   }
 );

@@ -1,4 +1,3 @@
-// components/LoginModal.jsx
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeLoginModal, openRegisterModal } from "../redux/slices/modalSlice";
@@ -8,8 +7,9 @@ import {
   loginFailure,
 } from "../redux/slices/authSlice";
 import { validateLogin } from "../utils/Validation";
+import { login } from "../services/authService";
 import { IoIosEyeOff, IoMdEye } from "react-icons/io";
-import avatar from "../assets/profile-avatar.jpg";
+import { toast } from "react-toastify";
 
 const LoginModal = () => {
   const { isLoginOpen } = useSelector((state) => state.modal);
@@ -18,21 +18,9 @@ const LoginModal = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Simulated user data
-  const simulateLogin = () => {
-    // In a real app, this would be an API call
-    return {
-      fullName: "Nguyễn Văn A",
-      email: "nguyenvana@gmail.com",
-      password: "123456",
-      avatar: { avatar }, // Using placeholder for demo
-      points: 2500,
-      id: "user123",
-    };
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateLogin(email, password);
 
@@ -42,22 +30,37 @@ const LoginModal = () => {
     }
 
     dispatch(loginStart());
+    setIsLoading(true);
 
     try {
-      // Simulate API call
-      const userData = simulateLogin();
-      console.log("Đăng nhập với:", { email, password });
+      const response = await login(email, password);
 
-      // Simulate successful login after a short delay
-      setTimeout(() => {
-        dispatch(loginSuccess(userData));
-        setErrors({});
+      if (response) {
+        // Store user info
+        dispatch(
+          loginSuccess({
+            email,
+            fullName: response.fullName || "Thành viên",
+            id: response.accountId,
+            avatar: response.image,
+          })
+        );
+        toast.success("Đăng nhập thành công!");
         setEmail("");
         setPassword("");
         dispatch(closeLoginModal());
-      }, 500);
+      } else {
+        dispatch(loginFailure("Đăng nhập thất bại"));
+        toast.error("Đăng nhập thất bại");
+      }
     } catch (error) {
-      dispatch(loginFailure("Đăng nhập thất bại. Vui lòng thử lại."));
+      console.error("Login error:", error);
+      const errorMessage =
+        error.response?.data?.message || error.message || "Đăng nhập thất bại";
+      dispatch(loginFailure(errorMessage));
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -146,9 +149,12 @@ const LoginModal = () => {
           </div>
           <button
             type="submit"
-            className="w-full bg-orange-500 text-white py-2 rounded-md hover:bg-orange-600 transition-colors duration-300"
+            disabled={isLoading}
+            className={`w-full ${
+              isLoading ? "bg-gray-400" : "bg-orange-500 hover:bg-orange-600"
+            } text-white py-2 rounded-md transition-colors duration-300`}
           >
-            Đăng Nhập
+            {isLoading ? "Đang xử lý..." : "Đăng Nhập"}
           </button>
         </form>
         <p className="text-center text-gray-600 mt-4">

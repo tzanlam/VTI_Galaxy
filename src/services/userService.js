@@ -1,4 +1,4 @@
-import api from "./AxiosClient.js";
+import api from "./axiosClient.js";
 
 const userService = {
     getAll() {
