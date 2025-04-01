@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout as logoutAction } from "../redux/slices/authSlice";
-import { logout as logoutService } from "../services/authService"; // Import logout from authService
+import { logout as logoutService } from "../services/authService";
 import defaultAvatar from "../assets/profile-avatar.jpg";
 
 const UserMenu = () => {
@@ -21,32 +21,32 @@ const UserMenu = () => {
   }, []);
 
   const handleLogout = () => {
-    dispatch(logoutAction()); // Clear Redux state
-    logoutService(); // Clear localStorage
+    dispatch(logoutAction());
+    logoutService();
     setIsMenuOpen(false);
   };
 
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
+        onClick={() => setIsMenuOpen((prev) => !prev)}
         className="flex items-center space-x-2 focus:outline-none"
+        aria-label={`Menu của ${user?.fullName || "Thành viên"}`}
       >
         <img
           src={user?.avatar || defaultAvatar}
-          alt="User Profile"
+          alt="Ảnh đại diện"
           className="h-10 w-10 rounded-full object-cover border-2 border-orange-500"
-          onError={(e) => {
-            e.target.src = defaultAvatar;
-          }}
+          onError={(e) => (e.target.src = defaultAvatar)}
+          loading="lazy"
         />
         <span className="text-gray-700 hidden md:block">
           {user?.fullName || "Thành viên"}
         </span>
         <svg
-          className={`w-4 h-4 text-gray-700 transform ${
+          className={`w-4 h-4 text-gray-700 transition-transform ${
             isMenuOpen ? "rotate-180" : ""
-          } transition-transform`}
+          }`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -56,12 +56,12 @@ const UserMenu = () => {
             strokeLinejoin="round"
             strokeWidth="2"
             d="M19 9l-7 7-7-7"
-          ></path>
+          />
         </svg>
       </button>
 
       {isMenuOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 animate-fadeIn">
           <a
             href="/profile"
             className="block px-4 py-2 text-gray-700 hover:bg-gray-100"

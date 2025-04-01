@@ -14,16 +14,20 @@ import { toast } from "react-toastify";
 const LoginModal = () => {
   const { isLoginOpen } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validateLogin(email, password);
-
+    const validationErrors = validateLogin(formData.email, formData.password);
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
@@ -33,30 +37,13 @@ const LoginModal = () => {
     setIsLoading(true);
 
     try {
-      const response = await login(email, password);
-
-      if (response) {
-        // Store user info
-        dispatch(
-          loginSuccess({
-            email,
-            fullName: response.fullName || "Thành viên",
-            id: response.accountId || response.id,
-            avatar: response.image,
-          })
-        );
-        toast.success("Đăng nhập thành công!");
-        setEmail("");
-        setPassword("");
-        dispatch(closeLoginModal());
-      } else {
-        dispatch(loginFailure("Đăng nhập thất bại"));
-        toast.error("Đăng nhập thất bại");
-      }
+      const response = await login(formData.email, formData.password);
+      dispatch(loginSuccess(response));
+      toast.success("Đăng nhập thành công!");
+      setFormData({ email: "", password: "" });
+      dispatch(closeLoginModal());
     } catch (error) {
-      console.error("Login error:", error);
-      const errorMessage =
-        error.response?.data?.message || error.message || "Đăng nhập thất bại";
+      const errorMessage = error.message || "Đăng nhập thất bại";
       dispatch(loginFailure(errorMessage));
       toast.error(errorMessage);
     } finally {
@@ -72,20 +59,20 @@ const LoginModal = () => {
         <button
           onClick={() => dispatch(closeLoginModal())}
           className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+          aria-label="Đóng"
         >
           <svg
             className="w-6 h-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
               d="M6 18L18 6M6 6l12 12"
-            ></path>
+            />
           </svg>
         </button>
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
@@ -102,11 +89,9 @@ const LoginModal = () => {
             <input
               type="email"
               id="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setErrors((prev) => ({ ...prev, email: "" }));
-              }}
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               placeholder="Nhập email của bạn"
             />
@@ -124,24 +109,18 @@ const LoginModal = () => {
             <input
               type={showPassword ? "text" : "password"}
               id="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setErrors((prev) => ({ ...prev, password: "" }));
-              }}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               className="w-full px-4 py-2 pr-12 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
               placeholder="Nhập mật khẩu"
             />
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-7 transform translate-y-1/2 text-gray-600 flex items-center justify-center"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-7 transform translate-y-1/2 text-gray-600"
             >
-              {showPassword ? (
-                <IoMdEye className="w-6 h-6" />
-              ) : (
-                <IoIosEyeOff className="w-6 h-6" />
-              )}
+              {showPassword ? <IoMdEye size={24} /> : <IoIosEyeOff size={24} />}
             </button>
             {errors.password && (
               <p className="text-red-500 text-sm mt-1">{errors.password}</p>
