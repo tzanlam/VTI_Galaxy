@@ -59,7 +59,7 @@ public class RoomController {
         }
     }
 
-    @PutMapping("/statusRoom")
+    @PutMapping("/putStatusRoom")
     public ResponseEntity<?> closedRoom(@RequestParam("roomId") int roomId) {
         try{
             return ResponseEntity.ok(roomService.closeRoom(roomId));

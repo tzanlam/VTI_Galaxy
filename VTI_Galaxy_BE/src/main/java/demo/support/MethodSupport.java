@@ -33,12 +33,12 @@ public class MethodSupport {
         }
     }
 
-    public static LocalDate convertToLocalDate(String dateString) throws Exception {
+    public static LocalDate convertToLocalDate(String dateString){
         try {
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return LocalDate.parse(dateString, dateFormatter);
         } catch (DateTimeParseException e) {
-            throw new Exception("error formatter date: " + dateString);
+            throw new IllegalArgumentException("error formatter date: " + dateString);
         }
     }
 
@@ -47,8 +47,7 @@ public class MethodSupport {
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             return LocalTime.parse(timeString, timeFormatter);
         } catch (DateTimeParseException e) {
-            System.out.println("error formatter time: " + timeString);
-            return null;
+            throw new IllegalArgumentException("error formatter time: " + timeString);
         }
     }
 

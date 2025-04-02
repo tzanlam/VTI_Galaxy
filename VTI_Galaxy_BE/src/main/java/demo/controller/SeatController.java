@@ -50,7 +50,7 @@ public class SeatController {
         }
     }
 
-    @PutMapping("/statusSeat")
+    @PutMapping("/putStatusSeat")
     public ResponseEntity<?> updateSeatStatus(@RequestParam("seatId") int id) {
         try{
             return ResponseEntity.ok(seatService.closedSeat(id));

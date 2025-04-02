@@ -50,7 +50,7 @@ public class GalaxyController {
         }
     }
 
-    @PutMapping("/statusGalaxy")
+    @PutMapping("/putStatusGalaxy")
     public ResponseEntity<?> closeGalaxy(@RequestParam("galaxyId") int id) {
         try{
             return ResponseEntity.ok(galaxyService.closedGalaxy(id));
