@@ -44,7 +44,7 @@ public class MethodSupport {
 
     public static LocalTime convertToLocalTime(String timeString) {
         try {
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
             return LocalTime.parse(timeString, timeFormatter);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("error formatter time: " + timeString);
@@ -53,7 +53,7 @@ public class MethodSupport {
 
     public static LocalDateTime buildLocalDateTime(String date, String time) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         return LocalDateTime.of(LocalDate.parse(date, dateFormatter), LocalTime.parse(time, timeFormatter));
     }
 }
