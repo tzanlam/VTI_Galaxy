@@ -1,6 +1,7 @@
 package demo.modal.entity;
 
 import demo.modal.constant.ActiveStatus;
+import demo.modal.constant.AgeLimit;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,22 +22,36 @@ public class Movie extends Time{
     private String name;
 
     @Column
+    private String country;
+
+    @Column
+    private String producer;
+
+    @Column
     private String description;
 
     @Column
-    private String genre;
+    private String director;
 
     @Column
     private String actor;
 
     @Column
-    private String director;
+    private String genre;
+
 
     @Column
     private LocalTime duration;
 
     @Column
     private LocalDate releaseDate;
+
+    @Column
+    private double rating;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private AgeLimit ageLimit;
 
     @Column
     @Enumerated(EnumType.STRING)

@@ -25,6 +25,6 @@ public class ShowTime {
     @Column
     private LocalDate date;
 
-    @OneToMany(mappedBy = "showTimes")
+    @OneToMany(mappedBy = "showTime") // Sửa từ "showTimes" thành "showTime"
     private List<StartTime> startTimes;
 }

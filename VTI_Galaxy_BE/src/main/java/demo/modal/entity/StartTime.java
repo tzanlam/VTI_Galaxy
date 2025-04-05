@@ -18,4 +18,8 @@ public class StartTime {
 
     @Column
     private LocalTime endTime;
+
+    @ManyToOne
+    @JoinColumn(name = "show_time_id") // Tên cột khóa ngoại trong bảng StartTime
+    private ShowTime showTime;
 }

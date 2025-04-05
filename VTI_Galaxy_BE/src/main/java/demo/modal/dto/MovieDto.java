@@ -1,5 +1,7 @@
 package demo.modal.dto;
 
+import demo.modal.constant.ActiveStatus;
+import demo.modal.constant.AgeLimit;
 import demo.modal.entity.Movie;
 import lombok.Data;
 
@@ -15,6 +17,11 @@ public class MovieDto {
     private String releaseDate;
     private String createdDate;
     private String modifiedDate;
+    private String country; // Thêm trường country
+    private String producer; // Thêm trường producer
+    private double rating; // Thêm trường rating
+    private AgeLimit ageLimit; // Thêm trường ageLimit
+    private ActiveStatus status; // Thêm trường status
 
     public MovieDto(Movie movie) {
         this.id = movie.getId();
@@ -27,5 +34,10 @@ public class MovieDto {
         this.releaseDate = movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : null;
         this.createdDate = movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : null;
         this.modifiedDate = movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : null;
+        this.country = movie.getCountry();
+        this.producer = movie.getProducer();
+        this.rating = movie.getRating();
+        this.ageLimit = movie.getAgeLimit();
+        this.status = movie.getStatus();
     }
 }

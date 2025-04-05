@@ -1,6 +1,7 @@
 package demo.modal.request;
 
 import demo.modal.constant.ActiveStatus;
+import demo.modal.constant.AgeLimit;
 import demo.modal.entity.Movie;
 import lombok.Data;
 
@@ -16,6 +17,11 @@ public class MovieRequest {
     private String director;
     private String duration;
     private String releaseDate;
+    private String country;
+    private String producer;
+    private Double rating; // Thêm trường rating (dùng Double để hỗ trợ null)
+    private AgeLimit ageLimit; // Thêm trường ageLimit
+    private ActiveStatus status;
 
     public void setMovie(Movie movie) {
         movie.setName(name);
@@ -25,6 +31,10 @@ public class MovieRequest {
         movie.setDirector(director);
         movie.setDuration(convertToLocalTime(duration));
         movie.setReleaseDate(convertToLocalDate(releaseDate));
-        movie.setStatus(ActiveStatus.INACTIVE);
+        movie.setCountry(country);
+        movie.setProducer(producer);
+        movie.setRating(rating != null ? rating : 0.0);
+        movie.setAgeLimit(ageLimit);
+        movie.setStatus(status != null ? status : ActiveStatus.INACTIVE);
     }
 }
