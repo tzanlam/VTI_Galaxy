@@ -15,7 +15,7 @@ const MenuItem = ({ item }) => {
           item.active
             ? "text-orange-500 font-semibold hover:text-orange-600"
             : "text-gray-700 hover:text-orange-500"
-        } block py-2`}
+        } block py-2 text-lg`}
       >
         {item.label}
       </a>

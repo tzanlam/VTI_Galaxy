@@ -13,12 +13,23 @@ export const movies = [
     rating: 7.7,
     genre: "Gia đình",
     duration: "120 phút",
-    description: "Một câu chuyện cổ tích về nàng công chúa và bảy chú lùn.",
+    description:
+      "Câu chuyện bắt đầu như một cổ tích, khi nàng công chúa Bạch Tuyết chào đời...",
     trailerUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     showtimes: [
-      { day: "Thứ Hai", times: ["10:00", "14:00", "18:00"] },
-      { day: "Thứ Ba", times: ["11:00", "15:00", "19:00"] },
+      { day: "Thứ Hai", date: "29/4/2025", times: ["10:00", "14:00", "18:00"] },
+      { day: "Thứ Ba", date: "30/4/2025", times: ["11:00", "15:00", "19:00"] },
+      { day: "Thứ Tư", date: "1/5/2025", times: ["13:00", "17:00", "21:00"] },
+      { day: "Thứ Năm", date: "2/5/2025", times: ["12:00", "16:00", "20:00"] },
+      { day: "Thứ Sáu", date: "3/5/2025", times: ["14:00", "18:00", "22:00"] },
+      { day: "Hôm nay", date: "4/5/2025", times: ["13:00", "17:00", "21:00"] }, // Thứ Bảy
+      { day: "Chủ Nhật", date: "5/5/2025", times: ["11:00", "15:00", "19:00"] },
     ],
+    releaseDate: "21.03.2025",
+    country: "Mỹ",
+    producer: "Walt Disney Pictures",
+    director: "Marc Webb",
+    actors: ["Rachel Zegler", "Gal Gadot"],
   },
   {
     id: 2,
@@ -30,8 +41,13 @@ export const movies = [
     description: "Một hành trình kinh dị tại nhà ga bị bỏ hoang.",
     trailerUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     showtimes: [
-      { day: "Thứ Tư", times: ["13:00", "17:00", "21:00"] },
-      { day: "Thứ Năm", times: ["12:00", "16:00", "20:00"] },
+      { day: "Thứ Hai", date: "29/4/2025", times: ["12:00", "16:00", "20:00"] },
+      { day: "Thứ Ba", date: "30/4/2025", times: ["13:00", "17:00", "21:00"] },
+      { day: "Thứ Tư", date: "1/5/2025", times: ["14:00", "18:00", "22:00"] },
+      { day: "Thứ Năm", date: "2/5/2025", times: ["11:00", "15:00", "19:00"] },
+      { day: "Thứ Sáu", date: "3/5/2025", times: ["10:00", "14:00", "18:00"] },
+      { day: "Hôm nay", date: "4/5/2025", times: ["12:00", "16:00", "20:00"] }, // Thứ Bảy
+      { day: "Chủ Nhật", date: "5/5/2025", times: ["13:00", "17:00", "21:00"] },
     ],
   },
   {
@@ -44,11 +60,15 @@ export const movies = [
     description: "Một cuộc phiêu lưu trên biển cả tìm kho báu One Piece.",
     trailerUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     showtimes: [
-      { day: "Thứ Tư", times: ["13:00", "17:00", "21:00"] },
-      { day: "Thứ Năm", times: ["12:00", "16:00", "20:00"] },
+      { day: "Thứ Hai", date: "29/4/2025", times: ["11:00", "15:00", "19:00"] },
+      { day: "Thứ Ba", date: "30/4/2025", times: ["12:00", "16:00", "20:00"] },
+      { day: "Thứ Tư", date: "1/5/2025", times: ["13:00", "17:00", "21:00"] },
+      { day: "Thứ Năm", date: "2/5/2025", times: ["14:00", "18:00", "22:00"] },
+      { day: "Thứ Sáu", date: "3/5/2025", times: ["10:00", "14:00", "18:00"] },
+      { day: "Hôm nay", date: "4/5/2025", times: ["11:00", "15:00", "19:00"] }, // Thứ Bảy
+      { day: "Chủ Nhật", date: "5/5/2025", times: ["12:00", "16:00", "20:00"] },
     ],
   },
-  // Bạn có thể thêm các phim khác như "Quỷ Nhập Tràng" hoặc "Mickey 17" nếu muốn
   {
     id: 4,
     title: "Quỷ Nhập Tràng",
