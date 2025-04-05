@@ -73,7 +73,7 @@ const MovieDetails = () => {
               </div>
               <div className="mb-2">
                 <p>
-                  <strong>Quốc gia:</strong> {movie.country}
+                  <strong>Quốc gia:</strong> {Wmovie.country}
                 </p>
               </div>
               <div className="mb-2">
@@ -156,7 +156,8 @@ const MovieDetails = () => {
           <ShowTime
             selectedCity={selectedCity}
             onCityChange={handleCityChange}
-            showtimes={movie.showtimes} // Truyền showtimes từ movie
+            showtimes={movie.showtimes}
+            releaseDate={movie.releaseDate} // Truyền releaseDate
           />
         </div>
       </div>
