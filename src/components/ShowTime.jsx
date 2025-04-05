@@ -1,168 +1,222 @@
-// MovieDetails.jsx
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { movies } from "../data/moviesData";
-import { IoMdTime } from "react-icons/io";
-import { FaRegCalendar } from "react-icons/fa";
-import ShowTime from "../components/ShowTime";
+import React, { useState, useEffect } from "react";
+import { cinemaData } from "../data/cinemaData";
 
-const MovieDetails = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [selectedCity, setSelectedCity] = useState("Toàn quốc");
+const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
+  const [isCityOpen, setIsCityOpen] = useState(false);
+  const [isCinemaOpen, setIsCinemaOpen] = useState(false);
+  const [selectedCinema, setSelectedCinema] = useState("Chọn rạp");
+  const [selectedDay, setSelectedDay] = useState("Hôm nay");
 
-  const movie = movies.find((m) => m.id === parseInt(id));
+  const toggleCityDropdown = () => setIsCityOpen(!isCityOpen);
+  const toggleCinemaDropdown = () => setIsCinemaOpen(!isCinemaOpen);
+
+  const handleCitySelect = (city) => {
+    onCityChange(city);
+    setIsCityOpen(false);
+    setSelectedCinema("Chọn rạp");
+  };
+
+  const handleCinemaSelect = (cinema) => {
+    setSelectedCinema(cinema.name);
+    setIsCinemaOpen(false);
+  };
+
+  const getCinemas = () => {
+    if (selectedCity === "Toàn quốc") {
+      return Object.values(cinemaData.cinemaLocations)
+        .flat()
+        .filter((cinema) => cinema.name);
+    }
+    return cinemaData.cinemaLocations[selectedCity] || [];
+  };
+
+  const cinemas = getCinemas();
 
   useEffect(() => {
-    if (!movie) {
-      navigate("/error", {
-        state: {
-          message: "Phim bạn đang tìm kiếm không tồn tại hoặc đã bị gỡ bỏ.",
-        },
+    console.log("Selected City:", selectedCity);
+    console.log("Cinemas:", cinemas);
+  }, [selectedCity, cinemas]);
+
+  const DropdownButton = ({ label, isOpen, onClick }) => (
+    <button
+      type="button"
+      className="inline-flex justify-between w-48 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      onClick={onClick}
+    >
+      {label}
+      <svg
+        className={`w-5 h-5 ml-2 -mr-1 transition-transform duration-200 ${
+          isOpen ? "rotate-180" : ""
+        }`}
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path
+          fillRule="evenodd"
+          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+          clipRule="evenodd"
+        />
+      </svg>
+    </button>
+  );
+
+  const DropdownMenu = ({ isOpen, items, onSelect, selectedItem }) =>
+    isOpen && (
+      <div className="absolute z-10 w-48 mt-2 origin-top-right bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto">
+        <div className="py-1">
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => onSelect(typeof item === "string" ? item : item)}
+                className={`block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white transition-colors duration-200 ${
+                  selectedItem === (typeof item === "string" ? item : item.name)
+                    ? "bg-blue-500 text-white"
+                    : ""
+                }`}
+              >
+                {typeof item === "string" ? item : item.name}
+              </button>
+            ))
+          ) : (
+            <div className="px-4 py-2 text-sm text-gray-500">
+              Không có rạp nào
+            </div>
+          )}
+        </div>
+      </div>
+    );
+
+  // Tính toán các ngày trong tuần dựa trên ngày hiện tại (4/5/2025)
+  const currentDate = new Date(2025, 4, 4); // 4/5/2025 (tháng bắt đầu từ 0)
+  const daysOfWeek = [
+    "Thứ Hai",
+    "Thứ Ba",
+    "Thứ Tư",
+    "Thứ Năm",
+    "Thứ Sáu",
+    "Hôm nay",
+    "Chủ Nhật",
+  ];
+
+  const getWeekDays = () => {
+    const weekDays = [];
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1); // Bắt đầu từ Thứ Hai
+
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      const dayName =
+        day.getDate() === currentDate.getDate() ? "Hôm nay" : daysOfWeek[i];
+      const formattedDate = `${day.getDate()}/${day.getMonth() + 1}`; // Bỏ năm
+      weekDays.push({
+        day: dayName,
+        date: formattedDate,
+        times: showtimes.find((st) => st.day === dayName)?.times || [],
       });
     }
-  }, [movie, navigate]);
-
-  if (!movie) return null;
-
-  const handleCityChange = (city) => {
-    setSelectedCity(city);
+    return weekDays;
   };
+
+  const weekDays = getWeekDays();
+
+  const handleDaySelect = (day) => {
+    setSelectedDay(day);
+  };
+
+  // Lấy lịch chiếu của ngày được chọn
+  const selectedShowtime = weekDays.find((st) => st.day === selectedDay);
 
   return (
     <div>
-      {movie.trailerUrl && (
-        <div className="w-full mb-8">
-          <div className="relative" style={{ paddingBottom: "30%" }}>
-            <iframe
-              src={movie.trailerUrl}
-              title={`Trailer for ${movie.title}`}
-              className="absolute top-0 left-0 w-full h-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
+      <div className="flex gap-4 mb-6">
+        {/* City Dropdown */}
+        <div className="relative inline-block text-left">
+          <DropdownButton
+            label={selectedCity}
+            isOpen={isCityOpen}
+            onClick={toggleCityDropdown}
+          />
+          <DropdownMenu
+            isOpen={isCityOpen}
+            items={cinemaData.cities}
+            onSelect={handleCitySelect}
+            selectedItem={selectedCity}
+          />
         </div>
-      )}
 
-      <div className="container mx-auto px-24 py-12">
-        <div className="flex flex-col md:flex-row gap-8">
-          <div className="md:w-1/4">
-            <img
-              src={movie.image}
-              alt={movie.title}
-              className="w-full h-auto rounded-lg shadow-lg"
-            />
-          </div>
-
-          <div className="md:w-2/3">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              {movie.title}
-            </h2>
-
-            <div className="text-md text-gray-600 mb-4">
-              <div className="mb-2 flex items-center gap-6">
-                <div className="flex items-center">
-                  <IoMdTime className="mr-2" />
-                  <span>{movie.duration}</span>
-                </div>
-                <div className="flex items-center">
-                  <FaRegCalendar className="mr-2" />
-                  <span>{movie.releaseDate}</span>
-                </div>
-              </div>
-              <div className="mb-2">
-                <p>
-                  <strong>Quốc gia:</strong> {Wmovie.country}
-                </p>
-              </div>
-              <div className="mb-2">
-                <p>
-                  <strong>Nhà sản xuất:</strong> {movie.producer}
-                </p>
-              </div>
-              <div className="mb-2">
-                <p>
-                  <strong>Thể loại:</strong>{" "}
-                  <button
-                    className="bg-blue-500 text-white px-2 py-1 rounded-md hover:bg-blue-600 transition-colors ml-2"
-                    onClick={() => alert(`Thể loại: ${movie.genre}`)}
-                  >
-                    {movie.genre}
-                  </button>
-                </p>
-              </div>
-              <div className="mb-2">
-                <p>
-                  <strong>Đạo diễn:</strong>{" "}
-                  <button
-                    className="bg-green-500 text-white px-2 py-1 rounded-md hover:bg-green-600 transition-colors ml-2"
-                    onClick={() =>
-                      alert(
-                        `Đạo diễn: ${movie.director || "Chưa có thông tin"}`
-                      )
-                    }
-                  >
-                    {movie.director || "Chưa có thông tin"}
-                  </button>
-                </p>
-              </div>
-              <div className="mb-2">
-                <p>
-                  <strong>Diễn viên:</strong>{" "}
-                  {movie.actors && movie.actors.length > 0 ? (
-                    movie.actors.map((actor, idx) => (
-                      <button
-                        key={idx}
-                        className="bg-purple-500 text-white px-2 py-1 rounded-md hover:bg-purple-600 transition-colors ml-2 mr-2"
-                        onClick={() => alert(`Diễn viên: ${actor}`)}
-                      >
-                        {actor}
-                      </button>
-                    ))
-                  ) : (
-                    <span>Chưa có thông tin</span>
-                  )}
-                </p>
-              </div>
-              <div className="mb-2">
-                <p>
-                  <strong>Đánh giá:</strong> {movie.rating}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-24 py-12">
-        <div className="flex items-center mb-4">
-          <span className="border-l-4 border-blue-500 mr-2"></span>
-          <h1 className="text-base font-bold capitalize inline-block">
-            Nội Dung Phim
-          </h1>
-        </div>
-        <p className="text-gray-700 text-base leading-relaxed">
-          {movie.description}
-        </p>
-
-        <div className="mt-8">
-          <div className="flex items-center mb-4 mt-4">
-            <span className="border-l-4 border-blue-500 mr-2"></span>
-            <h1 className="text-base font-bold capitalize inline-block">
-              Lịch chiếu
-            </h1>
-          </div>
-          <ShowTime
-            selectedCity={selectedCity}
-            onCityChange={handleCityChange}
-            showtimes={movie.showtimes}
-            releaseDate={movie.releaseDate} // Truyền releaseDate
+        {/* Cinema Dropdown */}
+        <div className="relative inline-block text-left">
+          <DropdownButton
+            label={selectedCinema}
+            isOpen={isCinemaOpen}
+            onClick={toggleCinemaDropdown}
+          />
+          <DropdownMenu
+            isOpen={isCinemaOpen}
+            items={cinemas}
+            onSelect={handleCinemaSelect}
+            selectedItem={selectedCinema}
           />
         </div>
       </div>
+
+      {/* Các button ngày */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {weekDays.map((showtime, idx) => (
+          <button
+            key={idx}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              selectedDay === showtime.day
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+            onClick={() => handleDaySelect(showtime.day)}
+          >
+            {showtime.day} ({showtime.date})
+          </button>
+        ))}
+      </div>
+
+      {/* Hiển thị lịch chiếu của ngày được chọn */}
+      {selectedShowtime && (
+        <div>
+          <h3 className="text-lg font-bold mb-4">
+            Lịch chiếu ngày {selectedShowtime.day} ({selectedShowtime.date})
+          </h3>
+          {cinemas.length > 0 ? (
+            cinemas.map((cinema, idx) => (
+              <div key={idx} className="mb-4">
+                <p className="text-sm font-medium text-gray-700">
+                  {cinema.name} - {cinema.address}
+                </p>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {selectedShowtime.times.map((time, timeIdx) => (
+                    <button
+                      key={timeIdx}
+                      className="bg-orange-500 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition-colors"
+                      onClick={() =>
+                        alert(
+                          `Đã đặt vé tại ${cinema.name} vào ${selectedShowtime.day} (${selectedShowtime.date}) lúc ${time}`
+                        )
+                      }
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">Không có rạp nào trong khu vực này.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
 
-export default MovieDetails;
+export default ShowTime;
