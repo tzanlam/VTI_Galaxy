@@ -59,7 +59,7 @@ public class OtherController {
         }
     }
 
-    @PutMapping("/deleleOther")
+    @PutMapping("/deleteOther")
     public ResponseEntity<?> deleteOther(@RequestParam("otherId") int otherId){
         try{
             return ResponseEntity.ok(otherService.deleteOtherById(otherId));
