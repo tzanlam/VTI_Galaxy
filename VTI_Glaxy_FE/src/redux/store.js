@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import modalReducer from "./slices/modalSlice";
 import authReducer from "./slices/authSlice";
-
+import galaxyReducer from "./slices/galaxySlice"
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
 
@@ -18,8 +18,10 @@ const store = configureStore({
   reducer: {
     modal: modalReducer,
     auth: authReducer,
+    galaxy: galaxyReducer
   },
   preloadedState,
+  // eslint-disable-next-line no-undef
   devTools: process.env.NODE_ENV !== "production", // Bật Redux DevTools trong dev
 });
 
