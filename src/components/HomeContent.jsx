@@ -1,10 +1,15 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import TrailerModal from "./TrailerModal";
-import { movies } from "../data/moviesData"; // Import dữ liệu
+import { movies } from "../data/moviesData";
 
 const HomeContent = () => {
   const [selectedTrailer, setSelectedTrailer] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const queryParams = new URLSearchParams(location.search);
+  const currentTab = queryParams.get("tab") || "now-showing";
 
   const openTrailer = (trailerUrl) => {
     setSelectedTrailer(trailerUrl);
@@ -14,19 +19,69 @@ const HomeContent = () => {
     setSelectedTrailer(null);
   };
 
+  const changeTab = (tab) => {
+    navigate(`/?tab=${tab}`);
+  };
+
+  let filteredMovies = [];
+  if (currentTab === "now-showing") {
+    filteredMovies = movies.filter((movie) => movie.status === "now-showing");
+  } else if (currentTab === "coming-soon") {
+    filteredMovies = movies.filter((movie) => movie.status === "coming-soon");
+  } else if (currentTab === "imax") {
+    filteredMovies = movies.filter((movie) => movie.format === "imax");
+  }
+
+  const tabTitle =
+    currentTab === "now-showing"
+      ? "Phim Đang Chiếu"
+      : currentTab === "coming-soon"
+      ? "Phim Sắp Chiếu"
+      : "Phim IMAX";
+
   return (
     <div className="container mx-auto px-24 py-12">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 text-center">
-          Phim Đang Chiếu
-        </h2>
-        <p className="text-gray-600 text-center mt-2">
-          Khám phá những bộ phim hot nhất hiện nay
-        </p>
+        <div className="flex space-x-6 mb-4">
+          <button
+            onClick={() => changeTab("now-showing")}
+            className={`text-xl font-semibold ${
+              currentTab === "now-showing"
+                ? "text-orange-500 border-b-2 border-orange-500"
+                : "text-gray-800 hover:text-orange-500"
+            } transition-colors`}
+          >
+            Phim Đang Chiếu
+          </button>
+          <button
+            onClick={() => changeTab("coming-soon")}
+            className={`text-xl font-semibold ${
+              currentTab === "coming-soon"
+                ? "text-orange-500 border-b-2 border-orange-500"
+                : "text-gray-800 hover:text-orange-500"
+            } transition-colors`}
+          >
+            Phim Sắp Chiếu
+          </button>
+          <button
+            onClick={() => changeTab("imax")}
+            className={`text-xl font-semibold ${
+              currentTab === "imax"
+                ? "text-orange-500 border-b-2 border-orange-500"
+                : "text-gray-800 hover:text-orange-500"
+            } transition-colors`}
+          >
+            Phim IMAX
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <h2 className="text-3xl font-bold text-gray-800">{tabTitle}</h2>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-        {movies.map((movie) => (
+        {filteredMovies.map((movie) => (
           <div
             key={movie.id}
             className="group relative rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"

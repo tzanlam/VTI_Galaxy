@@ -35,7 +35,8 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
   useEffect(() => {
     console.log("Selected City:", selectedCity);
     console.log("Cinemas:", cinemas);
-  }, [selectedCity, cinemas]);
+    console.log("Showtimes:", showtimes); // Debug prop showtimes
+  }, [selectedCity, cinemas, showtimes]);
 
   const DropdownButton = ({ label, isOpen, onClick }) => (
     <button
@@ -89,7 +90,6 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
       </div>
     );
 
-  // Tính toán các ngày trong tuần dựa trên ngày hiện tại (4/5/2025)
   const currentDate = new Date(2025, 4, 4); // 4/5/2025 (tháng bắt đầu từ 0)
   const daysOfWeek = [
     "Thứ Hai",
@@ -106,12 +106,29 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
     const startOfWeek = new Date(currentDate);
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1); // Bắt đầu từ Thứ Hai
 
+    if (!showtimes || !Array.isArray(showtimes)) {
+      console.warn("showtimes is undefined or not an array:", showtimes);
+      for (let i = 0; i < 7; i++) {
+        const day = new Date(startOfWeek);
+        day.setDate(startOfWeek.getDate() + i);
+        const dayName =
+          day.getDate() === currentDate.getDate() ? "Hôm nay" : daysOfWeek[i];
+        const formattedDate = `${day.getDate()}/${day.getMonth() + 1}`;
+        weekDays.push({
+          day: dayName,
+          date: formattedDate,
+          times: [], // Trả về mảng rỗng nếu không có showtimes
+        });
+      }
+      return weekDays;
+    }
+
     for (let i = 0; i < 7; i++) {
       const day = new Date(startOfWeek);
       day.setDate(startOfWeek.getDate() + i);
       const dayName =
         day.getDate() === currentDate.getDate() ? "Hôm nay" : daysOfWeek[i];
-      const formattedDate = `${day.getDate()}/${day.getMonth() + 1}`; // Bỏ năm
+      const formattedDate = `${day.getDate()}/${day.getMonth() + 1}`;
       weekDays.push({
         day: dayName,
         date: formattedDate,
@@ -127,13 +144,11 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
     setSelectedDay(day);
   };
 
-  // Lấy lịch chiếu của ngày được chọn
   const selectedShowtime = weekDays.find((st) => st.day === selectedDay);
 
   return (
     <div>
       <div className="flex gap-4 mb-6">
-        {/* City Dropdown */}
         <div className="relative inline-block text-left">
           <DropdownButton
             label={selectedCity}
@@ -148,7 +163,6 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
           />
         </div>
 
-        {/* Cinema Dropdown */}
         <div className="relative inline-block text-left">
           <DropdownButton
             label={selectedCinema}
@@ -164,7 +178,6 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
         </div>
       </div>
 
-      {/* Các button ngày */}
       <div className="flex flex-wrap gap-2 mb-6">
         {weekDays.map((showtime, idx) => (
           <button
@@ -176,12 +189,13 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
             }`}
             onClick={() => handleDaySelect(showtime.day)}
           >
-            {showtime.day} ({showtime.date})
+            {showtime.day}
+            <br />
+            {showtime.date}
           </button>
         ))}
       </div>
 
-      {/* Hiển thị lịch chiếu của ngày được chọn */}
       {selectedShowtime && (
         <div>
           <h3 className="text-lg font-bold mb-4">
@@ -191,7 +205,7 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
             cinemas.map((cinema, idx) => (
               <div key={idx} className="mb-4">
                 <p className="text-sm font-medium text-gray-700">
-                  {cinema.name} - {cinema.address}
+                  {cinema.name}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-1">
                   {selectedShowtime.times.map((time, timeIdx) => (
