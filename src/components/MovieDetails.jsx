@@ -1,10 +1,9 @@
-// MovieDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { movies } from "../data/moviesData";
 import { IoMdTime } from "react-icons/io";
 import { FaRegCalendar } from "react-icons/fa";
-import ShowTime from "../components/ShowTime";
+import ShowTime from "./ShowTime";
 
 const MovieDetails = () => {
   const { id } = useParams();
