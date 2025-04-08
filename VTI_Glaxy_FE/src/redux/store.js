@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import modalReducer from "./slices/modalSlice";
 import authReducer from "./slices/authSlice";
 import galaxyReducer from "./slices/galaxySlice"
+import accountReducer from "./slices/accountSlice"
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
 
@@ -18,7 +19,8 @@ const store = configureStore({
   reducer: {
     modal: modalReducer,
     auth: authReducer,
-    galaxy: galaxyReducer
+    galaxy: galaxyReducer,
+    account: accountReducer
   },
   preloadedState,
   // eslint-disable-next-line no-undef
