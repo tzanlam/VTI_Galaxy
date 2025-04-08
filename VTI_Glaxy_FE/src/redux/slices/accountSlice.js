@@ -120,7 +120,7 @@ const accountSlice = createSlice({
          state.loading = true,
          state.err = null
       })
-      .addCase(createAccountAdmin, (state, action)=>{
+      .addCase(createAccountAdmin.fulfilled, (state, action)=>{
          state.account = action.payload,
          state.loading = false
       })
@@ -144,7 +144,7 @@ const accountSlice = createSlice({
       })
 
       // cập nhật account
-      .addCase(updateAccount, (state)=>{
+      .addCase(updateAccount.pending, (state)=>{
          state.loading = true,
          state.err = null
       })
