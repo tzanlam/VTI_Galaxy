@@ -19,7 +19,7 @@ public class MovieDto {
     private String modifiedDate;
     private String country; // Thêm trường country
     private String producer; // Thêm trường producer
-    private double rating; // Thêm trường rating
+    private int rating; // Thêm trường rating
     private AgeLimit ageLimit; // Thêm trường ageLimit
     private ActiveStatus status; // Thêm trường status
 

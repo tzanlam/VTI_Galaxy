@@ -29,6 +29,6 @@ public class Galaxy extends Time{
     @OneToMany(mappedBy = "galaxy")
     private List<Room> rooms;
 
-    @OneToMany(mappedBy = "other")
+    @OneToMany(mappedBy = "galaxy")
     private List<Other> others;
 }

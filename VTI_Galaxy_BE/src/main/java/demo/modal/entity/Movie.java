@@ -39,7 +39,6 @@ public class Movie extends Time{
     @Column
     private String genre;
 
-
     @Column
     private LocalTime duration;
 
@@ -47,7 +46,7 @@ public class Movie extends Time{
     private LocalDate releaseDate;
 
     @Column
-    private double rating;
+    private int rating;
 
     @Column
     @Enumerated(EnumType.STRING)

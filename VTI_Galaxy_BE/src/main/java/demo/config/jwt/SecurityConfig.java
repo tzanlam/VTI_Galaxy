@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
                                 "/registerUser",
+                                "/postMovie",
                                 "/login",
                                 "/postImg").permitAll()
                         .anyRequest().authenticated())

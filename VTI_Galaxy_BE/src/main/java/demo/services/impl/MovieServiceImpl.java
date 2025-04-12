@@ -37,7 +37,8 @@ public class MovieServiceImpl implements MovieService {
         try {
             Movie movie = new Movie();
             request.setMovie(movie);
-            return new MovieDto(movieRepository.save(movie));
+            movieRepository.save(movie);
+            return new MovieDto(movie);
         } catch (Exception e) {
             throw new RuntimeException("Create movie failed");
         }
