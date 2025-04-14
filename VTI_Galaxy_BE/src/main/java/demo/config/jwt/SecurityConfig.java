@@ -64,7 +64,11 @@ public class SecurityConfig {
                                 "/registerUser",
                                 "/postMovie",
                                 "/login",
-                                "/postImg").permitAll()
+                                "/postImg",
+                                "/postMovie",
+                                "/getMovies",
+                                "/getMovieById",
+                                "/putStatusMovie").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);
         return http.build();

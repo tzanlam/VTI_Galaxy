@@ -5,7 +5,8 @@ import demo.modal.constant.AgeLimit;
 import demo.modal.entity.Movie;
 import lombok.Data;
 
-import static demo.support.MethodSupport.*;
+import static demo.support.MethodSupport.convertToLocalDate;
+import static demo.support.MethodSupport.convertToLocalTime;
 
 @Data
 public class MovieRequest {
@@ -18,8 +19,9 @@ public class MovieRequest {
     private String releaseDate;
     private String country;
     private String producer;
-    private int rating; // Thêm trường rating (dùng Double để hỗ trợ null)
-    private String  ageLimit; // Thêm trường ageLimit
+    private Double rating;
+    private AgeLimit ageLimit;
+    private ActiveStatus status;
 
     public void setMovie(Movie movie) {
         movie.setName(name);
@@ -31,8 +33,8 @@ public class MovieRequest {
         movie.setReleaseDate(convertToLocalDate(releaseDate));
         movie.setCountry(country);
         movie.setProducer(producer);
-        movie.setRating(rating);
-        movie.setAgeLimit(convertStringToEnum(AgeLimit.class, ageLimit));
-        movie.setStatus( ActiveStatus.INACTIVE);
+        movie.setRating(rating != null ? rating : 0.0);
+        movie.setAgeLimit(ageLimit);
+        movie.setStatus(status != null ? status : ActiveStatus.INACTIVE);
     }
 }
