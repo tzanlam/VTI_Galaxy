@@ -2,7 +2,7 @@ import axios from "axios";
 
 const axiosClient = axios.create({
   baseURL: "http://localhost:8082",
-  timeout: 10000, // Tăng timeout lên 10 giây
+  timeout: 5000,
   headers: { "Content-Type": "application/json" },
 });
 
@@ -20,7 +20,7 @@ axiosClient.interceptors.request.use(
 
 // Interceptor cho response
 axiosClient.interceptors.response.use(
-  (response) => response.data, // Trả về trực tiếp data thay vì toàn bộ response
+  (response) => response,
   (error) => {
     if (error.response) {
       const { status, data } = error.response;

@@ -1,15 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import TrailerModal from "./TrailerModal";
-import { movies } from "../data/moviesData";
+import { fetchMovies } from "../redux/slices/movieSlice";
 
 const HomeContent = () => {
   const [selectedTrailer, setSelectedTrailer] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { movies = [], loading, error } = useSelector((state) => state.movie);
 
   const queryParams = new URLSearchParams(location.search);
   const currentTab = queryParams.get("tab") || "now-showing";
+
+  // Lấy danh sách phim khi component mount
+  useEffect(() => {
+    dispatch(fetchMovies());
+  }, [dispatch]);
 
   const openTrailer = (trailerUrl) => {
     setSelectedTrailer(trailerUrl);
@@ -23,11 +31,24 @@ const HomeContent = () => {
     navigate(`/?tab=${tab}`);
   };
 
+  if (loading) {
+    return <div className="text-center py-12">Đang tải...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-12 text-red-500">
+        Lỗi: {error.message || "Không thể tải danh sách phim."}
+      </div>
+    );
+  }
+
+  // Chỉ lọc phim sau khi đã kiểm tra loading và error
   let filteredMovies = [];
   if (currentTab === "now-showing") {
-    filteredMovies = movies.filter((movie) => movie.status === "now-showing");
+    filteredMovies = movies.filter((movie) => movie.status === "ACTIVE");
   } else if (currentTab === "coming-soon") {
-    filteredMovies = movies.filter((movie) => movie.status === "coming-soon");
+    filteredMovies = movies.filter((movie) => movie.status === "INACTIVE");
   } else if (currentTab === "imax") {
     filteredMovies = movies.filter((movie) => movie.format === "imax");
   }
@@ -41,8 +62,8 @@ const HomeContent = () => {
 
   return (
     <div className="container mx-auto px-24 py-12">
-      <div className="mb-8">
-        <div className="flex space-x-6 mb-4">
+      <div className="mb-8 flex justify-between items-center">
+        <div className="flex space-x-6">
           <button
             onClick={() => changeTab("now-showing")}
             className={`text-xl font-semibold ${
@@ -88,8 +109,8 @@ const HomeContent = () => {
           >
             <div className="relative">
               <img
-                src={movie.image}
-                alt={movie.title}
+                src={movie.image || "https://via.placeholder.com/300x450"}
+                alt={movie.name}
                 className="w-full h-[450px] object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div className="absolute top-3 right-3 bg-yellow-400 text-black px-2 py-1 rounded-full text-sm font-bold z-10">
@@ -112,7 +133,7 @@ const HomeContent = () => {
             </div>
             <div className="p-4 bg-white relative z-0">
               <h3 className="text-lg font-semibold text-gray-800 truncate group-hover:text-orange-500 transition-colors">
-                {movie.title}
+                {movie.name}
               </h3>
               <div className="text-sm text-gray-600 mt-1 flex justify-between">
                 <span>{movie.genre}</span>
