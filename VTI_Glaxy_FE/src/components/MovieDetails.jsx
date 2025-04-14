@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { movies } from "../data/moviesData";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchMovieById } from "../redux/slices/movieSlice";
 import { IoMdTime } from "react-icons/io";
 import { FaRegCalendar } from "react-icons/fa";
 import ShowTime from "./ShowTime";
@@ -8,19 +9,29 @@ import ShowTime from "./ShowTime";
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { movie, loading, error } = useSelector((state) => state.movie);
   const [selectedCity, setSelectedCity] = useState("Toàn quốc");
 
-  const movie = movies.find((m) => m.id === parseInt(id));
-
+  // Lấy chi tiết phim khi component mount
   useEffect(() => {
-    if (!movie) {
+    dispatch(fetchMovieById(id));
+  }, [dispatch, id]);
+
+  // Chuyển hướng nếu không tìm thấy phim
+  useEffect(() => {
+    if (movie === null) {
       navigate("/error", {
         state: {
           message: "Phim bạn đang tìm kiếm không tồn tại hoặc đã bị gỡ bỏ.",
         },
       });
     }
-  }, [movie, navigate]);
+  }, [movie]);
+
+  if (loading) {
+    return <div className="text-center py-12">Đang tải...</div>;
+  }
 
   if (!movie) return null;
 
@@ -35,7 +46,7 @@ const MovieDetails = () => {
           <div className="relative" style={{ paddingBottom: "30%" }}>
             <iframe
               src={movie.trailerUrl}
-              title={`Trailer for ${movie.title}`}
+              title={`Trailer for ${movie.name}`}
               className="absolute top-0 left-0 w-full h-full"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
@@ -48,15 +59,15 @@ const MovieDetails = () => {
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/4">
             <img
-              src={movie.image}
-              alt={movie.title}
+              src={movie.image || "https://via.placeholder.com/300x450"}
+              alt={movie.name}
               className="w-full h-auto rounded-lg shadow-lg"
             />
           </div>
 
           <div className="md:w-2/3">
             <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              {movie.title}
+              {movie.name}
             </h2>
 
             <div className="text-md text-gray-600 mb-4">
@@ -109,14 +120,14 @@ const MovieDetails = () => {
               <div className="mb-2">
                 <p>
                   <strong>Diễn viên:</strong>{" "}
-                  {movie.actors && movie.actors.length > 0 ? (
-                    movie.actors.map((actor, idx) => (
+                  {movie.actor ? (
+                    movie.actor.split(",").map((actor, idx) => (
                       <button
                         key={idx}
                         className="bg-purple-500 text-white px-2 py-1 rounded-md hover:bg-purple-600 transition-colors ml-2 mr-2"
-                        onClick={() => alert(`Diễn viên: ${actor}`)}
+                        onClick={() => alert(`Diễn viên: ${actor.trim()}`)}
                       >
-                        {actor}
+                        {actor.trim()}
                       </button>
                     ))
                   ) : (
@@ -155,7 +166,7 @@ const MovieDetails = () => {
           <ShowTime
             selectedCity={selectedCity}
             onCityChange={handleCityChange}
-            showtimes={movie.showtimes} // Truyền showtimes từ movie
+            showtimes={movie.showtimes}
           />
         </div>
       </div>

@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout as logoutAction } from "../redux/slices/authSlice";
-import { logout as logoutService } from "../services/authService";
 import defaultAvatar from "../assets/profile-avatar.jpg";
 
 const UserMenu = () => {
