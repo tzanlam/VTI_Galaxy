@@ -1,12 +1,10 @@
 package demo.modal.request;
 
-import demo.modal.constant.ActiveStatus;
 import demo.modal.constant.AgeLimit;
 import demo.modal.entity.Movie;
 import lombok.Data;
 
-import static demo.support.MethodSupport.convertToLocalDate;
-import static demo.support.MethodSupport.convertToLocalTime;
+import static demo.support.MethodSupport.*;
 
 @Data
 public class MovieRequest {
@@ -19,9 +17,8 @@ public class MovieRequest {
     private String releaseDate;
     private String country;
     private String producer;
-    private Double rating;
-    private AgeLimit ageLimit;
-    private ActiveStatus status;
+    private int rating;
+    private String ageLimit;
 
     public void setMovie(Movie movie) {
         movie.setName(name);
@@ -33,8 +30,7 @@ public class MovieRequest {
         movie.setReleaseDate(convertToLocalDate(releaseDate));
         movie.setCountry(country);
         movie.setProducer(producer);
-        movie.setRating(rating != null ? rating : 0.0);
-        movie.setAgeLimit(ageLimit);
-        movie.setStatus(status != null ? status : ActiveStatus.INACTIVE);
+        movie.setRating(rating);
+        movie.setAgeLimit(convertStringToEnum(AgeLimit.class, ageLimit));
     }
 }
