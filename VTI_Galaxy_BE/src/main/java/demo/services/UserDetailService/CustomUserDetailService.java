@@ -1,7 +1,7 @@
 package demo.services.UserDetailService;
 
 import demo.modal.entity.Account;
-import demo.services.impl.repository.AccountRepository;
+import demo.repository.AccountRepository;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

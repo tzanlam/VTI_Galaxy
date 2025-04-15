@@ -2,7 +2,7 @@ package demo.services.impl;
 
 import demo.modal.dto.StartTimeDto;
 import demo.modal.entity.StartTime;
-import demo.services.impl.repository.StartTimeRepository;
+import demo.repository.StartTimeRepository;
 import demo.services.interfaceClass.StartTimeService;
 import org.springframework.stereotype.Service;
 

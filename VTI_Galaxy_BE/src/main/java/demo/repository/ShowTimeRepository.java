@@ -1,4 +1,4 @@
-package demo.services.impl.repository;
+package demo.repository;
 
 import demo.modal.entity.ShowTime;
 import org.springframework.data.jpa.repository.JpaRepository;

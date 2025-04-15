@@ -1,4 +1,4 @@
-package demo.services.impl.repository;
+package demo.repository;
 
 import demo.modal.entity.Seat;
 import org.springframework.data.jpa.repository.JpaRepository;

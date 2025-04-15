@@ -4,7 +4,7 @@ import demo.modal.constant.OpenStatus;
 import demo.modal.dto.SeatDto;
 import demo.modal.entity.Seat;
 import demo.modal.request.SeatRequest;
-import demo.services.impl.repository.SeatRepository;
+import demo.repository.SeatRepository;
 import demo.services.interfaceClass.SeatService;
 import org.springframework.stereotype.Service;
 

@@ -4,7 +4,7 @@ import demo.modal.constant.ActiveStatus;
 import demo.modal.dto.MovieDto;
 import demo.modal.entity.Movie;
 import demo.modal.request.MovieRequest;
-import demo.services.impl.repository.MovieRepository;
+import demo.repository.MovieRepository;
 import demo.services.interfaceClass.MovieService;
 import org.springframework.stereotype.Service;
 

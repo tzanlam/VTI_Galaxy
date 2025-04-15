@@ -4,7 +4,7 @@ import demo.modal.constant.ActiveStatus;
 import demo.modal.dto.EmployeeDto;
 import demo.modal.entity.Employee;
 import demo.modal.request.EmployeeRequest;
-import demo.services.impl.repository.EmployeeRepository;
+import demo.repository.EmployeeRepository;
 import demo.services.interfaceClass.EmployeeService;
 import org.springframework.stereotype.Service;
 

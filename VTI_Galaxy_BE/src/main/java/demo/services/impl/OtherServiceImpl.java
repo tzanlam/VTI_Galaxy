@@ -4,8 +4,8 @@ import demo.modal.constant.ActiveStatus;
 import demo.modal.dto.OtherDto;
 import demo.modal.entity.Other;
 import demo.modal.request.OtherRequest;
-import demo.services.impl.repository.GalaxyRepository;
-import demo.services.impl.repository.OtherRepository;
+import demo.repository.GalaxyRepository;
+import demo.repository.OtherRepository;
 import demo.services.interfaceClass.OtherService;
 import org.springframework.stereotype.Service;
 

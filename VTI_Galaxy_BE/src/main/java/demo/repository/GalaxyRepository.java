@@ -1,4 +1,4 @@
-package demo.services.impl.repository;
+package demo.repository;
 
 import demo.modal.entity.Galaxy;
 import demo.modal.entity.Other;
