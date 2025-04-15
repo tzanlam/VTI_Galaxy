@@ -1,6 +1,7 @@
 package demo.services.impl;
 
-import demo.config.mail.MailSender;
+
+import demo.config.mail.MailService;
 import demo.modal.constant.ActiveStatus;
 import demo.modal.dto.AccountDto;
 import demo.modal.entity.Account;
@@ -21,10 +22,10 @@ public class AccountServiceImpl implements AccountService {
     @Value("${spring.mail.username}")
     private String mailAdmin;
     private final AccountRepository accountRepository;
-    private final MailSender mailSender;
+    private final MailService mailSender;
     private final PasswordEncoder passwordEncoder;
 
-    public AccountServiceImpl(AccountRepository accountRepository, MailSender mailSender, PasswordEncoder passwordEncoder) {
+    public AccountServiceImpl(AccountRepository accountRepository, MailService  mailSender, PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
         this.mailSender = mailSender;
         this.passwordEncoder = passwordEncoder;
