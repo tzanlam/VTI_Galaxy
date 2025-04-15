@@ -113,6 +113,12 @@ public class AccountServiceImpl implements AccountService {
         try{
             account.setPassword(passwordEncoder.encode(password));
             accountRepository.save(account);
+            mailSender.sendMail(
+                    account.getEmail(),
+                    mailAdmin,
+                    "Mật khẩu mới của bạn",
+                    "mật khẩu mới của bạn là: "+ account.getPassword()
+            );
             return new AccountDto(account);
         }catch (Exception e) {
             throw new RuntimeException("Update password failed");
