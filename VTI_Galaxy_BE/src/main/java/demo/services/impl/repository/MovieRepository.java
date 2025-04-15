@@ -1,4 +1,4 @@
-package demo.repository;
+package demo.services.impl.repository;
 
 import demo.modal.entity.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;

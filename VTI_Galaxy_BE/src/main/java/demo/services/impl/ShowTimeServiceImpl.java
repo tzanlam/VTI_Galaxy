@@ -5,10 +5,10 @@ import demo.modal.entity.Galaxy;
 import demo.modal.entity.Movie;
 import demo.modal.entity.ShowTime;
 import demo.modal.entity.StartTime;
-import demo.repository.GalaxyRepository;
-import demo.repository.MovieRepository;
-import demo.repository.ShowTimeRepository;
-import demo.repository.StartTimeRepository;
+import demo.services.impl.repository.GalaxyRepository;
+import demo.services.impl.repository.MovieRepository;
+import demo.services.impl.repository.ShowTimeRepository;
+import demo.services.impl.repository.StartTimeRepository;
 import demo.services.interfaceClass.ShowTimeService;
 import org.springframework.stereotype.Service;
 

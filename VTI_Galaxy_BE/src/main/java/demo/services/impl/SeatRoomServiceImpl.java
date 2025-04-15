@@ -5,9 +5,9 @@ import demo.modal.entity.Room;
 import demo.modal.entity.Seat;
 import demo.modal.entity.SeatRoom;
 import demo.modal.request.SeatRoomRequest;
-import demo.repository.RoomRepository;
-import demo.repository.SeatRepository;
-import demo.repository.SeatRoomRepository;
+import demo.services.impl.repository.RoomRepository;
+import demo.services.impl.repository.SeatRepository;
+import demo.services.impl.repository.SeatRoomRepository;
 import demo.services.interfaceClass.SeatRoomService;
 import org.springframework.stereotype.Service;
 

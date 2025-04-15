@@ -46,6 +46,11 @@ public class Movie extends Time{
     private LocalDate releaseDate;
 
     @Column
+    private String imageURL;
+
+    @Column
+    private String trailerURL;
+    @Column
     private int rating;
 
     @Column
@@ -55,4 +60,6 @@ public class Movie extends Time{
     @Column
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
+
+
 }

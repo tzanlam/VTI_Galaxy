@@ -4,8 +4,8 @@ import demo.modal.constant.OpenStatus;
 import demo.modal.dto.RoomDto;
 import demo.modal.entity.Room;
 import demo.modal.request.RoomRequest;
-import demo.repository.GalaxyRepository;
-import demo.repository.RoomRepository;
+import demo.services.impl.repository.GalaxyRepository;
+import demo.services.impl.repository.RoomRepository;
 import demo.services.interfaceClass.RoomService;
 import org.springframework.stereotype.Service;
 

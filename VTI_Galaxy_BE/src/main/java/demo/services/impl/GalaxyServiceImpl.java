@@ -4,7 +4,7 @@ import demo.modal.constant.OpenStatus;
 import demo.modal.dto.GalaxyDto;
 import demo.modal.entity.Galaxy;
 import demo.modal.request.GalaxyRequest;
-import demo.repository.GalaxyRepository;
+import demo.services.impl.repository.GalaxyRepository;
 import demo.services.interfaceClass.GalaxyService;
 import org.springframework.stereotype.Service;
 

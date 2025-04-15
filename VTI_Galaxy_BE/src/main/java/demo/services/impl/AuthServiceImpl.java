@@ -3,7 +3,7 @@ package demo.services.impl;
 import demo.config.jwt.JwtTokenUtil;
 import demo.modal.dto.AuthResponse;
 import demo.modal.entity.Account;
-import demo.repository.AccountRepository;
+import demo.services.impl.repository.AccountRepository;
 import demo.services.interfaceClass.AuthService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

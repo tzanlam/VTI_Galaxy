@@ -3,7 +3,7 @@ package demo.services.impl;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import demo.modal.entity.Account;
-import demo.repository.AccountRepository;
+import demo.services.impl.repository.AccountRepository;
 import demo.services.interfaceClass.SupportService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -17,6 +17,8 @@ public class MovieDto {
     private String releaseDate;
     private String createdDate;
     private String modifiedDate;
+    private String imageURL;
+    private String trailerURL;
     private String country; // Thêm trường country
     private String producer; // Thêm trường producer
     private int rating; // Thêm trường rating
@@ -34,6 +36,8 @@ public class MovieDto {
         this.releaseDate = movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : null;
         this.createdDate = movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : null;
         this.modifiedDate = movie.getReleaseDate() != null ? movie.getReleaseDate().toString() : null;
+        this.imageURL = movie.getImageURL();
+        this.trailerURL =  movie.getTrailerURL();
         this.country = movie.getCountry();
         this.producer = movie.getProducer();
         this.rating = movie.getRating();

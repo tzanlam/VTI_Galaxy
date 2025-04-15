@@ -4,7 +4,7 @@ import demo.modal.constant.ActiveStatus;
 import demo.modal.dto.AccountDto;
 import demo.modal.entity.Account;
 import demo.modal.request.AccountRequest;
-import demo.repository.AccountRepository;
+import demo.services.impl.repository.AccountRepository;
 import demo.services.interfaceClass.AccountService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
