@@ -4,6 +4,8 @@ import authReducer from "./slices/authSlice";
 import galaxyReducer from "./slices/galaxySlice"
 import accountReducer from "./slices/accountSlice"
 import movieReducer from "./slices/movieSlice"
+import showTimeReducer from "./slices/showTimeSlice"
+
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
 
@@ -22,7 +24,8 @@ const store = configureStore({
     auth: authReducer,
     galaxy: galaxyReducer,
     account: accountReducer,
-    movie: movieReducer
+    movie: movieReducer,
+    showTime: showTimeReducer,
   },
   preloadedState,
   // eslint-disable-next-line no-undef
