@@ -107,7 +107,7 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
     startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1); // Bắt đầu từ Thứ Hai
 
     if (!showtimes || !Array.isArray(showtimes)) {
-      console.warn("showtimes is undefined or not an array:", showtimes);
+      // console.warn("showtimes is undefined or not an array:", showtimes);
       for (let i = 0; i < 7; i++) {
         const day = new Date(startOfWeek);
         day.setDate(startOfWeek.getDate() + i);
