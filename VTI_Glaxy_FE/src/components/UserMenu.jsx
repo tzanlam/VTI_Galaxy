@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout as logoutAction } from "../redux/slices/authSlice";
 import defaultAvatar from "../assets/profile-avatar.jpg";
-
 const UserMenu = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
@@ -21,7 +20,7 @@ const UserMenu = () => {
 
   const handleLogout = () => {
     dispatch(logoutAction());
-    logoutService();
+    // logoutService();
     setIsMenuOpen(false);
   };
 
