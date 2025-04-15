@@ -1,8 +1,8 @@
-import { createAsyncThunk, createSlice, isRejectedWithValue } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import showTimeService from "../../services/showTimeService"
 
 export const fetchShowTimes = createAsyncThunk(
-    "showtime/fetchShowTime",
+    "showtime/fetchShowTimes",
     async(_,{rejectWithValue}) =>{
         try{
             const response = await showTimeService.fetchShowTimes()
@@ -15,7 +15,7 @@ export const fetchShowTimes = createAsyncThunk(
 )
 
 export const fetchShowTimeById = createAsyncThunk(
-    "showtime/fetchShowTime",
+    "showtime/fetchShowTimeById",
     async(showTimeId, {rejectWithValue}) => {
         try{
             const response = await showTimeId.fetchShowTimeById(showTimeId)
@@ -77,16 +77,18 @@ const showTimeSlice = createSlice({
     reducer:{
         clearShowTimeState:(state) =>{
             state.showTime = null
+            state.showTimes = []
             state.error = null
         },
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchShowTimes.pending,(state) => {
+        // fetch All ShowTime
+            .addCase(fetchShowTimes.pending, (state) => {
                 state.loading = true
                 state.error = null
             })
-            .addCase(fetchShowTimes.fulfilled,(state,action) =>{
+            .addCase(fetchShowTimes.fulfilled, (state,action) =>{
                 state.showTimes = action.payload
                 state.loading = false
             })
@@ -94,24 +96,26 @@ const showTimeSlice = createSlice({
                 state.error = true
                 state.loading = false
             })
-            .addCase(fetchShowTimeById.rejected,(state) =>{
+        // fetch showtime By Id
+            .addCase(fetchShowTimeById.pending, (state) =>{
                 state.loading = true
                 state.error = null
             })
-            .addCase(fetchShowTimeById.fulfilled,(state) => {
+            .addCase(fetchShowTimeById.fulfilled, (action ,state) => {
                 state.showTimes = action.payload
                 state.loading = false
             })
             .addCase(fetchShowTimeById.rejected,(state,action) => {
-                state.error = action.updateShowTime
+                state.error = action.payload
                 state.loading = false
             })
+        // post showtime
             .addCase(postShowTime.pending,(state) => {
                 state.loading = true
                 state.error = null
             })
             .addCase(postShowTime.fulfilled, (state, action) => {
-                state.movie = push(action.payload);
+                state.movie = (action.payload);
                 state.loading = false;
                   })
             .addCase(postShowTime.rejected, (state, action) => {
