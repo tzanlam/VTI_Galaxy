@@ -1,24 +1,33 @@
 package demo.services.impl;
 
+import demo.config.mail.MailSender;
 import demo.modal.constant.ActiveStatus;
 import demo.modal.dto.AccountDto;
 import demo.modal.entity.Account;
 import demo.modal.request.AccountRequest;
 import demo.services.impl.repository.AccountRepository;
 import demo.services.interfaceClass.AccountService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static demo.support.MethodSupport.randomConfirmationCode;
+
 @Service
 public class AccountServiceImpl implements AccountService {
+    @Value("${spring.mail.username}")
+    private String mailAdmin;
     private final AccountRepository accountRepository;
+    private final MailSender mailSender;
+    private final PasswordEncoder passwordEncoder;
 
-    public AccountServiceImpl(AccountRepository accountRepository) {
+    public AccountServiceImpl(AccountRepository accountRepository, MailSender mailSender, PasswordEncoder passwordEncoder) {
         this.accountRepository = accountRepository;
+        this.mailSender = mailSender;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -55,7 +64,13 @@ public class AccountServiceImpl implements AccountService {
     public AccountDto registerUser(AccountRequest request) {
         try{
             Account account = request.userAccount();
+            account.setConfirmCode(randomConfirmationCode());
             accountRepository.save(account);
+            mailSender.sendMail(
+                    request.getEmail(),
+                    mailAdmin,
+                    "Xác nhận tạo tài khoản",
+                    "Mã xác nhận tài khoản của bạn là:"+account.getConfirmCode() );
             return new AccountDto(account);
         }catch (Exception e) {
             throw new RuntimeException("Create account failed");
@@ -95,10 +110,15 @@ public class AccountServiceImpl implements AccountService {
         Account account = accountRepository.findById(id).orElseThrow(
                 () -> new NullPointerException("Account not found")
         );
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
         try{
-            account.setPassword(encoder.encode(password));
+            account.setPassword(passwordEncoder.encode(password));
             accountRepository.save(account);
+            mailSender.sendMail(
+                    account.getEmail(),
+                    mailAdmin,
+                    "Mật khẩu mới của bạn",
+                    "mật khẩu mới của bạn là: "+ account.getPassword()
+            );
             return new AccountDto(account);
         }catch (Exception e) {
             throw new RuntimeException("Update password failed");
