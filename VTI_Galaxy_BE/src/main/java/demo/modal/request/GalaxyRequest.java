@@ -8,12 +8,14 @@ import lombok.Data;
 public class GalaxyRequest {
     private String name;
     private String address;
+    private String city;
 
     public Galaxy addGalaxy(){
         Galaxy galaxy = new Galaxy();
         galaxy.setName(name);
         galaxy.setAddress(address);
         galaxy.setStatus(OpenStatus.CLOSED);
+        galaxy.setCity(city);
         return galaxy;
     }
 
@@ -21,5 +23,6 @@ public class GalaxyRequest {
         galaxy.setName(name);
         galaxy.setAddress(address);
         galaxy.setStatus(OpenStatus.CLOSED);
+        galaxy.setCity(city);
     }
 }

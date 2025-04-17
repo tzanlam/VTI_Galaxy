@@ -5,15 +5,19 @@ import lombok.Data;
 
 @Data
 public class GalaxyDto {
-    public int id;
-    public String name;
-    public String address;
-    public String status;
+    private int id;
+    private String name;
+    private String address;
+    private String status;
+    private String city;
+    private String created;
 
     public GalaxyDto(Galaxy galaxy) {
         this.id = galaxy.getId();
         this.name = galaxy.getName();
         this.address = galaxy.getAddress();
         this.status = galaxy.getStatus() != null ? galaxy.getStatus().name() : null;
+        this.city = galaxy.getCity();
+        this.created = galaxy.getCreated() != null ? galaxy.getCreated().toString() : null;
     }
 }
