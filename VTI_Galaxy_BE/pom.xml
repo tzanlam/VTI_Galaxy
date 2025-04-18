@@ -49,8 +49,11 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.11.5</version>
         </dependency>
-
-
+<!--        add vn pay-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
         <!-- Spring Boot: Data JPA (ORM - Quản lý database) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
