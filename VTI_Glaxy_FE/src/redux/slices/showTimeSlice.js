@@ -74,7 +74,7 @@ const showTimeSlice = createSlice({
         loading:false,
         error:null,
     },
-    reducer:{
+    reducers:{
         clearShowTimeState:(state) =>{
             state.showTime = null
             state.showTimes = []

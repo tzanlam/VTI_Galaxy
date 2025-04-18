@@ -1,7 +1,7 @@
 import axiosClient from "./axiosClient";
 
 const seatRoomService = {
-   fetchSeatRoom(){
+   fetchSeatRooms(){
       return axiosClient.get("/getSeatRoom")
    },
    fetchSeatRoomById(seatRoomId){
