@@ -5,6 +5,7 @@ import demo.modal.entity.StartTime;
 import lombok.Data;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,11 +26,13 @@ public class ShowTimeDto {
     }
 
     private String getGalaxyName(ShowTime showTime) {
-        return showTime.getGalaxy() != null ? showTime.getGalaxy().getName() : null;
+        return showTime.getGalaxy() != null && showTime.getGalaxy().getName() != null
+                ? showTime.getGalaxy().getName() : "Không xác định";
     }
 
     private String getMovieName(ShowTime showTime) {
-        return showTime.getMovie() != null ? showTime.getMovie().getName() : null;
+        return showTime.getMovie() != null && showTime.getMovie().getName() != null
+                ? showTime.getMovie().getName() : "Không xác định";
     }
 
     private String formatDate(ShowTime showTime) {
@@ -37,13 +40,14 @@ public class ShowTimeDto {
     }
 
     private List<String> mapStartTimes(ShowTime showTime) {
-        if (showTime.getStartTimes() != null) {
+        if (showTime.getStartTimes() != null && !showTime.getStartTimes().isEmpty()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
             return showTime.getStartTimes().stream()
+                    .filter(startTime -> startTime.getStartTime() != null)
                     .map(StartTime::getStartTime)
                     .map(time -> time.format(formatter))
                     .collect(Collectors.toList());
         }
-        return null;
+        return Collections.emptyList();
     }
 }

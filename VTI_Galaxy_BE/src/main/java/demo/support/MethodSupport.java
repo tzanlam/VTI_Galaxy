@@ -35,10 +35,10 @@ public class MethodSupport {
 
     public static LocalDate convertToLocalDate(String dateString){
         try {
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             return LocalDate.parse(dateString, dateFormatter);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("error formatter date: " + dateString);
+            throw new IllegalArgumentException("Định dạng ngày không hợp lệ: " + dateString + ". Định dạng yêu cầu: yyyy-MM-dd");
         }
     }
 

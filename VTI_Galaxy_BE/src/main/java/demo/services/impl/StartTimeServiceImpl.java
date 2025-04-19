@@ -6,6 +6,8 @@ import demo.repository.StartTimeRepository;
 import demo.services.interfaceClass.StartTimeService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,5 +33,16 @@ public class StartTimeServiceImpl implements StartTimeService {
         st.setEndTime(convertToLocalTime(endTime));
         startTimeRepository.save(st);
         return new StartTimeDto(st);
+    }
+    @Override
+    public List<Integer> getStartTimeIdsByTimes(List<String> startTimes) {
+        return startTimes.stream()
+                .map(time -> {
+                    LocalTime localTime = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
+                    StartTime startTime = startTimeRepository.findByStartTime(localTime)
+                            .orElseThrow(() -> new RuntimeException("Không tìm thấy thời gian bắt đầu: " + time));
+                    return startTime.getId();
+                })
+                .collect(Collectors.toList());
     }
 }

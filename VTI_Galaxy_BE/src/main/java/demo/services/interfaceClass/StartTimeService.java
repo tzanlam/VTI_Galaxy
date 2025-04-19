@@ -10,4 +10,6 @@ public interface StartTimeService {
 
     // post
     StartTimeDto createStartTime(String startTime, String endTime);
+
+    List<Integer> getStartTimeIdsByTimes(List<String> startTimes);
 }
