@@ -4,7 +4,6 @@ import demo.services.interfaceClass.StartTimeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 
 @RestController
 @CrossOrigin("*")
@@ -25,10 +24,8 @@ public class StartTimeController {
     }
 
     @PostMapping("/postStartTime")
-    public ResponseEntity<?> create(@RequestBody Map<String, String> request) {
+    public ResponseEntity<?> create(@RequestParam("startTime") String startTime, @RequestParam("endTime") String endTime) {
         try {
-            String startTime = request.get("startTime");
-            String endTime = request.get("endTime");
             return ResponseEntity.ok(startTimeService.createStartTime(startTime, endTime));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Tạo thời gian bắt đầu thất bại");

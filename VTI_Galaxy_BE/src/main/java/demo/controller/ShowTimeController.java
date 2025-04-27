@@ -37,6 +37,15 @@ public class ShowTimeController {
         }
     }
 
+    @GetMapping("/getShowTimeByMovieDateAndGalaxy")
+    public ResponseEntity<?> getByMovieDateAndGalaxy(@RequestParam("movieId") int movie,@RequestParam("date") String date, @RequestParam("galaxyId") int galaxyId) {
+        try{
+            return ResponseEntity.ok(showTimeService.findByDateAndMovie(galaxyId, movie, date));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/getShowTimesByFilter")
     public ResponseEntity<?> getShowTimesByFilter(
             @RequestParam(value = "galaxyId", required = false) String galaxyId,

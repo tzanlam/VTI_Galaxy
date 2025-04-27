@@ -4,10 +4,8 @@ import demo.modal.entity.ShowTime;
 import demo.modal.entity.StartTime;
 import lombok.Data;
 
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 public class ShowTimeDto {
@@ -40,14 +38,15 @@ public class ShowTimeDto {
     }
 
     private List<String> mapStartTimes(ShowTime showTime) {
-        if (showTime.getStartTimes() != null && !showTime.getStartTimes().isEmpty()) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-            return showTime.getStartTimes().stream()
-                    .filter(startTime -> startTime.getStartTime() != null)
-                    .map(StartTime::getStartTime)
-                    .map(time -> time.format(formatter))
-                    .collect(Collectors.toList());
+        if (showTime.getStartTimes() == null) {
+            throw new NullPointerException("startTimes is null");
         }
-        return Collections.emptyList();
+        List<StartTime> st = showTime.getStartTimes();
+        startTimes = new ArrayList<>();
+        for (StartTime stTime : st) {
+            startTimes.add(stTime.getStartTime().toString());
+        }
+
+        return startTimes;
     }
 }

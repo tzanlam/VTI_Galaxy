@@ -63,6 +63,9 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     @Override
     public ShowTimeDto create(int galaxyId, int movieId, String date, List<Integer> startTimeIds) {
         ShowTime showTime = populate(galaxyId, movieId, date, startTimeIds);
+        showTimeRepository.save(showTime);
+        showTime = showTimeRepository.findById(showTime.getId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch chiếu sau khi lưu"));
         return new ShowTimeDto(showTime);
     }
 
@@ -101,7 +104,17 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         showTime.setGalaxy(galaxy);
         showTime.setMovie(movie);
         showTime.setDate(convertToLocalDate(date));
-        showTime.setStartTimes(startTimes);
-        return showTime;
+
+        // Lưu ShowTime trước để có ID
+        ShowTime savedShowTime = showTimeRepository.save(showTime);
+
+        // Cập nhật và lưu StartTime
+        startTimes.forEach(st -> {
+            st.setShowTime(savedShowTime);
+            startTimeRepository.save(st);
+        });
+        savedShowTime.setStartTimes(startTimes);
+
+        return showTimeRepository.save(savedShowTime);
     }
 }

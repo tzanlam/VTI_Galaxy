@@ -25,6 +25,6 @@ public class ShowTime {
     @Column
     private LocalDate date;
 
-    @OneToMany(mappedBy = "showTime", fetch = FetchType.EAGER)
+    @OneToMany
     private List<StartTime> startTimes;
 }
