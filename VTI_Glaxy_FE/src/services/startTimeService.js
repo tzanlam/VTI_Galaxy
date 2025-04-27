@@ -1,11 +1,12 @@
 import axiosClient from "./axiosClient";
 
 const startTimeService = {
-   fetchStartTime(){
-      return axiosClient.get("/getStartTimes")
-   },
-   createStartTime(startTime, endTime){
-      return axiosClient.post(`/postStartTime?startTime=${startTime}&endTime=${endTime}`)
-   }
-}
+  fetchStartTimes() {
+    return axiosClient.get("/getStartTimes");
+  },
+  createStartTime(startTime, endTime) {
+    return axiosClient.post("/postStartTime", { startTime, endTime });
+  },
+};
+
 export default startTimeService;

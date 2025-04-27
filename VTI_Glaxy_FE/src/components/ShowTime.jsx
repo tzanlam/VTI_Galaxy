@@ -1,42 +1,152 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchShowTimesByFilter } from "../redux/slices/showTimeSlice";
+import { fetchStartTimes } from "../redux/slices/startTimeSlice"; // Thêm import
 import { cinemaData } from "../data/cinemaData";
 
-const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
+const ShowTime = ({ selectedCity, onCityChange }) => {
+  const dispatch = useDispatch();
+  const { showTimes, loading, error } = useSelector((state) => state.showTime);
+  const {
+    startTimes,
+    loading: startTimeLoading,
+    error: startTimeError,
+  } = useSelector((state) => state.startTime);
   const [isCityOpen, setIsCityOpen] = useState(false);
   const [isCinemaOpen, setIsCinemaOpen] = useState(false);
+  const [isMovieOpen, setIsMovieOpen] = useState(false);
   const [selectedCinema, setSelectedCinema] = useState("Chọn rạp");
-  const [selectedDay, setSelectedDay] = useState("Hôm nay");
+  const [selectedMovie, setSelectedMovie] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(null);
+
+  // Log trạng thái chọn lọc
+  console.log("ShowTime state:", {
+    selectedCity,
+    selectedCinema,
+    selectedMovie,
+    selectedDay,
+    showTimes,
+    startTimes,
+    loading,
+    error,
+    startTimeLoading,
+    startTimeError,
+  });
+
+  // Tải startTimes khi component gắn kết
+  useEffect(() => {
+    console.log("Dispatching fetchStartTimes");
+    dispatch(fetchStartTimes());
+  }, [dispatch]);
+
+  // Tự động chọn rạp đầu tiên khi selectedCity thay đổi
+  useEffect(() => {
+    if (selectedCity && selectedCity !== "Toàn quốc") {
+      const cinemas = cinemaData.cinemaLocations[selectedCity] || [];
+      if (cinemas.length > 0) {
+        console.log("Auto-selecting first cinema:", cinemas[0].name);
+        setSelectedCinema(cinemas[0].name);
+      } else {
+        console.log("No cinemas available for city:", selectedCity);
+        setSelectedCinema("Chọn rạp");
+      }
+    }
+  }, [selectedCity]);
 
   const toggleCityDropdown = () => setIsCityOpen(!isCityOpen);
   const toggleCinemaDropdown = () => setIsCinemaOpen(!isCinemaOpen);
+  const toggleMovieDropdown = () => setIsMovieOpen(!isMovieOpen);
 
-  const handleCitySelect = (city) => {
-    onCityChange(city);
-    setIsCityOpen(false);
-    setSelectedCinema("Chọn rạp");
-  };
+  const handleCitySelect = useCallback(
+    (city) => {
+      console.log("Selected city:", city);
+      onCityChange(city);
+      setIsCityOpen(false);
+      setSelectedMovie(null);
+    },
+    [onCityChange]
+  );
 
-  const handleCinemaSelect = (cinema) => {
+  const handleCinemaSelect = useCallback((cinema) => {
+    console.log("Selected cinema:", cinema);
     setSelectedCinema(cinema.name);
     setIsCinemaOpen(false);
-  };
+    setSelectedMovie(null);
+  }, []);
 
-  const getCinemas = () => {
+  const handleMovieSelect = useCallback((movie) => {
+    console.log("Selected movie:", movie);
+    setSelectedMovie(movie);
+    setIsMovieOpen(false);
+  }, []);
+
+  const getCinemas = useMemo(() => {
     if (selectedCity === "Toàn quốc") {
       return Object.values(cinemaData.cinemaLocations)
         .flat()
         .filter((cinema) => cinema.name);
     }
     return cinemaData.cinemaLocations[selectedCity] || [];
-  };
+  }, [selectedCity]);
 
-  const cinemas = getCinemas();
+  const movies = useMemo(() => {
+    const movieList = showTimes
+      .map((st) => ({ id: st.movieId, name: st.movieName }))
+      .filter(
+        (movie, index, self) =>
+          index === self.findIndex((m) => m.id === movie.id)
+      );
+    console.log("Computed movies:", movieList);
+    return movieList;
+  }, [showTimes]);
+
+  const getWeekDays = useMemo(() => {
+    const weekDays = [];
+    const today = new Date();
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(today);
+      day.setDate(today.getDate() + i);
+      const dayName =
+        i === 0
+          ? "Hôm nay"
+          : [
+              "Chủ Nhật",
+              "Thứ Hai",
+              "Thứ Ba",
+              "Thứ Tư",
+              "Thứ Năm",
+              "Thứ Sáu",
+              "Thứ Bảy",
+            ][day.getDay()];
+      const formattedDate = `${day.getDate()}/${day.getMonth() + 1}`;
+      const dateForApi = day.toISOString().split("T")[0];
+      weekDays.push({ day: dayName, date: formattedDate, dateForApi });
+    }
+    console.log("Computed weekDays:", weekDays);
+    return weekDays;
+  }, []);
 
   useEffect(() => {
-    console.log("Selected City:", selectedCity);
-    console.log("Cinemas:", cinemas);
-    console.log("Showtimes:", showtimes); // Debug prop showtimes
-  }, [selectedCity, cinemas, showtimes]);
+    if (selectedCity && selectedCinema !== "Chọn rạp" && selectedDay) {
+      const galaxyId = cinemaData.cinemaLocations[selectedCity]?.find(
+        (cinema) => cinema.name === selectedCinema
+      )?.id;
+      if (galaxyId) {
+        console.log("Dispatching fetchShowTimesByFilter with:", {
+          galaxyId,
+          movieId: selectedMovie?.id,
+          date: selectedDay.dateForApi,
+        });
+        dispatch(
+          fetchShowTimesByFilter({
+            galaxyId: String(galaxyId),
+            movieId: selectedMovie?.id ? String(selectedMovie.id) : null,
+            date: selectedDay.dateForApi,
+          })
+        );
+      }
+    }
+  }, [selectedCity, selectedCinema, selectedDay, selectedMovie, dispatch]);
 
   const DropdownButton = ({ label, isOpen, onClick }) => (
     <button
@@ -71,87 +181,46 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
             items.map((item, index) => (
               <button
                 key={index}
-                onClick={() => onSelect(typeof item === "string" ? item : item)}
+                onClick={() => onSelect(item)}
                 className={`block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white transition-colors duration-200 ${
-                  selectedItem === (typeof item === "string" ? item : item.name)
+                  selectedItem === (item.name || item)
                     ? "bg-blue-500 text-white"
                     : ""
                 }`}
               >
-                {typeof item === "string" ? item : item.name}
+                {item.name || item}
               </button>
             ))
           ) : (
             <div className="px-4 py-2 text-sm text-gray-500">
-              Không có rạp nào
+              Không có dữ liệu
             </div>
           )}
         </div>
       </div>
     );
 
-  const currentDate = new Date(2025, 4, 4); // 4/5/2025 (tháng bắt đầu từ 0)
-  const daysOfWeek = [
-    "Thứ Hai",
-    "Thứ Ba",
-    "Thứ Tư",
-    "Thứ Năm",
-    "Thứ Sáu",
-    "Hôm nay",
-    "Chủ Nhật",
-  ];
-
-  const getWeekDays = () => {
-    const weekDays = [];
-    const startOfWeek = new Date(currentDate);
-    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay() + 1); // Bắt đầu từ Thứ Hai
-
-    if (!showtimes || !Array.isArray(showtimes)) {
-      // console.warn("showtimes is undefined or not an array:", showtimes);
-      for (let i = 0; i < 7; i++) {
-        const day = new Date(startOfWeek);
-        day.setDate(startOfWeek.getDate() + i);
-        const dayName =
-          day.getDate() === currentDate.getDate() ? "Hôm nay" : daysOfWeek[i];
-        const formattedDate = `${day.getDate()}/${day.getMonth() + 1}`;
-        weekDays.push({
-          day: dayName,
-          date: formattedDate,
-          times: [], // Trả về mảng rỗng nếu không có showtimes
-        });
-      }
-      return weekDays;
-    }
-
-    for (let i = 0; i < 7; i++) {
-      const day = new Date(startOfWeek);
-      day.setDate(startOfWeek.getDate() + i);
-      const dayName =
-        day.getDate() === currentDate.getDate() ? "Hôm nay" : daysOfWeek[i];
-      const formattedDate = `${day.getDate()}/${day.getMonth() + 1}`;
-      weekDays.push({
-        day: dayName,
-        date: formattedDate,
-        times: showtimes.find((st) => st.day === dayName)?.times || [],
-      });
-    }
-    return weekDays;
-  };
-
-  const weekDays = getWeekDays();
-
-  const handleDaySelect = (day) => {
+  const handleDaySelect = useCallback((day) => {
+    console.log("Selected day:", day);
     setSelectedDay(day);
-  };
+  }, []);
 
-  const selectedShowtime = weekDays.find((st) => st.day === selectedDay);
+  const selectedShowtimes = useMemo(() => {
+    if (!selectedDay) return [];
+    const filtered = showTimes.filter(
+      (st) => st.date === selectedDay.dateForApi
+    );
+    console.log("Computed selectedShowtimes:", filtered);
+    return filtered;
+  }, [showTimes, selectedDay]);
 
   return (
-    <div>
-      <div className="flex gap-4 mb-6">
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-4">Lịch Chiếu Phim</h2>
+      <div className="flex flex-wrap gap-4 mb-6">
         <div className="relative inline-block text-left">
           <DropdownButton
-            label={selectedCity}
+            label={selectedCity || "Chọn thành phố"}
             isOpen={isCityOpen}
             onClick={toggleCityDropdown}
           />
@@ -162,7 +231,6 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
             selectedItem={selectedCity}
           />
         </div>
-
         <div className="relative inline-block text-left">
           <DropdownButton
             label={selectedCinema}
@@ -171,64 +239,92 @@ const ShowTime = ({ selectedCity, onCityChange, showtimes }) => {
           />
           <DropdownMenu
             isOpen={isCinemaOpen}
-            items={cinemas}
+            items={getCinemas}
             onSelect={handleCinemaSelect}
             selectedItem={selectedCinema}
           />
         </div>
+        <div className="relative inline-block text-left">
+          <DropdownButton
+            label={selectedMovie?.name || "Chọn phim"}
+            isOpen={isMovieOpen}
+            onClick={toggleMovieDropdown}
+          />
+          <DropdownMenu
+            isOpen={isMovieOpen}
+            items={movies}
+            onSelect={handleMovieSelect}
+            selectedItem={selectedMovie?.name}
+          />
+        </div>
       </div>
-
       <div className="flex flex-wrap gap-2 mb-6">
-        {weekDays.map((showtime, idx) => (
+        {getWeekDays.map((day, idx) => (
           <button
             key={idx}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              selectedDay === showtime.day
+              selectedDay?.date === day.date
                 ? "bg-blue-500 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
-            onClick={() => handleDaySelect(showtime.day)}
+            onClick={() => handleDaySelect(day)}
           >
-            {showtime.day}
+            {day.day}
             <br />
-            {showtime.date}
+            {day.date}
           </button>
         ))}
       </div>
-
-      {selectedShowtime && (
-        <div>
-          <h3 className="text-lg font-bold mb-4">
-            Lịch chiếu ngày {selectedShowtime.day} ({selectedShowtime.date})
-          </h3>
-          {cinemas.length > 0 ? (
-            cinemas.map((cinema, idx) => (
-              <div key={idx} className="mb-4">
-                <p className="text-sm font-medium text-gray-700">
-                  {cinema.name}
-                </p>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {selectedShowtime.times.map((time, timeIdx) => (
+      {loading && <p className="text-gray-500">Đang tải lịch chiếu...</p>}
+      {error && (
+        <p className="text-red-500">
+          Lỗi: {error.message || "Không thể tải lịch chiếu"}
+        </p>
+      )}
+      {startTimeLoading && (
+        <p className="text-gray-500">Đang tải thời gian bắt đầu...</p>
+      )}
+      {startTimeError && (
+        <p className="text-red-500">
+          Lỗi: {startTimeError.message || "Không thể tải thời gian bắt đầu"}
+        </p>
+      )}
+      {!loading && !error && selectedShowtimes.length > 0
+        ? selectedShowtimes.map((showtime, idx) => (
+            <div key={idx} className="mb-4 p-4 bg-white rounded-lg shadow">
+              <h3 className="text-lg font-bold mb-2">
+                {showtime.galaxyName} - {showtime.movieName}
+              </h3>
+              <p className="text-sm text-gray-700 mb-1">
+                Ngày: {selectedDay?.date}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {showtime.startTimes.length > 0 ? (
+                  showtime.startTimes.map((time, timeIdx) => (
                     <button
                       key={timeIdx}
                       className="bg-orange-500 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition-colors"
                       onClick={() =>
                         alert(
-                          `Đã đặt vé tại ${cinema.name} vào ${selectedShowtime.day} (${selectedShowtime.date}) lúc ${time}`
+                          `Đã đặt vé tại ${showtime.galaxyName} cho ${showtime.movieName} vào ${selectedDay?.day} (${selectedDay?.date}) lúc ${time}`
                         )
                       }
                     >
                       {time}
                     </button>
-                  ))}
-                </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500">Chưa có thời gian chiếu.</p>
+                )}
               </div>
-            ))
-          ) : (
-            <p className="text-gray-500">Không có rạp nào trong khu vực này.</p>
+            </div>
+          ))
+        : !loading &&
+          !error && (
+            <p className="text-gray-500">
+              Không có lịch chiếu cho lựa chọn này.
+            </p>
           )}
-        </div>
-      )}
     </div>
   );
 };
