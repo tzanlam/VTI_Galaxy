@@ -26,8 +26,8 @@ public class Galaxy extends Time{
     @Enumerated(EnumType.STRING)
     private OpenStatus status;
 
-    @OneToMany(mappedBy = "galaxy")
-    private List<Room> rooms;
+//    @OneToMany(mappedBy = "galaxy")
+//    private List<Room> rooms;
 
     @OneToMany(mappedBy = "galaxy")
     private List<Other> others;
