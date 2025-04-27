@@ -23,6 +23,9 @@ public class Galaxy extends Time{
     private String address;
 
     @Column
+    private String city;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private OpenStatus status;
 
