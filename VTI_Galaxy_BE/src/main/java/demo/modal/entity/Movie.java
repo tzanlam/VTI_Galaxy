@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -50,8 +51,12 @@ public class Movie extends Time{
 
     @Column
     private String trailerURL;
+
     @Column
     private int rating;
+
+    @OneToMany
+    private List<ShowTime> showTimes;
 
     @Column
     @Enumerated(EnumType.STRING)

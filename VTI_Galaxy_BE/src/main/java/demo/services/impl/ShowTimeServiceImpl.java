@@ -102,7 +102,6 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         showTime.setMovie(movie);
         showTime.setDate(convertToLocalDate(date));
         showTime.setStartTimes(startTimes);
-        startTimes.forEach(st -> st.setShowTime(showTime));
-        return showTimeRepository.save(showTime);
+        return showTime;
     }
 }

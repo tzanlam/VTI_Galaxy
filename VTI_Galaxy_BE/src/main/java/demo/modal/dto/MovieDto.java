@@ -22,7 +22,7 @@ public class MovieDto {
     private String country; // Thêm trường country
     private String producer; // Thêm trường producer
     private int rating; // Thêm trường rating
-    private AgeLimit ageLimit; // Thêm trường ageLimit
+    private AgeLimit ageLimit; // Thêm trường ageLimitz
     private ActiveStatus status; // Thêm trường status
 
     public MovieDto(Movie movie) {
