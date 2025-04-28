@@ -7,7 +7,6 @@ import router from "./routes/RouterConfig";
 import LoginModal from "./components/LoginModal";
 import RegisterModal from "./components/RegisterModal";
 import { restoreAuth } from "./redux/slices/authSlice";
-import HomeAdmin from "./pages/HomeAdmin";
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -37,10 +36,8 @@ function AppContent() {
 function App() {
   return (
     <Provider store={store}>
-      <BrowserRouter >
-      <HomeAdmin />
-      {/* <AppContent /> */}
-      </BrowserRouter>
+      {/* <HomeAdmin /> */}
+      <AppContent />
     </Provider>
   );
 }
