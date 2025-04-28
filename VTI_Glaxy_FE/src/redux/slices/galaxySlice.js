@@ -49,15 +49,17 @@ export const deleteGalaxy = createAsyncThunk('galaxy/delete', async(galaxyId, {r
 const galaxySlice = createSlice({
    name: 'galaxy',
    initialState: {
-      galaxied: [],
+      galaxies: [],
       galaxy: null,
-      err: null,
+      error: null,
       loading: false
    },
    reducers: {
       clearGalaxySlice: (state) => {
+         state.galaxies = []
          state.galaxy= null,
-         state.err=null
+         state.error=null,
+         state.loading = false
       }
    },
    extraReducers: (builder) => {
@@ -132,6 +134,6 @@ const galaxySlice = createSlice({
    },
  });
  
- export const { clearGalaxyState } = galaxySlice.actions;
+ export const { clearGalaxySlice } = galaxySlice.actions;
  
  export default galaxySlice.reducer;
