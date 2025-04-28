@@ -31,24 +31,28 @@ export const fetchShowTimeById = createAsyncThunk(
   }
 );
 
-export const fetchShowTimesByFilter = createAsyncThunk(
-  "showtime/fetchShowTimesByFilter",
+export const fetchShowTimeByMovieDateAndGalaxy = createAsyncThunk(
+  "showtime/fetchShowTimeByMovieDateAndGalaxy",
   async ({ galaxyId, movieId, date }, { rejectWithValue }) => {
     try {
-      console.log("fetchShowTimesByFilter params:", {
+      console.log("fetchShowTimeByMovieDateAndGalaxy params:", {
         galaxyId,
         movieId,
         date,
       });
-      const response = await showTimeService.fetchShowTimesByFilter(
+      const response = await showTimeService.fetchShowTimeByMovieDateAndGalaxy(
         galaxyId,
         movieId,
         date
       );
-      console.log("fetchShowTimesByFilter response:", response.data);
-      return response.data;
+      console.log("fetchShowTimeByMovieDateAndGalaxy response:", response.data);
+      // Chuẩn hóa dữ liệu: bọc object trong mảng
+      return Array.isArray(response.data) ? response.data : [response.data];
     } catch (err) {
-      console.error("fetchShowTimesByFilter error:", err.response?.data);
+      console.error(
+        "fetchShowTimeByMovieDateAndGalaxy error:",
+        err.response?.data
+      );
       return rejectWithValue(
         err.response?.data || "Lỗi khi lấy lịch chiếu theo bộ lọc"
       );
@@ -191,23 +195,28 @@ const showTimeSlice = createSlice({
         state.loading = false;
         console.log("fetchShowTimeById rejected, error:", action.payload);
       })
-      .addCase(fetchShowTimesByFilter.pending, (state) => {
+      .addCase(fetchShowTimeByMovieDateAndGalaxy.pending, (state) => {
         state.loading = true;
         state.error = null;
-        console.log("fetchShowTimesByFilter pending");
+        console.log("fetchShowTimeByMovieDateAndGalaxy pending");
       })
-      .addCase(fetchShowTimesByFilter.fulfilled, (state, action) => {
-        state.showTimes = action.payload;
+      .addCase(fetchShowTimeByMovieDateAndGalaxy.fulfilled, (state, action) => {
+        state.showTimes = Array.isArray(action.payload)
+          ? action.payload
+          : [action.payload];
         state.loading = false;
         console.log(
-          "fetchShowTimesByFilter fulfilled, showTimes:",
+          "fetchShowTimeByMovieDateAndGalaxy fulfilled, showTimes:",
           action.payload
         );
       })
-      .addCase(fetchShowTimesByFilter.rejected, (state, action) => {
+      .addCase(fetchShowTimeByMovieDateAndGalaxy.rejected, (state, action) => {
         state.error = action.payload;
         state.loading = false;
-        console.log("fetchShowTimesByFilter rejected, error:", action.payload);
+        console.log(
+          "fetchShowTimeByMovieDateAndGalaxy rejected, error:",
+          action.payload
+        );
       })
       .addCase(postShowTime.pending, (state) => {
         state.loading = true;

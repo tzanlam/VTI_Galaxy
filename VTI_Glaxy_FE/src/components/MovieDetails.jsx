@@ -206,7 +206,7 @@ const MovieDetails = () => {
           <ShowTime
             selectedCity={selectedCity}
             onCityChange={handleCityChange}
-            showtimes={movie.showtimes}
+            movieId={id}
           />
         </div>
       </div>

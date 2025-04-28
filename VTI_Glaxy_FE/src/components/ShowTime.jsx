@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchShowTimesByFilter } from "../redux/slices/showTimeSlice";
+import { fetchShowTimeByMovieDateAndGalaxy } from "../redux/slices/showTimeSlice";
 import { fetchStartTimes } from "../redux/slices/startTimeSlice";
 import { fetchGalaxies } from "../redux/slices/galaxySlice";
 
-const ShowTime = ({ selectedCity, onCityChange }) => {
-  const dispatch = useDispatch(); // Sửa từ Dispatch() thành useDispatch()
+const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
+  const dispatch = useDispatch();
   const { showTimes, loading, error } = useSelector((state) => state.showTime);
   const {
     startTimes,
@@ -19,10 +19,8 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
   } = useSelector((state) => state.galaxy);
   const [isCityOpen, setIsCityOpen] = useState(false);
   const [isCinemaOpen, setIsCinemaOpen] = useState(false);
-  const [isMovieOpen, setIsMovieOpen] = useState(false);
   const [selectedCinema, setSelectedCinema] = useState("Chọn rạp");
   const [selectedGalaxyId, setSelectedGalaxyId] = useState(null);
-  const [selectedMovie, setSelectedMovie] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
 
   useEffect(() => {
@@ -30,6 +28,11 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
     dispatch(fetchGalaxies());
     dispatch(fetchStartTimes());
   }, [dispatch]);
+
+  // Kiểm tra showTimes
+  useEffect(() => {
+    console.log("Current showTimes:", showTimes);
+  }, [showTimes]);
 
   const cities = useMemo(() => {
     const cityList = [
@@ -62,7 +65,6 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
 
   const toggleCityDropdown = () => setIsCityOpen(!isCityOpen);
   const toggleCinemaDropdown = () => setIsCinemaOpen(!isCinemaOpen);
-  const toggleMovieDropdown = () => setIsMovieOpen(!isMovieOpen);
 
   const handleCitySelect = useCallback(
     (city) => {
@@ -71,7 +73,6 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
       setIsCityOpen(false);
       setSelectedCinema("Chọn rạp");
       setSelectedGalaxyId(null);
-      setSelectedMovie(null);
     },
     [onCityChange]
   );
@@ -81,25 +82,7 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
     setSelectedCinema(cinema.name);
     setSelectedGalaxyId(cinema.id);
     setIsCinemaOpen(false);
-    setSelectedMovie(null);
   }, []);
-
-  const handleMovieSelect = useCallback((movie) => {
-    console.log("Selected movie:", movie);
-    setSelectedMovie(movie);
-    setIsMovieOpen(false);
-  }, []);
-
-  const movies = useMemo(() => {
-    const movieList = showTimes
-      .map((st) => ({ id: st.movieId, name: st.movieName }))
-      .filter(
-        (movie, index, self) =>
-          index === self.findIndex((m) => m.id === movie.id)
-      );
-    console.log("Computed movies:", movieList);
-    return movieList;
-  }, [showTimes]);
 
   const getWeekDays = useMemo(() => {
     const weekDays = [];
@@ -132,17 +115,18 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
       selectedCity &&
       selectedCinema !== "Chọn rạp" &&
       selectedDay &&
-      selectedGalaxyId
+      selectedGalaxyId &&
+      movieId
     ) {
-      console.log("Dispatching fetchShowTimesByFilter with:", {
+      console.log("Dispatching fetchShowTimeByMovieDateAndGalaxy with:", {
         galaxyId: selectedGalaxyId,
-        movieId: selectedMovie?.id,
+        movieId,
         date: selectedDay.dateForApi,
       });
       dispatch(
-        fetchShowTimesByFilter({
+        fetchShowTimeByMovieDateAndGalaxy({
           galaxyId: String(selectedGalaxyId),
-          movieId: selectedMovie?.id ? String(selectedMovie.id) : null,
+          movieId: String(movieId),
           date: selectedDay.dateForApi,
         })
       );
@@ -151,8 +135,8 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
     selectedCity,
     selectedCinema,
     selectedDay,
-    selectedMovie,
     selectedGalaxyId,
+    movieId,
     dispatch,
   ]);
 
@@ -215,6 +199,11 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
 
   const selectedShowtimes = useMemo(() => {
     if (!selectedDay) return [];
+    // Kiểm tra showTimes là mảng
+    if (!Array.isArray(showTimes)) {
+      console.warn("showTimes is not an array:", showTimes);
+      return [];
+    }
     const filtered = showTimes.filter(
       (st) => st.date === selectedDay.dateForApi
     );
@@ -260,19 +249,6 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
             selectedItem={selectedCinema}
           />
         </div>
-        <div className="relative inline-block text-left">
-          <DropdownButton
-            label={selectedMovie?.name || "Chọn phim"}
-            isOpen={isMovieOpen}
-            onClick={toggleMovieDropdown}
-          />
-          <DropdownMenu
-            isOpen={isMovieOpen}
-            items={movies}
-            onSelect={handleMovieSelect}
-            selectedItem={selectedMovie?.name}
-          />
-        </div>
       </div>
       <div className="flex flex-wrap gap-2 mb-6">
         {getWeekDays.map((day, idx) => (
@@ -294,7 +270,7 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
       {loading && <p className="text-gray-500">Đang tải lịch chiếu...</p>}
       {error && (
         <p className="text-red-500">
-          Lỗi: {error.message || "Không thể tải lịch chiếu"}
+          Lỗi: {error.message || error || "Không thể tải lịch chiếu"}
         </p>
       )}
       {startTimeLoading && (
@@ -311,9 +287,7 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
               <h3 className="text-lg font-bold mb-2">
                 {showtime.galaxyName} - {showtime.movieName}
               </h3>
-              <p className="text-sm text-gray-700 mb-1">
-                Ngày: {selectedDay?.date}
-              </p>
+
               <div className="flex flex-wrap gap-2">
                 {showtime.startTimes.length > 0 ? (
                   showtime.startTimes.map((time, timeIdx) => (
