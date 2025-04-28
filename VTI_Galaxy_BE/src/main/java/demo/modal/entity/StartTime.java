@@ -20,5 +20,6 @@ public class StartTime {
     private LocalTime endTime;
 
     @ManyToOne
+    @JoinColumn(name = "show_time_id")
     private ShowTime showTime;
 }
