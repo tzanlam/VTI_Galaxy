@@ -20,9 +20,15 @@ const StartTime = () => {
       alert("Vui lòng nhập đầy đủ thời gian bắt đầu và kết thúc");
       return;
     }
-    dispatch(createStartTime({ startTime, endTime }));
-    setStartTime("");
-    setEndTime("");
+    dispatch(createStartTime({ startTime, endTime }))
+      .unwrap()
+      .then(() => {
+        setStartTime("");
+        setEndTime("");
+      })
+      .catch((err) =>
+        alert(`Lỗi khi thêm thời gian: ${err.message || "Vui lòng thử lại"}`)
+      );
   };
 
   return (
@@ -60,6 +66,7 @@ const StartTime = () => {
           <button
             type="submit"
             className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            disabled={loading}
           >
             Thêm
           </button>

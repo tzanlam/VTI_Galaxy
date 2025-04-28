@@ -1,57 +1,64 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchShowTimesByFilter } from "../redux/slices/showTimeSlice";
-import { fetchStartTimes } from "../redux/slices/startTimeSlice"; // Thêm import
-import { cinemaData } from "../data/cinemaData";
+import { fetchStartTimes } from "../redux/slices/startTimeSlice";
+import { fetchGalaxies } from "../redux/slices/galaxySlice";
 
 const ShowTime = ({ selectedCity, onCityChange }) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // Sửa từ Dispatch() thành useDispatch()
   const { showTimes, loading, error } = useSelector((state) => state.showTime);
   const {
     startTimes,
     loading: startTimeLoading,
     error: startTimeError,
   } = useSelector((state) => state.startTime);
+  const {
+    galaxies,
+    loading: galaxyLoading,
+    error: galaxyError,
+  } = useSelector((state) => state.galaxy);
   const [isCityOpen, setIsCityOpen] = useState(false);
   const [isCinemaOpen, setIsCinemaOpen] = useState(false);
   const [isMovieOpen, setIsMovieOpen] = useState(false);
   const [selectedCinema, setSelectedCinema] = useState("Chọn rạp");
+  const [selectedGalaxyId, setSelectedGalaxyId] = useState(null);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
 
-  // Log trạng thái chọn lọc
-  console.log("ShowTime state:", {
-    selectedCity,
-    selectedCinema,
-    selectedMovie,
-    selectedDay,
-    showTimes,
-    startTimes,
-    loading,
-    error,
-    startTimeLoading,
-    startTimeError,
-  });
-
-  // Tải startTimes khi component gắn kết
   useEffect(() => {
-    console.log("Dispatching fetchStartTimes");
+    console.log("Dispatching fetchGalaxies and fetchStartTimes");
+    dispatch(fetchGalaxies());
     dispatch(fetchStartTimes());
   }, [dispatch]);
 
-  // Tự động chọn rạp đầu tiên khi selectedCity thay đổi
+  const cities = useMemo(() => {
+    const cityList = [
+      "Toàn quốc",
+      ...new Set(galaxies.map((g) => g.city).filter(Boolean)),
+    ];
+    console.log("Computed cities:", cityList);
+    return cityList;
+  }, [galaxies]);
+
+  const getCinemas = useMemo(() => {
+    const cinemas =
+      selectedCity === "Toàn quốc"
+        ? galaxies
+        : galaxies.filter((g) => g.city === selectedCity);
+    return cinemas.map((g) => ({ id: g.id, name: g.name }));
+  }, [selectedCity, galaxies]);
+
   useEffect(() => {
-    if (selectedCity && selectedCity !== "Toàn quốc") {
-      const cinemas = cinemaData.cinemaLocations[selectedCity] || [];
-      if (cinemas.length > 0) {
-        console.log("Auto-selecting first cinema:", cinemas[0].name);
-        setSelectedCinema(cinemas[0].name);
-      } else {
-        console.log("No cinemas available for city:", selectedCity);
-        setSelectedCinema("Chọn rạp");
-      }
+    if (selectedCity && selectedCity !== "Toàn quốc" && getCinemas.length > 0) {
+      console.log("Auto-selecting first cinema:", getCinemas[0].name);
+      setSelectedCinema(getCinemas[0].name);
+      setSelectedGalaxyId(getCinemas[0].id);
+    } else {
+      console.log("No cinemas available for city:", selectedCity);
+      setSelectedCinema("Chọn rạp");
+      setSelectedGalaxyId(null);
     }
-  }, [selectedCity]);
+  }, [selectedCity, getCinemas]);
 
   const toggleCityDropdown = () => setIsCityOpen(!isCityOpen);
   const toggleCinemaDropdown = () => setIsCinemaOpen(!isCinemaOpen);
@@ -62,6 +69,8 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
       console.log("Selected city:", city);
       onCityChange(city);
       setIsCityOpen(false);
+      setSelectedCinema("Chọn rạp");
+      setSelectedGalaxyId(null);
       setSelectedMovie(null);
     },
     [onCityChange]
@@ -70,6 +79,7 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
   const handleCinemaSelect = useCallback((cinema) => {
     console.log("Selected cinema:", cinema);
     setSelectedCinema(cinema.name);
+    setSelectedGalaxyId(cinema.id);
     setIsCinemaOpen(false);
     setSelectedMovie(null);
   }, []);
@@ -79,15 +89,6 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
     setSelectedMovie(movie);
     setIsMovieOpen(false);
   }, []);
-
-  const getCinemas = useMemo(() => {
-    if (selectedCity === "Toàn quốc") {
-      return Object.values(cinemaData.cinemaLocations)
-        .flat()
-        .filter((cinema) => cinema.name);
-    }
-    return cinemaData.cinemaLocations[selectedCity] || [];
-  }, [selectedCity]);
 
   const movies = useMemo(() => {
     const movieList = showTimes
@@ -127,26 +128,33 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
   }, []);
 
   useEffect(() => {
-    if (selectedCity && selectedCinema !== "Chọn rạp" && selectedDay) {
-      const galaxyId = cinemaData.cinemaLocations[selectedCity]?.find(
-        (cinema) => cinema.name === selectedCinema
-      )?.id;
-      if (galaxyId) {
-        console.log("Dispatching fetchShowTimesByFilter with:", {
-          galaxyId,
-          movieId: selectedMovie?.id,
+    if (
+      selectedCity &&
+      selectedCinema !== "Chọn rạp" &&
+      selectedDay &&
+      selectedGalaxyId
+    ) {
+      console.log("Dispatching fetchShowTimesByFilter with:", {
+        galaxyId: selectedGalaxyId,
+        movieId: selectedMovie?.id,
+        date: selectedDay.dateForApi,
+      });
+      dispatch(
+        fetchShowTimesByFilter({
+          galaxyId: String(selectedGalaxyId),
+          movieId: selectedMovie?.id ? String(selectedMovie.id) : null,
           date: selectedDay.dateForApi,
-        });
-        dispatch(
-          fetchShowTimesByFilter({
-            galaxyId: String(galaxyId),
-            movieId: selectedMovie?.id ? String(selectedMovie.id) : null,
-            date: selectedDay.dateForApi,
-          })
-        );
-      }
+        })
+      );
     }
-  }, [selectedCity, selectedCinema, selectedDay, selectedMovie, dispatch]);
+  }, [
+    selectedCity,
+    selectedCinema,
+    selectedDay,
+    selectedMovie,
+    selectedGalaxyId,
+    dispatch,
+  ]);
 
   const DropdownButton = ({ label, isOpen, onClick }) => (
     <button
@@ -217,6 +225,14 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h2 className="text-2xl font-bold mb-4">Lịch Chiếu Phim</h2>
+      {galaxyLoading && (
+        <p className="text-gray-500">Đang tải danh sách rạp...</p>
+      )}
+      {galaxyError && (
+        <p className="text-red-500">
+          Lỗi: {galaxyError.message || "Không thể tải danh sách rạp"}
+        </p>
+      )}
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="relative inline-block text-left">
           <DropdownButton
@@ -226,7 +242,7 @@ const ShowTime = ({ selectedCity, onCityChange }) => {
           />
           <DropdownMenu
             isOpen={isCityOpen}
-            items={cinemaData.cities}
+            items={cities}
             onSelect={handleCitySelect}
             selectedItem={selectedCity}
           />
