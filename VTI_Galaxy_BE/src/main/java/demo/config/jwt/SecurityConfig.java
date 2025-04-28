@@ -72,7 +72,8 @@ public class SecurityConfig {
                                 "/postGalaxy",
                                 "/getShowTimesByFilter",
                                 "/getShowTime",
-                                "postShowTime").permitAll()
+                                "/postShowTime",
+                                "/postStartTime").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);
         return http.build();
