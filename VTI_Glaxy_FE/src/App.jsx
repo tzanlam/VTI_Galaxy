@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { RouterProvider } from "react-router-dom";
+import { BrowserRouter, RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import store from "./redux/store";
@@ -7,6 +7,7 @@ import router from "./routes/RouterConfig";
 import LoginModal from "./components/LoginModal";
 import RegisterModal from "./components/RegisterModal";
 import { restoreAuth } from "./redux/slices/authSlice";
+import HomeAdmin from "./pages/HomeAdmin";
 
 function AppContent() {
   const dispatch = useDispatch();
@@ -36,7 +37,10 @@ function AppContent() {
 function App() {
   return (
     <Provider store={store}>
-      <AppContent />
+      <BrowserRouter >
+      <HomeAdmin />
+      {/* <AppContent /> */}
+      </BrowserRouter>
     </Provider>
   );
 }

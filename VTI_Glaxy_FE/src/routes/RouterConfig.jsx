@@ -5,6 +5,8 @@ import HomePage from "../pages/HomePage";
 import MovieDetails from "../components/MovieDetails";
 import Layout from "../components/Layout";
 import ErrorPage from "../components/ErrorPage";
+import HomeAdmin from "../pages/HomeAdmin";
+import GalaxyManagement from "../components/admin/GalaxyManagement";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +36,16 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    element: <HomeAdmin />,
+    path: "/management",
+    children: [
+      {
+        element: <GalaxyManagement />,
+        path: "galaxy"
+      }
+    ]
+  }
 ]);
 
 export default router;
