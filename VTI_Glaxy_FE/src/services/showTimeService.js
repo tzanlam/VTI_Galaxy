@@ -7,8 +7,8 @@ const showTimeService = {
   fetchShowTimeById(showTimeId) {
     return axiosClient.get(`/getShowTime/${showTimeId}`);
   },
-  fetchShowTimesByFilter(galaxyId, movieId, date) {
-    return axiosClient.get("/getShowTimesByFilter", {
+  fetchShowTimeByMovieDateAndGalaxy(galaxyId, movieId, date) {
+    return axiosClient.get("/getShowTimeByMovieDateAndGalaxy", {
       params: { galaxyId, movieId, date },
     });
   },
