@@ -1,9 +1,9 @@
 package demo.modal.dto;
 
 import demo.modal.entity.ShowTime;
-import demo.modal.entity.StartTime;
 import lombok.Data;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class ShowTimeDto {
         this.galaxyName = getGalaxyName(showTime);
         this.movieName = getMovieName(showTime);
         this.date = formatDate(showTime);
-        this.startTimes = mapStartTimes(showTime);
+        this.startTimes = mapTime(showTime);
     }
 
     private String getGalaxyName(ShowTime showTime) {
@@ -37,16 +37,12 @@ public class ShowTimeDto {
         return showTime.getDate() != null ? showTime.getDate().toString() : null;
     }
 
-    private List<String> mapStartTimes(ShowTime showTime) {
-        if (showTime.getStartTimes() == null) {
-            throw new NullPointerException("startTimes is null");
+    private List<String> mapTime(ShowTime showTime){
+        List<String> st = new ArrayList<>();
+        for (LocalTime std : showTime.getStartTimes()){
+            st.add(std.toString());
         }
-        List<StartTime> st = showTime.getStartTimes();
-        startTimes = new ArrayList<>();
-        for (StartTime stTime : st) {
-            startTimes.add(stTime.getStartTime().toString());
-        }
-
-        return startTimes;
+        return st;
     }
+
 }

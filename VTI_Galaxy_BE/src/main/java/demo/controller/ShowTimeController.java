@@ -5,11 +5,6 @@ import demo.services.interfaceClass.ShowTimeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RestController
 @CrossOrigin("*")
 public class ShowTimeController {
@@ -66,12 +61,10 @@ public class ShowTimeController {
     @PostMapping("/postShowTime")
     public ResponseEntity<?> createShowTime(@RequestBody ShowTimeRequest request) {
         try {
-            List<Integer> startTimeIds = parseStartTimes(request.getStartTimes());
             return ResponseEntity.ok(showTimeService.create(
                     Integer.parseInt(request.getGalaxyId()),
                     Integer.parseInt(request.getMovieId()),
-                    request.getDate(),
-                    startTimeIds
+                    request.getDate(), request.getStartTimes()
             ));
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body("galaxyId, movieId hoặc startTimes không hợp lệ");
@@ -86,13 +79,11 @@ public class ShowTimeController {
             @RequestBody ShowTimeRequest request
     ) {
         try {
-            List<Integer> startTimeIds = parseStartTimes(request.getStartTimes());
             return ResponseEntity.ok(showTimeService.updateShowTime(
                     showTimeId,
                     Integer.parseInt(request.getGalaxyId()),
                     Integer.parseInt(request.getMovieId()),
-                    request.getDate(),
-                    startTimeIds
+                    request.getDate(), request.getStartTimes()
             ));
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body("galaxyId, movieId hoặc startTimes không hợp lệ");
@@ -109,15 +100,5 @@ public class ShowTimeController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-    }
-
-    private List<Integer> parseStartTimes(String startTimes) {
-        if (startTimes == null || startTimes.trim().isEmpty()) {
-            return Collections.emptyList();
-        }
-        return Arrays.stream(startTimes.split(","))
-                .map(String::trim)
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
     }
 }

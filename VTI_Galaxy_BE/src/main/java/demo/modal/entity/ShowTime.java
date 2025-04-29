@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,6 +27,8 @@ public class ShowTime {
     @Column
     private LocalDate date;
 
-    @OneToMany(mappedBy = "showTime", fetch = FetchType.EAGER)
-    private List<StartTime> startTimes;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "showtime_start_times", joinColumns = @JoinColumn(name = "showtime_id"))
+    @Column(name = "start_time")
+    private List<LocalTime> startTimes = new ArrayList<>();
 }

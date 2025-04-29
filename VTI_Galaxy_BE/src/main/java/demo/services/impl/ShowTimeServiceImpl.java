@@ -4,11 +4,9 @@ import demo.modal.dto.ShowTimeDto;
 import demo.modal.entity.Galaxy;
 import demo.modal.entity.Movie;
 import demo.modal.entity.ShowTime;
-import demo.modal.entity.StartTime;
 import demo.repository.GalaxyRepository;
 import demo.repository.MovieRepository;
 import demo.repository.ShowTimeRepository;
-import demo.repository.StartTimeRepository;
 import demo.services.interfaceClass.ShowTimeService;
 import org.springframework.stereotype.Service;
 
@@ -18,20 +16,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static demo.support.MethodSupport.convertToLocalDate;
+import static demo.support.MethodSupport.convertToLocalTime;
 
 @Service
 public class ShowTimeServiceImpl implements ShowTimeService {
     private final ShowTimeRepository showTimeRepository;
     private final GalaxyRepository galaxyRepository;
     private final MovieRepository movieRepository;
-    private final StartTimeRepository startTimeRepository;
 
     public ShowTimeServiceImpl(ShowTimeRepository showTimeRepository, GalaxyRepository galaxyRepository,
-                               MovieRepository movieRepository, StartTimeRepository startTimeRepository) {
+                               MovieRepository movieRepository) {
         this.showTimeRepository = showTimeRepository;
         this.galaxyRepository = galaxyRepository;
         this.movieRepository = movieRepository;
-        this.startTimeRepository = startTimeRepository;
     }
 
     @Override
@@ -61,19 +58,17 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public ShowTimeDto create(int galaxyId, int movieId, String date, List<Integer> startTimeIds) {
+    public ShowTimeDto create(int galaxyId, int movieId, String date, List<String> startTimeIds) {
         ShowTime showTime = populate(galaxyId, movieId, date, startTimeIds);
         showTimeRepository.save(showTime);
-        showTime = showTimeRepository.findById(showTime.getId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch chiếu sau khi lưu"));
         return new ShowTimeDto(showTime);
     }
 
     @Override
-    public ShowTimeDto updateShowTime(int id, int galaxyId, int movieId, String date, List<Integer> startTimeIds) {
+    public ShowTimeDto updateShowTime(int id, int galaxyId, int movieId, String date, List<String> startTimes) {
         ShowTime showTime = showTimeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch chiếu với id " + id));
-        ShowTime updated = populate(galaxyId, movieId, date, startTimeIds);
+        ShowTime updated = populate(galaxyId, movieId, date, startTimes);
         showTime.setGalaxy(updated.getGalaxy());
         showTime.setMovie(updated.getMovie());
         showTime.setDate(convertToLocalDate(date));
@@ -89,32 +84,20 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         showTimeRepository.delete(showTime);
     }
 
-    private ShowTime populate(int galaxyId, int movieId, String date, List<Integer> startTimeIds) {
+    private ShowTime populate(int galaxyId, int movieId, String date, List<String> startTimes) {
+        ShowTime showTime = new ShowTime();
         Galaxy galaxy = galaxyRepository.findById(galaxyId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy rạp với id " + galaxyId));
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phim với id " + movieId));
-        List<StartTime> startTimes = new ArrayList<>();
-        for (Integer id : startTimeIds) {
-            StartTime startTime = startTimeRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy thời gian bắt đầu với id " + id));
-            startTimes.add(startTime);
+        if (showTime.getStartTimes() == null) startTimes = new ArrayList<>();
+        for (String st : startTimes){
+            showTime.getStartTimes().add(convertToLocalTime(st));
         }
-        ShowTime showTime = new ShowTime();
         showTime.setGalaxy(galaxy);
         showTime.setMovie(movie);
         showTime.setDate(convertToLocalDate(date));
-
-        // Lưu ShowTime trước để có ID
         ShowTime savedShowTime = showTimeRepository.save(showTime);
-
-        // Cập nhật và lưu StartTime
-        startTimes.forEach(st -> {
-            st.setShowTime(savedShowTime);
-            startTimeRepository.save(st);
-        });
-        savedShowTime.setStartTimes(startTimes);
-
         return showTimeRepository.save(savedShowTime);
     }
 }
