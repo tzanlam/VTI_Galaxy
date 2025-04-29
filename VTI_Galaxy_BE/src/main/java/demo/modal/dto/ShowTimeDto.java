@@ -1,5 +1,6 @@
 package demo.modal.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import demo.modal.entity.ShowTime;
 import lombok.Data;
 
@@ -13,6 +14,7 @@ public class ShowTimeDto {
     private String galaxyName;
     private String movieName;
     private String date;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> startTimes;
 
     public ShowTimeDto(ShowTime showTime) {

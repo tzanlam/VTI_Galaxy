@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer> {
-    @Query("SELECT s FROM ShowTime s WHERE s.galaxy.id = :galaxyId " +
+    @Query("SELECT s FROM ShowTime s LEFT JOIN FETCH s.startTimes WHERE s.galaxy.id = :galaxyId " +
             "AND s.movie.id = :movieId " +
             "AND s.date = :date")
     Optional<ShowTime> findByDateAndMovie(
@@ -20,7 +20,6 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer> {
             @Param("movieId") int movieId,
             @Param("date") LocalDate date
     );
-
     @Query("SELECT s FROM ShowTime s WHERE (:galaxyId IS NULL OR s.galaxy.id = :galaxyId) " +
             "AND (:movieId IS NULL OR s.movie.id = :movieId) " +
             "AND (:date IS NULL OR s.date = :date)")
