@@ -8,7 +8,6 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
   const dispatch = useDispatch();
   const { showTimes, loading, error } = useSelector((state) => state.showTime);
   const {
-    startTimes,
     loading: startTimeLoading,
     error: startTimeError,
   } = useSelector((state) => state.startTime);
