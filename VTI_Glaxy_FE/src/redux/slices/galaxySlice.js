@@ -61,6 +61,7 @@ export const deleteGalaxy = createAsyncThunk(
   async (galaxyId, { rejectWithValue }) => {
     try {
       const response = await galaxyService.deleteGalaxy(galaxyId);
+      console.log(response);
       return { id: galaxyId }; // Trả về galaxyId để lọc trong reducer
     } catch (error) {
       console.error("Error deleting galaxy:", error);
