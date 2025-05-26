@@ -8,6 +8,7 @@ import ErrorPage from "../components/ErrorPage";
 import HomeAdmin from "../pages/HomeAdmin";
 import GalaxyManagement from "../components/admin/GalaxyManagement";
 import RoomManagement from "../components/admin/RoomManagement";
+import MovieManagement from "../components/admin/MovieManagement";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
       {
         element: <RoomManagement />,
         path: "room"
+      },
+      {
+        element: <MovieManagement />,
+        path: 'movie'
       }
     ]
   }
