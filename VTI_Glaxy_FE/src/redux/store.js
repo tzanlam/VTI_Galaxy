@@ -6,7 +6,7 @@ import accountReducer from "./slices/accountSlice";
 import movieReducer from "./slices/movieSlice";
 import showTimeReducer from "./slices/showTimeSlice";
 import startTimeReducer from "./slices/startTimeSlice";
-
+import roomReducer from "./slices/roomSlice"
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
 
@@ -25,6 +25,7 @@ const store = configureStore({
     auth: authReducer,
     galaxy: galaxyReducer,
     account: accountReducer,
+    room: roomReducer,
     movie: movieReducer,
     showTime: showTimeReducer,
     startTime: startTimeReducer,

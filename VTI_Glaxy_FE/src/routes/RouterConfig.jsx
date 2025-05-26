@@ -7,6 +7,7 @@ import Layout from "../components/Layout";
 import ErrorPage from "../components/ErrorPage";
 import HomeAdmin from "../pages/HomeAdmin";
 import GalaxyManagement from "../components/admin/GalaxyManagement";
+import RoomManagement from "../components/admin/RoomManagement";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
       {
         element: <GalaxyManagement />,
         path: "galaxy"
+      },
+      {
+        element: <RoomManagement />,
+        path: "room"
       }
     ]
   }
