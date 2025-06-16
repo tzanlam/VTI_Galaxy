@@ -9,6 +9,7 @@ import HomeAdmin from "../pages/HomeAdmin";
 import GalaxyManagement from "../components/admin/GalaxyManagement";
 import RoomManagement from "../components/admin/RoomManagement";
 import MovieManagement from "../components/admin/MovieManagement";
+import SeatSelection from "../components/SeatSelection";
 
 const router = createBrowserRouter([
   {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
         element: <ErrorPage />,
       },
       {
+        path: "/seat-selection/:showtimeId",
+        element: <SeatSelection />,
+      },
+      {
         path: "*",
         element: <ErrorPage />,
       },
@@ -44,18 +49,18 @@ const router = createBrowserRouter([
     children: [
       {
         element: <GalaxyManagement />,
-        path: "galaxy"
+        path: "galaxy",
       },
       {
         element: <RoomManagement />,
-        path: "room"
+        path: "room",
       },
       {
         element: <MovieManagement />,
-        path: 'movie'
-      }
-    ]
-  }
+        path: "movie",
+      },
+    ],
+  },
 ]);
 
 export default router;

@@ -3,14 +3,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchShowTimeByMovieDateAndGalaxy } from "../redux/slices/showTimeSlice";
 import { fetchStartTimes } from "../redux/slices/startTimeSlice";
 import { fetchGalaxies } from "../redux/slices/galaxySlice";
+import { useNavigate } from "react-router-dom";
 
 const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { showTimes, loading, error } = useSelector((state) => state.showTime);
-  const {
-    loading: startTimeLoading,
-    error: startTimeError,
-  } = useSelector((state) => state.startTime);
+  const { loading: startTimeLoading, error: startTimeError } = useSelector(
+    (state) => state.startTime
+  );
   const {
     galaxies,
     loading: galaxyLoading,
@@ -210,6 +211,18 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
     return filtered;
   }, [showTimes, selectedDay]);
 
+  const handleTimeClick = (showtime, time) => {
+    navigate(`/seat-selection/${showtime.id}`, {
+      state: {
+        showtimeId: showtime.id,
+        movieName: showtime.movieName,
+        galaxyName: showtime.galaxyName,
+        date: selectedDay?.dateForApi,
+        time: time,
+      },
+    });
+  };
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h2 className="text-2xl font-bold mb-4">Lịch Chiếu Phim</h2>
@@ -293,11 +306,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
                     <button
                       key={timeIdx}
                       className="bg-orange-500 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition-colors"
-                      onClick={() =>
-                        alert(
-                          `Đã đặt vé tại ${showtime.galaxyName} cho ${showtime.movieName} vào ${selectedDay?.day} (${selectedDay?.date}) lúc ${time}`
-                        )
-                      }
+                      onClick={() => handleTimeClick(showtime, time)}
                     >
                       {time}
                     </button>
