@@ -107,93 +107,145 @@ const SeatSelection = () => {
         </p>
       </div>
 
-      <div className="mb-8">
-        <div className="w-full bg-gray-800 h-12 rounded-lg mb-6 flex items-center justify-center">
-          <p className="text-white text-lg">Màn hình</p>
-        </div>
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Phần bên trái - Sơ đồ ghế */}
+        <div className="md:w-2/3">
+          <div className="w-full bg-gray-800 h-12 rounded-lg mb-6 flex items-center justify-center">
+            <p className="text-white text-lg">Màn hình</p>
+          </div>
 
-        {/* Hiển thị ghế theo từng hàng để dễ nhìn hơn */}
-        <div className="mb-8">
-          {["A", "B", "C", "D", "E", "F", "G", "H"].map((row) => (
-            <div key={row} className="flex justify-center mb-2">
-              <div className="w-8 flex items-center justify-center font-bold text-gray-600">
-                {row}
+          {/* Hiển thị ghế theo từng hàng để dễ nhìn hơn */}
+          <div className="mb-8">
+            {["A", "B", "C", "D", "E", "F", "G", "H"].map((row) => (
+              <div key={row} className="flex justify-center mb-2">
+                <div className="w-8 flex items-center justify-center font-bold text-gray-600">
+                  {row}
+                </div>
+                <div className="flex gap-1">
+                  {seats
+                    .filter((seat) => seat.row === row)
+                    .map((seat) => (
+                      <button
+                        key={seat.id}
+                        className={`w-8 h-8 rounded-md text-white text-xs flex items-center justify-center ${getSeatStatus(
+                          seat
+                        )}`}
+                        onClick={() => handleSeatClick(seat)}
+                        disabled={seat.status === "BOOKED"}
+                      >
+                        {seat.number}
+                      </button>
+                    ))}
+                </div>
               </div>
-              <div className="flex gap-1">
-                {seats
-                  .filter((seat) => seat.row === row)
-                  .map((seat) => (
-                    <button
-                      key={seat.id}
-                      className={`w-8 h-8 rounded-md text-white text-xs flex items-center justify-center ${getSeatStatus(
-                        seat
-                      )}`}
-                      onClick={() => handleSeatClick(seat)}
-                      disabled={seat.status === "BOOKED"}
-                    >
-                      {seat.number}
-                    </button>
-                  ))}
+            ))}
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 mb-6">
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-blue-500 rounded-sm mr-2"></div>
+              <span className="text-sm">Ghế thường</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-yellow-500 rounded-sm mr-2"></div>
+              <span className="text-sm">Ghế VIP</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-green-500 rounded-sm mr-2"></div>
+              <span className="text-sm">Đã chọn</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-gray-500 rounded-sm mr-2"></div>
+              <span className="text-sm">Đã đặt</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Phần bên phải - Thông tin đặt vé */}
+        <div className="md:w-1/3 bg-white p-6 rounded-lg shadow-md">
+          <div className="border-b pb-4 mb-4">
+            <h2 className="text-xl font-bold mb-4">Thông tin đặt vé</h2>
+            <div className="space-y-2">
+              <p>
+                <span className="font-medium">Phim:</span> {movieName}
+              </p>
+              <p>
+                <span className="font-medium">Rạp:</span> {galaxyName}
+              </p>
+              <p>
+                <span className="font-medium">Ngày chiếu:</span> {date}
+              </p>
+              <p>
+                <span className="font-medium">Giờ chiếu:</span> {time}
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h2 className="text-xl font-bold mb-4">Ghế đã chọn</h2>
+            {selectedSeats.length > 0 ? (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {selectedSeats.map((seat) => (
+                  <span
+                    key={seat.id}
+                    className="px-2 py-1 bg-green-100 border border-green-500 rounded-md"
+                  >
+                    {seat.id}
+                  </span>
+                ))}
               </div>
-            </div>
-          ))}
-        </div>
+            ) : (
+              <p className="text-gray-500 mb-4">Chưa chọn ghế nào</p>
+            )}
 
-        <div className="flex flex-wrap justify-center gap-4 mb-6">
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-blue-500 rounded-sm mr-2"></div>
-            <span className="text-sm">Ghế thường</span>
+            {selectedSeats.length > 0 && (
+              <div className="space-y-2 border-t pt-4">
+                <div className="flex justify-between">
+                  <span>
+                    Ghế thường (
+                    {selectedSeats.filter((s) => s.type === "STANDARD").length}
+                    x):
+                  </span>
+                  <span>
+                    {(
+                      selectedSeats.filter((s) => s.type === "STANDARD")
+                        .length * 90000
+                    ).toLocaleString()}{" "}
+                    VNĐ
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>
+                    Ghế VIP (
+                    {selectedSeats.filter((s) => s.type === "VIP").length}x):
+                  </span>
+                  <span>
+                    {(
+                      selectedSeats.filter((s) => s.type === "VIP").length *
+                      120000
+                    ).toLocaleString()}{" "}
+                    VNĐ
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-yellow-500 rounded-sm mr-2"></div>
-            <span className="text-sm">Ghế VIP</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-green-500 rounded-sm mr-2"></div>
-            <span className="text-sm">Đã chọn</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-gray-500 rounded-sm mr-2"></div>
-            <span className="text-sm">Đã đặt</span>
-          </div>
-        </div>
-      </div>
 
-      <div className="border-t pt-4">
-        <div className="mb-4">
-          <h2 className="text-xl font-bold mb-2">Ghế đã chọn</h2>
-          {selectedSeats.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {selectedSeats.map((seat) => (
-                <span
-                  key={seat.id}
-                  className="px-2 py-1 bg-green-100 border border-green-500 rounded-md"
-                >
-                  {seat.id}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">Chưa chọn ghế nào</p>
-          )}
-        </div>
-
-        <div className="flex justify-between items-center">
-          <div>
-            <p className="text-lg">
-              Tổng tiền:{" "}
-              <span className="font-bold">
+          <div className="border-t pt-4">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-lg font-bold">Tổng tiền:</span>
+              <span className="text-xl font-bold text-orange-500">
                 {calculateTotal().toLocaleString()} VNĐ
               </span>
-            </p>
+            </div>
+            <button
+              className="w-full py-3 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium"
+              onClick={handleBooking}
+              disabled={selectedSeats.length === 0}
+            >
+              Tiếp tục thanh toán
+            </button>
           </div>
-          <button
-            className="px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
-            onClick={handleBooking}
-            disabled={selectedSeats.length === 0}
-          >
-            Tiếp tục
-          </button>
         </div>
       </div>
     </div>
