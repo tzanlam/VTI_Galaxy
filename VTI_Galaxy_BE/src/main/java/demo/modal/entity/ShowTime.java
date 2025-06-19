@@ -27,7 +27,7 @@ public class ShowTime {
     @Column
     private LocalDate date;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "showtime_start_times", joinColumns = @JoinColumn(name = "showtime_id"))
     @Column(name = "start_time")
     private List<LocalTime> startTimes = new ArrayList<>();

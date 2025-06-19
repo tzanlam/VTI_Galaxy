@@ -14,7 +14,7 @@ public class SeatRequest {
         seat.setSeatNameType(seatNameType);
         seat.setDescription(description);
         seat.setPrice(price);
-        seat.setStatus(OpenStatus.CLOSED);
+        seat.setStatus(OpenStatus.OPEN);
         return seat;
     }
 }

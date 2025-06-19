@@ -73,7 +73,8 @@ public class SecurityConfig {
                                 "/getShowTimesByFilter",
                                 "/getShowTime",
                                 "/postShowTime",
-                                "/postStartTime").permitAll()
+                                "/postStartTime",
+                                "/postSeat").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);
         return http.build();
