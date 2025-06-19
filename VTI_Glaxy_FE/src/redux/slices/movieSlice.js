@@ -2,12 +2,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import movieService from "../../services/movieService";
 
-export const  fetchMovies = createAsyncThunk(
+export const fetchMovies = createAsyncThunk(
   "movie/fetchMovies",
   async (_, { rejectWithValue }) => {
     try {
       const response = await movieService.fetchMovies();
-      console.log(response.data)
+      console.log(response.data);
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response.data);
