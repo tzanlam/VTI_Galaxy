@@ -6,7 +6,10 @@ import accountReducer from "./slices/accountSlice";
 import movieReducer from "./slices/movieSlice";
 import showTimeReducer from "./slices/showTimeSlice";
 import startTimeReducer from "./slices/startTimeSlice";
-import roomReducer from "./slices/roomSlice"
+import roomReducer from "./slices/roomSlice";
+import seatReducer from "./slices/seatSlice";
+import seatRoomReducer from "./slices/seatRoomSlice";
+
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
 
@@ -29,6 +32,8 @@ const store = configureStore({
     movie: movieReducer,
     showTime: showTimeReducer,
     startTime: startTimeReducer,
+    seat: seatReducer,
+    seatRoom: seatRoomReducer,
   },
   preloadedState,
   // eslint-disable-next-line no-undef

@@ -9,8 +9,12 @@ const axiosClient = axios.create({
 // Interceptor cho request
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    if (token && !["/login", "/register"].some((url) => config.url.includes(url))) {
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (
+      token &&
+      !["/login", "/register"].some((url) => config.url.includes(url))
+    ) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
@@ -27,7 +31,9 @@ axiosClient.interceptors.response.use(
       switch (status) {
         case 400:
         case 401:
-          return Promise.reject(new Error(data.message || "Email hoặc mật khẩu không đúng"));
+          return Promise.reject(
+            new Error(data.message || "Email hoặc mật khẩu không đúng")
+          );
         case 403:
           return Promise.reject(new Error("Bạn không có quyền truy cập"));
         case 500:

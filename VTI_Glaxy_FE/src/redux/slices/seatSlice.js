@@ -1,79 +1,68 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import seatService from "../../services/seatService";
 
-export const fetchSeats = createAsyncThunk('seat/fetchSeats', async({rejectWithValue})=>{
-   try {
-      return await (seatService.fetchSeats).data
-   } catch (error) {
-      return rejectWithValue(error.data)
-   }
-})
+// Async thunk để lấy danh sách ghế theo suất chiếu
+export const fetchSeats = createAsyncThunk(
+  "seat/fetchSeats",
+  async (showTimeId, { rejectWithValue }) => {
+    try {
+      // Sử dụng service để gọi API
+      const response = await seatService.fetchSeatByShowTimeId(showTimeId);
+      return response.data;
+    } catch (error) {
+      console.error("Lỗi khi lấy thông tin ghế:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Không thể lấy thông tin ghế"
+      );
+    }
+  }
+);
 
-export const fetchSeatById = createAsyncThunk('seat/fetchSeatById', async(seatId, {rejectWithValue})=>{
-   try{
-      return (await (seatService.fetchSeatById(seatId))).data
-   }catch(err){
-      return rejectWithValue(err.data)
-   }
-})
-
-export const createSeat = createAsyncThunk('seat/createSeat', async(request, {rejectWithValue})=>{
-   try{
-      return (await (seatService.createSeat(request))).data
-   }catch(err){
-      return rejectWithValue(err.data)
-   }
-})
-
-export const updateSeat = createAsyncThunk('seat/updateSeat', async({seatId, request}, {rejectWithValue})=>{
-   try {
-      return (await (seatService.updateSeat(seatId, request))).data
-   } catch (error) {
-      return rejectWithValue(error.data)
-   }
-})
-
-export const deleteSeat = createAsyncThunk('seat/deleteSeat', async(seatId, {rejectWithValue})=>{
-   try{
-      return (await (seatService.deleteSeat(seatId))).data
-   }catch(err){
-      return rejectWithValue(err.data)
-   }
-})
-
+// Slice
 const seatSlice = createSlice({
-   name: 'seat',
-   initialState: {
-      seat: null,
-      seats: [],
-      loading: false,
-      error: null
-   },
-   reducers: {
-      clearSeatState: (state) => {
-         state.seat = null,
-         state.seats = [],
-         state.loading = false,
-         state.error = null
-      }
-   },
-   extraReducers: (builder) => {
-      builder
-      // fetch seats
-      .addCase(fetchSeats.pending, (state)=>{
-         state.loading = true,
-         state.error = null
-      })
-      .addCase(fetchSeats.fulfilled, (state, action)=>{
-         state.seats = action.payload,
-         state.loading = false
-      })
-      .addCase(fetchSeats.rejected, (state, action)=>{
-         state.error = action.payload,
-         state.loading = false
-      })
-   }
-})
+  name: "seat",
+  initialState: {
+    seats: [],
+    selectedSeats: [],
+    loading: false,
+    error: null,
+  },
+  reducers: {
+    selectSeat: (state, action) => {
+      const seat = action.payload;
+      const isSelected = state.selectedSeats.some((s) => s.id === seat.id);
 
-export const {clearSeatState} = seatSlice.actions
-export default seatSlice.reducer
+      if (isSelected) {
+        state.selectedSeats = state.selectedSeats.filter(
+          (s) => s.id !== seat.id
+        );
+      } else {
+        state.selectedSeats.push(seat);
+      }
+    },
+    resetSelectedSeats: (state) => {
+      state.selectedSeats = [];
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchSeats.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSeats.fulfilled, (state, action) => {
+        state.loading = false;
+        state.seats = action.payload;
+      })
+      .addCase(fetchSeats.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Đã xảy ra lỗi khi lấy thông tin ghế";
+      });
+  },
+});
+
+// Đảm bảo export các actions từ slice
+export const { selectSeat, resetSelectedSeats } = seatSlice.actions;
+
+// Export reducer
+export default seatSlice.reducer;
