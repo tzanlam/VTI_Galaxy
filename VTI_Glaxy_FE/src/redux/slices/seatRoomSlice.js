@@ -6,8 +6,10 @@ export const fetchSeatRooms = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await seatRoomService.fetchSeatRooms();
+      console.log("fetchSeatRooms response:", response.data);
       return response.data;
     } catch (err) {
+      console.error("fetchSeatRooms error:", err);
       return rejectWithValue(
         err.response?.data || "Lỗi khi lấy danh sách ghế phòng"
       );
@@ -22,8 +24,10 @@ export const fetchSeatRoomsByShowtimeId = createAsyncThunk(
       const response = await seatRoomService.fetchSeatRoomsByShowtimeId(
         showtimeId
       );
+      console.log("fetchSeatRoomsByShowtimeId response:", response.data);
       return response.data;
     } catch (error) {
+      console.error("fetchSeatRoomsByShowtimeId error:", error);
       return rejectWithValue(
         error.response?.data ||
           "Lỗi khi lấy danh sách ghế phòng theo suất chiếu"
@@ -53,9 +57,12 @@ export const fetchSeatRoomById = createAsyncThunk(
   "seatRoom/fetchSeatRoomById",
   async (seatRoomId, { rejectWithValue }) => {
     try {
-      return (await seatRoomService.fetchSeatById(seatRoomId)).data;
+      const response = await seatRoomService.fetchSeatRoomById(seatRoomId);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error);
+      return rejectWithValue(
+        error.response?.data || "Lỗi khi lấy thông tin ghế phòng"
+      );
     }
   }
 );
@@ -64,20 +71,10 @@ export const createSeatRoom = createAsyncThunk(
   "seatRoom/createSeatRoom",
   async (request, { rejectWithValue }) => {
     try {
-      return (await seatRoomService.createSeatRoom(request)).data;
+      const response = await seatRoomService.createSeatRoom(request);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.data);
-    }
-  }
-);
-
-export const updateSeatRoomName = createAsyncThunk(
-  "seatRoom/update",
-  async ({ seatRoomId, name }, { rejectWithValue }) => {
-    try {
-      return (await seatRoomService.updateNameSeatRoom(seatRoomId, name)).data;
-    } catch (err) {
-      return rejectWithValue(err.data);
+      return rejectWithValue(error.response?.data || "Lỗi khi tạo ghế phòng");
     }
   }
 );
@@ -120,12 +117,13 @@ const seatRoomSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchSeatRooms.fulfilled, (state, action) => {
-        state.seatRooms = action.payload;
+        state.seatRooms = Array.isArray(action.payload) ? action.payload : [];
         state.loading = false;
       })
       .addCase(fetchSeatRooms.rejected, (state, action) => {
         state.error = action.payload;
         state.loading = false;
+        state.seatRooms = [];
       })
       // fetch seat rooms by showtime id
       .addCase(fetchSeatRoomsByShowtimeId.pending, (state) => {
@@ -133,12 +131,13 @@ const seatRoomSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchSeatRoomsByShowtimeId.fulfilled, (state, action) => {
-        state.seatRooms = action.payload;
+        state.seatRooms = Array.isArray(action.payload) ? action.payload : [];
         state.loading = false;
       })
       .addCase(fetchSeatRoomsByShowtimeId.rejected, (state, action) => {
         state.error = action.payload;
         state.loading = false;
+        state.seatRooms = [];
       })
       // update seat room status
       .addCase(updateSeatRoomStatus.fulfilled, (state, action) => {
@@ -147,6 +146,11 @@ const seatRoomSlice = createSlice({
         if (seatRoom) {
           seatRoom.status = status;
         }
+        state.loading = false;
+      })
+      .addCase(updateSeatRoomStatus.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
       });
   },
 });

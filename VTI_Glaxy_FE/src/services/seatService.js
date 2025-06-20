@@ -2,16 +2,13 @@ import axiosClient from "./axiosClient";
 
 const seatService = {
   fetchSeats() {
-    return axiosClient.get("/getSeat");
+    return axiosClient.get("/getSeats");
   },
   fetchSeatById(seatId) {
     return axiosClient.get(`/getSeatById?seatId=${seatId}`);
   },
-  fetchSeatByRoomId(roomId) {
-    return axiosClient.get(`/getSeatByRoomId?roomId=${roomId}`);
-  },
   fetchSeatByShowTimeId(showTimeId) {
-    return axiosClient.get(`/getSeatByShowTimeId?showTimeId=${showTimeId}`);
+    return axiosClient.get(`/getSeatRoomsByShowtime?showtimeId=${showTimeId}`);
   },
   createSeat(seatRequest) {
     return axiosClient.post("/postSeat", seatRequest);
@@ -20,7 +17,8 @@ const seatService = {
     return axiosClient.put(`/putSeat?seatId=${seatId}`, seatRequest);
   },
   deleteSeat(seatId) {
-    return axiosClient.put(`putStatusSeat?seatId=${seatId}`);
+    return axiosClient.put(`/putStatusSeat?seatId=${seatId}`);
   },
 };
+
 export default seatService;

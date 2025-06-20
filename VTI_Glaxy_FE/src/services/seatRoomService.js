@@ -2,31 +2,27 @@ import axiosClient from "./axiosClient";
 
 const seatRoomService = {
   fetchSeatRooms() {
-    return axiosClient.get("/getSeatRoom");
+    return axiosClient.get("/getSeatRooms");
   },
   fetchSeatRoomById(seatRoomId) {
     return axiosClient.get(`/getSeatRoomById?seatRoomId=${seatRoomId}`);
   },
-  fetchSeatRoomsByRoomId(roomId) {
-    return axiosClient.get(`/getSeatRoomsByRoomId?roomId=${roomId}`);
-  },
   fetchSeatRoomsByShowtimeId(showtimeId) {
-    return axiosClient.get(
-      `/getSeatRoomsByShowtimeId?showtimeId=${showtimeId}`
-    );
+    return axiosClient.get(`/getSeatRoomsByShowtime?showtimeId=${showtimeId}`);
   },
   createSeatRoom(seatRoomRequest) {
     return axiosClient.post("/postSeatRoom", seatRoomRequest);
   },
   updateSeatRoomStatus(seatRoomId, status) {
     return axiosClient.put(
-      `/updateSeatRoomStatus?seatRoomId=${seatRoomId}&status=${status}`
+      `/putSeatRoomStatus?seatRoomId=${seatRoomId}&status=${status}`
     );
   },
   updateNameSeatRoom(seatRoomId, name) {
     return axiosClient.put(
-      `/putSeatRoomName?seatRoomId=${seatRoomId}&seatRoomName=${name}`
+      `/putSeatRoomStatus?seatRoomId=${seatRoomId}&status=${name}`
     );
   },
 };
+
 export default seatRoomService;
