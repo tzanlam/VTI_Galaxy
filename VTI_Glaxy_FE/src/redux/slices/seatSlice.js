@@ -1,14 +1,18 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import seatService from "../../services/seatService";
+import {
+  fetchSeatRoomsByShowtimeId,
+  selectSeatRoom,
+  unselectSeatRoom,
+} from "./seatRoomSlice";
 
 // Async thunk để lấy danh sách ghế theo suất chiếu
 export const fetchSeats = createAsyncThunk(
   "seat/fetchSeats",
   async (showTimeId, { rejectWithValue }) => {
     try {
-      // Sử dụng service để gọi API
-      const response = await seatService.fetchSeatByShowTimeId(showTimeId);
-      return response.data;
+      // Sử dụng action từ seatRoomSlice
+      const response = await fetchSeatRoomsByShowtimeId(showTimeId).unwrap();
+      return response;
     } catch (error) {
       console.error("Lỗi khi lấy thông tin ghế:", error);
       return rejectWithValue(
@@ -36,8 +40,10 @@ const seatSlice = createSlice({
         state.selectedSeats = state.selectedSeats.filter(
           (s) => s.id !== seat.id
         );
+        unselectSeatRoom(seat.id); // Đồng bộ với seatRoomSlice
       } else {
         state.selectedSeats.push(seat);
+        selectSeatRoom(seat.id); // Đồng bộ với seatRoomSlice
       }
     },
     resetSelectedSeats: (state) => {
