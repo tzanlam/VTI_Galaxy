@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SeatRoomRepository extends JpaRepository<SeatRoom, Integer> {
     List<SeatRoom> findByShowTimeId(int showTimeId);
+
+    List<SeatRoom> findByRoomId(int roomId);
 }

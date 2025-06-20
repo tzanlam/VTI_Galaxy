@@ -42,6 +42,15 @@ public class SeatRoomController {
         }
     }
 
+    @GetMapping("/getSeatRoomsByRoomId")
+    public ResponseEntity<?> findSeatRoomsByRoomId(@RequestParam("roomId") int roomId) {
+        try {
+            return ResponseEntity.ok(seatRoomService.getSeatRoomsByRoomId(roomId));
+        } catch (Exception e) {
+            return ResponseEntity.ofNullable(e.getMessage());
+        }
+    }
+
     @PostMapping("/postSeatRoom")
     public ResponseEntity<?> postSeatRoom(@RequestBody SeatRoomRequest request) {
         try {

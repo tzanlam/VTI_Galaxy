@@ -15,7 +15,7 @@ public class SeatRoomDto {
         this.id = String.valueOf(seatRoom.getId());
         this.seatId = String.valueOf(seatRoom.getSeat().getId());
         this.roomId = String.valueOf(seatRoom.getRoom().getId());
-        this.showtimeId = String.valueOf(seatRoom.getShowTime().getId()); 
+        this.showtimeId = String.valueOf(seatRoom.getShowTime().getId());
         this.status = seatRoom.getStatus() != null ? seatRoom.getStatus().toString() : null;
     }
 }

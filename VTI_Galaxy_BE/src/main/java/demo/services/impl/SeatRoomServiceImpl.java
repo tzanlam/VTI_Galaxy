@@ -50,9 +50,16 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     public List<SeatRoomDto> getSeatRoomsByShowtime(int showtimeId) {
         try {
             List<SeatRoom> seatRooms = seatRoomRepository.findByShowTimeId(showtimeId);
-            if (seatRooms.isEmpty()) {
-                throw new RuntimeException("No seat rooms found for showtime id: " + showtimeId);
-            }
+            return seatRooms.stream().map(SeatRoomDto::new).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve seat rooms: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<SeatRoomDto> getSeatRoomsByRoomId(int roomId) {
+        try {
+            List<SeatRoom> seatRooms = seatRoomRepository.findByRoomId(roomId);
             return seatRooms.stream().map(SeatRoomDto::new).collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve seat rooms: " + e.getMessage());
@@ -75,16 +82,14 @@ public class SeatRoomServiceImpl implements SeatRoomService {
             if (request.getQuantityColumn() <= rowLabels.length) {
                 for (int i = 0; i < request.getQuantityColumn(); i++) {
                     for (int j = 1; j <= request.getSeatPerRow(); j++) {
-                        // Tạo ghế mới
                         Seat seat = new Seat();
                         String seatName = rowLabels[i] + j;
                         seat.setName(seatName);
-                        seat.setType(SeatType.STANDARD); // Mặc định là STANDARD
-                        seat.setPrice(50000); // Giá mặc định
+                        seat.setType(SeatType.STANDARD);
+                        seat.setPrice(50000);
                         seat.setRoom(room);
                         Seat savedSeat = seatRepository.save(seat);
 
-                        // Tạo SeatRoom tương ứng
                         SeatRoom seatRoom = new SeatRoom();
                         seatRoom.setSeat(savedSeat);
                         seatRoom.setRoom(room);
