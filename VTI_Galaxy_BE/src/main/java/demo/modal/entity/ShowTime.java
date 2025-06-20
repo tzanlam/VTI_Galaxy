@@ -24,6 +24,10 @@ public class ShowTime {
     @JoinColumn
     private Movie movie;
 
+    @ManyToOne
+    @JoinColumn
+    private Room room;
+
     @Column
     private LocalDate date;
 

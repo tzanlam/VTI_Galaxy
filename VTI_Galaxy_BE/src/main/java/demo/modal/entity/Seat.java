@@ -1,6 +1,7 @@
 package demo.modal.entity;
 
 import demo.modal.constant.OpenStatus;
+import demo.modal.constant.SeatType;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -8,12 +9,17 @@ import lombok.Data;
 @Entity
 @Table
 public class Seat {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column
-    private String seatNameType;
+    private String name; // Tên ghế, ví dụ: "A1", "A2"
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private SeatType type; // Loại ghế: STANDARD, VIP, COUPLE
 
     @Column
     private String description;
@@ -24,4 +30,11 @@ public class Seat {
     @Column
     @Enumerated(EnumType.STRING)
     private OpenStatus status;
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room room; // Phòng chứa ghế
+
+
+
 }

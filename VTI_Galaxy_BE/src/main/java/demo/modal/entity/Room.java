@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @Entity
 @Table
 @Data
@@ -24,7 +26,13 @@ public class Room extends Time{
     @Enumerated(EnumType.STRING)
     private OpenStatus status;
 
+    @Column
+    private int capacity;
+
     @ManyToOne
     @JoinColumn
     private Galaxy galaxy;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+    private List<Seat> seats; // Danh sách ghế trong phòng
 }

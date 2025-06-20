@@ -29,7 +29,7 @@ public class Galaxy extends Time{
     @Enumerated(EnumType.STRING)
     private OpenStatus status;
 
-    @OneToMany(mappedBy = "galaxy")
+    @OneToMany(mappedBy = "galaxy", cascade = CascadeType.ALL)
     private List<Room> rooms;
 
     @OneToMany(mappedBy = "galaxy")

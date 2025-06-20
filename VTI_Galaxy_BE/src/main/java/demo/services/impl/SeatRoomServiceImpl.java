@@ -1,13 +1,16 @@
 package demo.services.impl;
 
+import demo.modal.constant.SeatType;
 import demo.modal.dto.SeatRoomDto;
 import demo.modal.entity.Room;
 import demo.modal.entity.Seat;
 import demo.modal.entity.SeatRoom;
+import demo.modal.entity.ShowTime;
 import demo.modal.request.SeatRoomRequest;
 import demo.repository.RoomRepository;
 import demo.repository.SeatRepository;
 import demo.repository.SeatRoomRepository;
+import demo.repository.ShowTimeRepository;
 import demo.services.interfaceClass.SeatRoomService;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +23,14 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     private final SeatRoomRepository seatRoomRepository;
     private final SeatRepository seatRepository;
     private final RoomRepository roomRepository;
+    private final ShowTimeRepository showTimeRepository;
 
-    public SeatRoomServiceImpl(SeatRoomRepository seatRoomRepository, SeatRepository seatRepository, RoomRepository roomRepository) {
+    public SeatRoomServiceImpl(SeatRoomRepository seatRoomRepository, SeatRepository seatRepository,
+                               RoomRepository roomRepository, ShowTimeRepository showTimeRepository) {
         this.seatRoomRepository = seatRoomRepository;
         this.seatRepository = seatRepository;
         this.roomRepository = roomRepository;
+        this.showTimeRepository = showTimeRepository;
     }
 
     @Override
@@ -41,44 +47,73 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     }
 
     @Override
+    public List<SeatRoomDto> getSeatRoomsByShowtime(int showtimeId) {
+        try {
+            List<SeatRoom> seatRooms = seatRoomRepository.findByShowTimeId(showtimeId);
+            if (seatRooms.isEmpty()) {
+                throw new RuntimeException("No seat rooms found for showtime id: " + showtimeId);
+            }
+            return seatRooms.stream().map(SeatRoomDto::new).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to retrieve seat rooms: " + e.getMessage());
+        }
+    }
+
+    @Override
     public List<SeatRoomDto> createSeatRoom(SeatRoomRequest request) {
-        Seat seat = seatRepository.findById(request.getSeatId()).orElseThrow(
-                () -> new RuntimeException("No seat found with id: " + request.getSeatId())
-        );
         Room room = roomRepository.findById(request.getRoomId()).orElseThrow(
                 () -> new RuntimeException("No room found with id: " + request.getRoomId())
         );
+        ShowTime showTime = showTimeRepository.findById(request.getShowtimeId()).orElseThrow(
+                () -> new RuntimeException("No showtime found with id: " + request.getShowtimeId())
+        );
 
-        List<SeatRoomDto> seatRoomList = new ArrayList<>();
-        String[] rowLabels = new String[]{"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y"};
+        List<SeatRoomDto> seatRoomDtos = new ArrayList<>();
+        String[] rowLabels = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y"};
 
-        if (request.getQuantityColumn() <= rowLabels.length) {
-            for (int i = 0; i < request.getQuantityColumn(); i++) {
-                for (int j = 1; j <= request.getSeatPerRow(); j++) {
-                    SeatRoom seatRoom = new SeatRoom();
-                    seatRoom.setSeat(seat);
-                    seatRoom.setRoom(room);
-                    seatRoom.setStatus(SeatRoom.BookedStatus.AVAILABLE);
-                    String seatName = rowLabels[i] + j;
-                    seatRoom.setName(seatName);
-                    seatRoomRepository.save(seatRoom);
+        try {
+            if (request.getQuantityColumn() <= rowLabels.length) {
+                for (int i = 0; i < request.getQuantityColumn(); i++) {
+                    for (int j = 1; j <= request.getSeatPerRow(); j++) {
+                        // Tạo ghế mới
+                        Seat seat = new Seat();
+                        String seatName = rowLabels[i] + j;
+                        seat.setName(seatName);
+                        seat.setType(SeatType.STANDARD); // Mặc định là STANDARD
+                        seat.setPrice(50000); // Giá mặc định
+                        seat.setRoom(room);
+                        Seat savedSeat = seatRepository.save(seat);
+
+                        // Tạo SeatRoom tương ứng
+                        SeatRoom seatRoom = new SeatRoom();
+                        seatRoom.setSeat(savedSeat);
+                        seatRoom.setRoom(room);
+                        seatRoom.setShowTime(showTime);
+                        seatRoom.setStatus(SeatRoom.BookedStatus.AVAILABLE);
+                        SeatRoom savedSeatRoom = seatRoomRepository.save(seatRoom);
+                        seatRoomDtos.add(new SeatRoomDto(savedSeatRoom));
+                    }
                 }
+            } else {
+                throw new RuntimeException("QuantityColumn exceeds the maximum limit of rows.");
             }
-        } else {
-            throw new RuntimeException("QuantityColumn exceeds the maximum limit of rows.");
+            return seatRoomDtos;
+        } catch (Exception e) {
+            throw new RuntimeException("Seat room creation failed: " + e.getMessage());
         }
-
-        return seatRoomList;
     }
 
-
     @Override
-    public SeatRoomDto changeName(int seatRoomId, String name) {
+    public SeatRoomDto changeStatus(int seatRoomId, SeatRoom.BookedStatus status) {
         SeatRoom seatRoom = seatRoomRepository.findById(seatRoomId).orElseThrow(
-                () -> new RuntimeException("No seat found with id: " + seatRoomId)
+                () -> new RuntimeException("No seat room found with id: " + seatRoomId)
         );
-        seatRoom.setName(name);
-        seatRoomRepository.save(seatRoom);
-        return new SeatRoomDto(seatRoom);
+        try {
+            seatRoom.setStatus(status);
+            seatRoomRepository.save(seatRoom);
+            return new SeatRoomDto(seatRoom);
+        } catch (Exception e) {
+            throw new RuntimeException("Seat room status change failed: " + e.getMessage());
+        }
     }
 }

@@ -1,5 +1,6 @@
 package demo.controller;
 
+import demo.modal.entity.SeatRoom;
 import demo.modal.request.SeatRoomRequest;
 import demo.services.interfaceClass.SeatRoomService;
 import org.springframework.http.ResponseEntity;
@@ -16,36 +17,46 @@ public class SeatRoomController {
 
     @GetMapping("/getSeatRooms")
     public ResponseEntity<?> findAllSeatRooms() {
-        try{
+        try {
             return ResponseEntity.ok(seatRoomService.getAllSeatRooms());
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.ofNullable(e.getMessage());
         }
     }
 
     @GetMapping("/getSeatRoomById")
-    public ResponseEntity<?> findSeatRoomById(@RequestParam("seatRoomId")int id) {
-        try{
+    public ResponseEntity<?> findSeatRoomById(@RequestParam("seatRoomId") int id) {
+        try {
             return ResponseEntity.ok(seatRoomService.getSeatRoomById(id));
-        }catch (Exception e){
+        } catch (Exception e) {
+            return ResponseEntity.ofNullable(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getSeatRoomsByShowtime")
+    public ResponseEntity<?> findSeatRoomsByShowtime(@RequestParam("showtimeId") int showtimeId) {
+        try {
+            return ResponseEntity.ok(seatRoomService.getSeatRoomsByShowtime(showtimeId));
+        } catch (Exception e) {
             return ResponseEntity.ofNullable(e.getMessage());
         }
     }
 
     @PostMapping("/postSeatRoom")
     public ResponseEntity<?> postSeatRoom(@RequestBody SeatRoomRequest request) {
-        try{
+        try {
             return ResponseEntity.ok(seatRoomService.createSeatRoom(request));
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @PutMapping("/putSeatRoomName")
-    public ResponseEntity<?> changeSeatRoomName(@RequestParam("seatRoomId") int seatRoomId, @RequestParam("seatRoomName") String seatRoomName) {
-        try{
-            return ResponseEntity.ok(seatRoomService.changeName(seatRoomId, seatRoomName));
-        }catch (Exception e){
+    @PutMapping("/putSeatRoomStatus")
+    public ResponseEntity<?> changeSeatRoomStatus(@RequestParam("seatRoomId") int seatRoomId,
+                                                  @RequestParam("status") SeatRoom.BookedStatus status) {
+        try {
+            return ResponseEntity.ok(seatRoomService.changeStatus(seatRoomId, status));
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -53,7 +53,8 @@ public class SeatController {
     @PutMapping("/putStatusSeat")
     public ResponseEntity<?> updateSeatStatus(@RequestParam("seatId") int id) {
         try{
-            return ResponseEntity.ok(seatService.closedSeat(id));
+            seatService.closedSeat(id);
+            return ResponseEntity.ok("Seat status updated to BOOKED");
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

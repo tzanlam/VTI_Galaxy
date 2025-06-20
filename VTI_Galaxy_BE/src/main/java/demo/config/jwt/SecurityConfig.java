@@ -74,7 +74,12 @@ public class SecurityConfig {
                                 "/getShowTime",
                                 "/postShowTime",
                                 "/postStartTime",
-                                "/postSeat").permitAll()
+                                "/postSeat",
+                                "/getSeat",
+                                "/postRoom",
+                                "/getRoom",
+                                "/postSeatRoom",
+                                "/getSeatRooms").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);
         return http.build();
