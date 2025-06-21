@@ -1,5 +1,5 @@
 package demo.modal.constant;
 
 public enum SeatType {
-    STANDARD,VIP,COUPLE
+    STANDARD,VIP,DOUBLE
 }

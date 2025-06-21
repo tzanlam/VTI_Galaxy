@@ -1,6 +1,7 @@
 package demo.services.impl;
 
 import demo.modal.constant.SeatType;
+import demo.modal.constant.OpenStatus;
 import demo.modal.dto.SeatRoomDto;
 import demo.modal.entity.Room;
 import demo.modal.entity.Seat;
@@ -88,37 +89,56 @@ public class SeatRoomServiceImpl implements SeatRoomService {
         );
 
         List<SeatRoomDto> seatRoomDtos = new ArrayList<>();
-        String[] rowLabels = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y"};
+        String[] rowLabels = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+        int seatNumber = 1; // Biến đếm số thứ tự liên tục
 
         try {
-            if (request.getQuantityColumn() <= rowLabels.length) {
-                for (int i = 0; i < request.getQuantityColumn(); i++) {
-                    for (int j = 1; j <= request.getSeatPerRow(); j++) {
-                        Seat seat = new Seat();
-                        String seatName = rowLabels[i] + j;
-                        seat.setName(seatName);
+            // Kiểm tra giới hạn cột (A-Z) và hàng (tối đa 30 ghế mỗi cột)
+            if (request.getQuantityColumn() > rowLabels.length) {
+                throw new RuntimeException("QuantityColumn exceeds maximum limit of " + rowLabels.length + " rows (A-Z).");
+            }
+            if (request.getSeatPerRow() > 30) {
+                throw new RuntimeException("SeatPerRow exceeds maximum limit of 30 seats per row.");
+            }
+            if (request.getQuantityColumn() * request.getSeatPerRow() > 780) {
+                throw new RuntimeException("Total seats exceed maximum limit of 780 (26 rows × 30 seats per row).");
+            }
+
+            for (int i = 0; i < request.getQuantityColumn(); i++) {
+                for (int j = 1; j <= request.getSeatPerRow(); j++) {
+                    Seat seat = new Seat();
+                    String seatName = rowLabels[i] + seatNumber; // Sử dụng seatNumber để đánh số liên tục
+                    seat.setName(seatName);
+                    if (i == 0) {
+                        seat.setType(SeatType.VIP);
+                        seat.setPrice(180000);
+                    } else if (i == request.getQuantityColumn() - 1) {
+                        seat.setType(SeatType.DOUBLE);
+                        seat.setPrice(120000);
+                    } else {
                         seat.setType(SeatType.STANDARD);
                         seat.setPrice(90000);
-                        seat.setRoom(room);
-                        Seat savedSeat = seatRepository.save(seat);
-
-                        SeatRoom seatRoom = new SeatRoom();
-                        seatRoom.setSeat(savedSeat);
-                        seatRoom.setRoom(room);
-                        seatRoom.setShowTime(showTime);
-                        seatRoom.setStatus(SeatRoom.BookedStatus.AVAILABLE);
-                        SeatRoom savedSeatRoom = seatRoomRepository.save(seatRoom);
-                        seatRoomDtos.add(new SeatRoomDto(savedSeatRoom));
                     }
+                    seat.setRoom(room);
+                    seat.setStatus(OpenStatus.OPEN);
+                    Seat savedSeat = seatRepository.save(seat);
+
+                    SeatRoom seatRoom = new SeatRoom();
+                    seatRoom.setSeat(savedSeat);
+                    seatRoom.setRoom(room);
+                    seatRoom.setShowTime(showTime);
+                    seatRoom.setStatus(SeatRoom.BookedStatus.AVAILABLE);
+                    SeatRoom savedSeatRoom = seatRoomRepository.save(seatRoom);
+                    seatRoomDtos.add(new SeatRoomDto(savedSeatRoom));
+                    seatNumber++; // Tăng số thứ tự
                 }
-            } else {
-                throw new RuntimeException("QuantityColumn exceeds the maximum limit of rows.");
             }
             return seatRoomDtos;
         } catch (Exception e) {
             throw new RuntimeException("Seat room creation failed: " + e.getMessage());
         }
     }
+
 
     @Override
     public SeatRoomDto changeStatus(int seatRoomId, SeatRoom.BookedStatus status) {
