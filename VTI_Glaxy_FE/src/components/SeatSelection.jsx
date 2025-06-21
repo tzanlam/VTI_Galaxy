@@ -71,34 +71,21 @@ const SeatSelection = () => {
     }
   };
 
-  const handleBooking = async () => {
+  const handleBooking = () => {
     if (selectedSeats.length === 0) {
       toast.warning("Vui lòng chọn ít nhất một ghế");
       return;
     }
 
-    try {
-      for (const seatRoom of selectedSeats) {
-        await axiosClient.put(
-          `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
-        );
-      }
-
-      const seatRoomIds = selectedSeats.map((seat) => seat.id);
-      const response = await axiosClient.post("/api/booking/create", {
-        showTimeId: showtimeId,
-        seatRoomIds: seatRoomIds,
-        totalPrice: calculateTotal(),
-      });
-
-      if (response.data) {
-        toast.success("Đặt vé thành công!");
-        navigate("/");
-      }
-    } catch (error) {
-      console.error("Lỗi khi đặt vé:", error);
-      toast.error(error.response?.data?.message || "Đã xảy ra lỗi khi đặt vé");
-    }
+    // Chuyển hướng đến trang chọn combo
+    navigate("/other", {
+      state: {
+        showtimeId,
+        selectedSeats,
+        movieInfo,
+        totalSeatPrice: calculateTotal(),
+      },
+    });
   };
 
   const seatStyles = {
@@ -178,7 +165,6 @@ const SeatSelection = () => {
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
-        {/* Sơ đồ ghế */}
         <div className="md:w-2/3 overflow-x-auto max-w-[800px] min-w-[300px]">
           <div className="w-full bg-gray-800 h-12 rounded-lg mb-6 flex items-center justify-center">
             <p className="text-white text-lg">Màn hình</p>
@@ -242,11 +228,10 @@ const SeatSelection = () => {
           </div>
         </div>
 
-        {/* Thông tin đặt vé */}
         <div className="md:w-1/3 bg-white p-6 rounded-lg shadow-md md:sticky md:top-4 max-w-sm mx-auto md:mx-0">
           <div className="border-b pb-4 mb-4">
             <h2 className="text-xl font-bold mb-4">Thông tin đặt vé</h2>
-            <div className="space-yzinha-2">
+            <div className="space-y-2">
               <p>
                 <span className="font-medium">Phim:</span> {movieInfo.movieName}
               </p>
@@ -305,7 +290,7 @@ const SeatSelection = () => {
             onClick={handleBooking}
             disabled={selectedSeats.length === 0}
           >
-            Đặt vé
+            Tiếp tục
           </button>
         </div>
       </div>
