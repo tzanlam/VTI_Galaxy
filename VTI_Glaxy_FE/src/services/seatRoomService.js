@@ -20,7 +20,7 @@ const seatRoomService = {
   },
   updateNameSeatRoom(seatRoomId, name) {
     return axiosClient.put(
-      `/putSeatRoomStatus?seatRoomId=${seatRoomId}&status=${name}`
+      `/putNameSeatRoom?seatRoomId=${seatRoomId}&name=${name}`
     );
   },
 };
