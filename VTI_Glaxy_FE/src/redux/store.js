@@ -9,6 +9,7 @@ import startTimeReducer from "./slices/startTimeSlice";
 import roomReducer from "./slices/roomSlice";
 import seatReducer from "./slices/seatSlice";
 import seatRoomReducer from "./slices/seatRoomSlice";
+import otherReducer from "./slices/otherSlice";
 
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
@@ -34,6 +35,7 @@ const store = configureStore({
     startTime: startTimeReducer,
     seat: seatReducer,
     seatRoom: seatRoomReducer,
+    other: otherReducer,
   },
   preloadedState,
   // eslint-disable-next-line no-undef
