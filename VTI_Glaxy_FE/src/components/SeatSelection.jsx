@@ -61,16 +61,21 @@ const SeatSelection = () => {
   }, [showtimeId, dispatch, navigate]);
 
   const handleSeatClick = (seatRoom) => {
-    // Chỉ cho phép chọn ghế có trạng thái AVAILABLE
-    if (seatRoom.status !== "AVAILABLE") return;
+    if (!seatRoom.seat || seatRoom.status === "BOOKED") return; // Chỉ cho phép click ghế không phải BOOKED
 
     const isSelected = selectedSeats.some((s) => s.id === seatRoom.id);
     if (isSelected) {
       setSelectedSeats(selectedSeats.filter((s) => s.id !== seatRoom.id));
       dispatch(unselectSeatRoom(seatRoom.id));
+      dispatch(
+        updateSeatRoomStatus({ seatRoomId: seatRoom.id, status: "AVAILABLE" })
+      );
     } else {
       setSelectedSeats([...selectedSeats, seatRoom]);
       dispatch(selectSeatRoom(seatRoom.id));
+      dispatch(
+        updateSeatRoomStatus({ seatRoomId: seatRoom.id, status: "SELECTED" })
+      );
     }
   };
 
@@ -107,9 +112,9 @@ const SeatSelection = () => {
   };
 
   const getSeatStatus = (seatRoom) => {
-    if (seatRoom.status !== "AVAILABLE")
+    if (!seatRoom.seat || seatRoom.status === "BOOKED")
       return "bg-gray-500 cursor-not-allowed";
-    if (selectedSeats.some((s) => s.id === seatRoom.id)) return "bg-green-500";
+    if (seatRoom.status === "SELECTED") return "bg-green-500";
 
     // Phân loại ghế dựa vào seat.type
     const seatType = seatRoom.seat.type.includes("VIP") ? "VIP" : "STANDARD";
@@ -121,7 +126,7 @@ const SeatSelection = () => {
   // Tính tổng tiền dựa trên giá ghế từ backend
   const calculateTotal = () => {
     return selectedSeats.reduce((total, seatRoom) => {
-      return total + seatRoom.seat.price;
+      return total + (seatRoom.seat?.price || 0);
     }, 0);
   };
 
@@ -145,7 +150,7 @@ const SeatSelection = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Đã xảy ra lỗi: {error}</p>
+          <p>Đã xảy ra lỗi: {error.message || error}</p>
           <button
             className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
             onClick={() => dispatch(fetchSeatRoomsByShowtimeId(showtimeId))}
@@ -157,12 +162,14 @@ const SeatSelection = () => {
     );
   }
 
-  // Nhóm ghế theo hàng, sử dụng mảng rỗng nếu seatRooms không phải là mảng
+  // Nhóm ghế theo hàng, bỏ qua các seatRoom không có seat hợp lệ
   const seatsByRow = (Array.isArray(seatRooms) ? seatRooms : []).reduce(
     (acc, seatRoom) => {
-      const row = seatRoom.seat.name.charAt(0);
-      if (!acc[row]) acc[row] = [];
-      acc[row].push(seatRoom);
+      if (seatRoom.seat && seatRoom.seat.name) {
+        const row = seatRoom.seat.name.charAt(0);
+        if (!acc[row]) acc[row] = [];
+        acc[row].push(seatRoom);
+      }
       return acc;
     },
     {}
@@ -208,9 +215,11 @@ const SeatSelection = () => {
                             seatRoom
                           )}`}
                           onClick={() => handleSeatClick(seatRoom)}
-                          disabled={seatRoom.status !== "AVAILABLE"}
+                          disabled={
+                            !seatRoom.seat || seatRoom.status === "BOOKED"
+                          }
                         >
-                          {seatRoom.seat.name.substring(1)}
+                          {seatRoom.seat?.name.substring(1) || "N/A"}
                         </button>
                       ))}
                   </div>
@@ -268,7 +277,7 @@ const SeatSelection = () => {
                     key={seatRoom.id}
                     className="px-2 py-1 bg-green-100 border border-green-500 rounded-md"
                   >
-                    {seatRoom.seat.name}
+                    {seatRoom.seat?.name || "N/A"}
                   </span>
                 ))}
               </div>
@@ -281,8 +290,8 @@ const SeatSelection = () => {
                 {/* Hiển thị chi tiết từng loại ghế đã chọn */}
                 {selectedSeats.map((seatRoom) => (
                   <div key={seatRoom.id} className="flex justify-between">
-                    <span>{seatRoom.seat.name}:</span>
-                    <span>{formatCurrency(seatRoom.seat.price)}</span>
+                    <span>{seatRoom.seat?.name || "N/A"}:</span>
+                    <span>{formatCurrency(seatRoom.seat?.price || 0)}</span>
                   </div>
                 ))}
                 <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">

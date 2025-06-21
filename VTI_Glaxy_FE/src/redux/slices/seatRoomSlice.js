@@ -46,6 +46,7 @@ export const updateSeatRoomStatus = createAsyncThunk(
       );
       return { id: seatRoomId, status, data: response.data };
     } catch (error) {
+      console.error("updateSeatRoomStatus error:", error);
       return rejectWithValue(
         error.response?.data || "Lỗi khi cập nhật trạng thái ghế"
       );
@@ -60,6 +61,7 @@ export const fetchSeatRoomById = createAsyncThunk(
       const response = await seatRoomService.fetchSeatRoomById(seatRoomId);
       return response.data;
     } catch (error) {
+      console.error("fetchSeatRoomById error:", error);
       return rejectWithValue(
         error.response?.data || "Lỗi khi lấy thông tin ghế phòng"
       );
@@ -74,6 +76,7 @@ export const createSeatRoom = createAsyncThunk(
       const response = await seatRoomService.createSeatRoom(request);
       return response.data;
     } catch (error) {
+      console.error("createSeatRoom error:", error);
       return rejectWithValue(error.response?.data || "Lỗi khi tạo ghế phòng");
     }
   }
@@ -140,6 +143,10 @@ const seatRoomSlice = createSlice({
         state.seatRooms = [];
       })
       // update seat room status
+      .addCase(updateSeatRoomStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(updateSeatRoomStatus.fulfilled, (state, action) => {
         const { id, status } = action.payload;
         const seatRoom = state.seatRooms.find((sr) => sr.id === id);
