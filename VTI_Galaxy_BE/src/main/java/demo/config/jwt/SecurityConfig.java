@@ -74,6 +74,7 @@ public class SecurityConfig {
                                 "/getShowTime",
                                 "/postShowTime",
                                 "/postStartTime",
+                                "/getStartTimes",
                                 "/postSeat",
                                 "/getSeat",
                                 "/postRoom",

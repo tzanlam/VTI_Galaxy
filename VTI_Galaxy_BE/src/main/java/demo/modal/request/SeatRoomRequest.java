@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class SeatRoomRequest {
+    private int id;
     private int seatId; // ID của ghế
     private int roomId; // ID của phòng chiếu
     private int showtimeId; // ID của suất chiếu
@@ -15,7 +16,10 @@ public class SeatRoomRequest {
 
     public SeatRoom toSeatRoom() {
         SeatRoom seatRoom = new SeatRoom();
+        seatRoom.setId(id);
         seatRoom.setStatus(status != null ? status : SeatRoom.BookedStatus.AVAILABLE);
         return seatRoom;
     }
+
+
 }

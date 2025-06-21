@@ -4,6 +4,7 @@ import demo.modal.constant.OpenStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.List;
 
@@ -29,9 +30,11 @@ public class Galaxy extends Time{
     @Enumerated(EnumType.STRING)
     private OpenStatus status;
 
-    @OneToMany(mappedBy = "galaxy", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "galaxy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Room> rooms;
 
-    @OneToMany(mappedBy = "galaxy")
+    @OneToMany(mappedBy = "galaxy", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Other> others;
 }

@@ -1,5 +1,6 @@
 package demo.controller;
 
+import demo.modal.dto.SeatRoomDto;
 import demo.modal.entity.SeatRoom;
 import demo.modal.request.SeatRoomRequest;
 import demo.services.interfaceClass.SeatRoomService;
@@ -20,7 +21,7 @@ public class SeatRoomController {
         try {
             return ResponseEntity.ok(seatRoomService.getAllSeatRooms());
         } catch (Exception e) {
-            return ResponseEntity.ofNullable(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -29,7 +30,7 @@ public class SeatRoomController {
         try {
             return ResponseEntity.ok(seatRoomService.getSeatRoomById(id));
         } catch (Exception e) {
-            return ResponseEntity.ofNullable(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -38,7 +39,7 @@ public class SeatRoomController {
         try {
             return ResponseEntity.ok(seatRoomService.getSeatRoomsByShowtime(showtimeId));
         } catch (Exception e) {
-            return ResponseEntity.ofNullable(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -47,7 +48,7 @@ public class SeatRoomController {
         try {
             return ResponseEntity.ok(seatRoomService.getSeatRoomsByRoomId(roomId));
         } catch (Exception e) {
-            return ResponseEntity.ofNullable(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -62,9 +63,9 @@ public class SeatRoomController {
 
     @PutMapping("/putSeatRoomStatus")
     public ResponseEntity<?> changeSeatRoomStatus(@RequestParam("seatRoomId") int seatRoomId,
-                                                  @RequestParam("status") SeatRoom.BookedStatus status) {
+                                                  @RequestParam("status") String status) {
         try {
-            return ResponseEntity.ok(seatRoomService.changeStatus(seatRoomId, status));
+            return ResponseEntity.ok(seatRoomService.changeStatus(seatRoomId, SeatRoom.BookedStatus.valueOf(status)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

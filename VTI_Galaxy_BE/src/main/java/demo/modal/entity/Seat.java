@@ -1,5 +1,6 @@
 package demo.modal.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import demo.modal.constant.OpenStatus;
 import demo.modal.constant.SeatType;
 import jakarta.persistence.*;
@@ -33,7 +34,8 @@ public class Seat {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
-    private Room room; // Phòng chứa ghế
+    @JsonBackReference
+    private Room room;
 
 
 

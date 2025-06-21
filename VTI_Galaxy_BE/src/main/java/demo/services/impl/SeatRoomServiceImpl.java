@@ -35,7 +35,10 @@ public class SeatRoomServiceImpl implements SeatRoomService {
 
     @Override
     public List<SeatRoomDto> getAllSeatRooms() {
-        return seatRoomRepository.findAll().stream().map(SeatRoomDto::new).collect(Collectors.toList());
+        return seatRoomRepository.findAll().stream()
+                .filter(seatRoom -> seatRoom.getSeat() != null)
+                .map(SeatRoomDto::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -43,6 +46,9 @@ public class SeatRoomServiceImpl implements SeatRoomService {
         SeatRoom seatRoom = seatRoomRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("No seat room found with id: " + id)
         );
+        if (seatRoom.getSeat() == null) {
+            throw new RuntimeException("SeatRoom with id " + id + " has no associated seat");
+        }
         return new SeatRoomDto(seatRoom);
     }
 
@@ -50,7 +56,10 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     public List<SeatRoomDto> getSeatRoomsByShowtime(int showtimeId) {
         try {
             List<SeatRoom> seatRooms = seatRoomRepository.findByShowTimeId(showtimeId);
-            return seatRooms.stream().map(SeatRoomDto::new).collect(Collectors.toList());
+            return seatRooms.stream()
+                    .filter(seatRoom -> seatRoom.getSeat() != null)
+                    .map(SeatRoomDto::new)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve seat rooms: " + e.getMessage());
         }
@@ -60,7 +69,10 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     public List<SeatRoomDto> getSeatRoomsByRoomId(int roomId) {
         try {
             List<SeatRoom> seatRooms = seatRoomRepository.findByRoomId(roomId);
-            return seatRooms.stream().map(SeatRoomDto::new).collect(Collectors.toList());
+            return seatRooms.stream()
+                    .filter(seatRoom -> seatRoom.getSeat() != null)
+                    .map(SeatRoomDto::new)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve seat rooms: " + e.getMessage());
         }
@@ -86,7 +98,7 @@ public class SeatRoomServiceImpl implements SeatRoomService {
                         String seatName = rowLabels[i] + j;
                         seat.setName(seatName);
                         seat.setType(SeatType.STANDARD);
-                        seat.setPrice(50000);
+                        seat.setPrice(90000);
                         seat.setRoom(room);
                         Seat savedSeat = seatRepository.save(seat);
 
@@ -113,6 +125,9 @@ public class SeatRoomServiceImpl implements SeatRoomService {
         SeatRoom seatRoom = seatRoomRepository.findById(seatRoomId).orElseThrow(
                 () -> new RuntimeException("No seat room found with id: " + seatRoomId)
         );
+        if (seatRoom.getSeat() == null) {
+            throw new RuntimeException("SeatRoom with id " + seatRoomId + " has no associated seat");
+        }
         try {
             seatRoom.setStatus(status);
             seatRoomRepository.save(seatRoom);
