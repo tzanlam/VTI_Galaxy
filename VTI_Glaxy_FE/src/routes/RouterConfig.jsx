@@ -10,6 +10,7 @@ import GalaxyManagement from "../components/admin/GalaxyManagement";
 import RoomManagement from "../components/admin/RoomManagement";
 import MovieManagement from "../components/admin/MovieManagement";
 import SeatSelection from "../components/SeatSelection";
+import Other from "../components/Other";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: "/seat-selection/:showtimeId",
         element: <SeatSelection />,
+      },
+      {
+        path: "/other",
+        element: <Other />,
       },
       {
         path: "*",
