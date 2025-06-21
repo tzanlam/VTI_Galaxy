@@ -8,6 +8,7 @@ import {
   selectSeatRoom,
   unselectSeatRoom,
   clearSeatRoomState,
+  updateSeatRoomStatus,
 } from "../redux/slices/seatRoomSlice";
 
 const SeatSelection = () => {
@@ -16,13 +17,9 @@ const SeatSelection = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Lấy thông tin từ state của route
   const { movieName, galaxyName, date, time } = location.state || {};
-
-  // Lấy state từ Redux
   const { seatRooms, loading, error } = useSelector((state) => state.seatRoom);
 
-  // State cho thông tin phim và rạp
   const [movieInfo, setMovieInfo] = useState({
     movieName: movieName || "Không có thông tin",
     galaxyName: galaxyName || "Không có thông tin",
@@ -30,11 +27,9 @@ const SeatSelection = () => {
     time: time || "Không có thông tin",
   });
 
-  // State cho ghế đã chọn
   const [selectedSeats, setSelectedSeats] = useState([]);
 
   useEffect(() => {
-    // Kiểm tra đăng nhập
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!token) {
@@ -43,10 +38,8 @@ const SeatSelection = () => {
       return;
     }
 
-    // Reset state khi component mount
     dispatch(clearSeatRoomState());
 
-    // Fetch seat rooms từ API
     if (showtimeId) {
       console.log("Fetching seat rooms for showtime ID:", showtimeId);
       dispatch(fetchSeatRoomsByShowtimeId(showtimeId));
@@ -54,14 +47,13 @@ const SeatSelection = () => {
       console.error("Missing showtimeId parameter");
     }
 
-    // Cleanup khi unmount
     return () => {
       dispatch(clearSeatRoomState());
     };
   }, [showtimeId, dispatch, navigate]);
 
   const handleSeatClick = (seatRoom) => {
-    if (!seatRoom.seat || seatRoom.status === "BOOKED") return; // Chỉ cho phép click ghế không phải BOOKED
+    if (!seatRoom.seat || seatRoom.status === "BOOKED") return;
 
     const isSelected = selectedSeats.some((s) => s.id === seatRoom.id);
     if (isSelected) {
@@ -86,14 +78,12 @@ const SeatSelection = () => {
     }
 
     try {
-      // Cập nhật trạng thái ghế thành BOOKED
       for (const seatRoom of selectedSeats) {
         await axiosClient.put(
           `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
         );
       }
 
-      // Gọi API để tạo booking
       const seatRoomIds = selectedSeats.map((seat) => seat.id);
       const response = await axiosClient.post("/api/booking/create", {
         showTimeId: showtimeId,
@@ -111,32 +101,36 @@ const SeatSelection = () => {
     }
   };
 
-  const getSeatStatus = (seatRoom) => {
-    if (!seatRoom.seat || seatRoom.status === "BOOKED")
-      return "bg-gray-500 cursor-not-allowed";
-    if (seatRoom.status === "SELECTED") return "bg-green-500";
-
-    // Phân loại ghế dựa vào seat.type
-    const seatType = seatRoom.seat.type.includes("VIP") ? "VIP" : "STANDARD";
-    return seatType === "VIP"
-      ? "bg-yellow-500 hover:bg-yellow-600"
-      : "bg-blue-500 hover:bg-blue-600";
+  const seatStyles = {
+    BOOKED: "bg-gray-500 cursor-not-allowed",
+    SELECTED: "bg-green-500",
+    VIP: "bg-yellow-500 hover:bg-yellow-600",
+    DOUBLE: "bg-purple-500 hover:bg-purple-600",
+    STANDARD: "bg-blue-500 hover:bg-blue-600",
   };
 
-  // Tính tổng tiền dựa trên giá ghế từ backend
+  const getSeatStatus = (seatRoom) => {
+    if (!seatRoom.seat || seatRoom.status === "BOOKED")
+      return seatStyles.BOOKED;
+    if (seatRoom.status === "SELECTED") return seatStyles.SELECTED;
+    return seatStyles[seatRoom.seat.type] || seatStyles.STANDARD;
+  };
+
   const calculateTotal = () => {
     return selectedSeats.reduce((total, seatRoom) => {
       return total + (seatRoom.seat?.price || 0);
     }, 0);
   };
 
-  // Format số tiền
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
     }).format(amount);
   };
+
+  const baseSeatClass =
+    "h-6 rounded text-white text-[10px] flex items-center justify-center";
 
   if (loading) {
     return (
@@ -162,7 +156,6 @@ const SeatSelection = () => {
     );
   }
 
-  // Nhóm ghế theo hàng, bỏ qua các seatRoom không có seat hợp lệ
   const seatsByRow = (Array.isArray(seatRooms) ? seatRooms : []).reduce(
     (acc, seatRoom) => {
       if (seatRoom.seat && seatRoom.seat.name) {
@@ -184,26 +177,24 @@ const SeatSelection = () => {
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
-        {/* Phần bên trái - Sơ đồ ghế */}
-        <div className="md:w-2/3">
+      <div className="flex flex-col md:flex-row gap-4">
+        {/* Sơ đồ ghế */}
+        <div className="md:w-2/3 overflow-x-auto max-w-[800px] min-w-[300px]">
           <div className="w-full bg-gray-800 h-12 rounded-lg mb-6 flex items-center justify-center">
             <p className="text-white text-lg">Màn hình</p>
           </div>
 
-          {/* Hiển thị ghế theo từng hàng */}
           <div className="mb-8">
             {Object.keys(seatsByRow)
               .sort()
               .map((row) => (
-                <div key={row} className="flex justify-center mb-2">
-                  <div className="w-8 flex items-center justify-center font-bold text-gray-600">
+                <div key={row} className="flex justify-start mb-2 min-w-max">
+                  <div className="w-8 flex items-center justify-center font-bold text-gray-600 text-sm">
                     {row}
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-0.5">
                     {seatsByRow[row]
                       .sort((a, b) => {
-                        // Lấy số từ seat.name (ví dụ: A1 -> 1, B10 -> 10)
                         const numA = parseInt(a.seat.name.substring(1));
                         const numB = parseInt(b.seat.name.substring(1));
                         return numA - numB;
@@ -211,9 +202,9 @@ const SeatSelection = () => {
                       .map((seatRoom) => (
                         <button
                           key={seatRoom.id}
-                          className={`w-8 h-8 rounded-md text-white text-xs flex items-center justify-center ${getSeatStatus(
-                            seatRoom
-                          )}`}
+                          className={`${baseSeatClass} ${
+                            seatRoom.seat.type === "DOUBLE" ? "w-16" : "w-8"
+                          } ${getSeatStatus(seatRoom)}`}
                           onClick={() => handleSeatClick(seatRoom)}
                           disabled={
                             !seatRoom.seat || seatRoom.status === "BOOKED"
@@ -237,21 +228,25 @@ const SeatSelection = () => {
               <span className="text-sm">Ghế VIP</span>
             </div>
             <div className="flex items-center">
+              <div className="w-4 h-4 bg-purple-500 rounded-sm mr-2"></div>
+              <span className="text-sm">Ghế đôi</span>
+            </div>
+            <div className="flex items-center">
               <div className="w-4 h-4 bg-green-500 rounded-sm mr-2"></div>
               <span className="text-sm">Đã chọn</span>
             </div>
             <div className="flex items-center">
               <div className="w-4 h-4 bg-gray-500 rounded-sm mr-2"></div>
-              <span className="text-sm">Không khả dụng</span>
+              <span className="text-sm">Đã bán</span>
             </div>
           </div>
         </div>
 
-        {/* Phần bên phải - Thông tin đặt vé */}
-        <div className="md:w-1/3 bg-white p-6 rounded-lg shadow-md">
+        {/* Thông tin đặt vé */}
+        <div className="md:w-1/3 bg-white p-6 rounded-lg shadow-md md:sticky md:top-4 max-w-sm mx-auto md:mx-0">
           <div className="border-b pb-4 mb-4">
             <h2 className="text-xl font-bold mb-4">Thông tin đặt vé</h2>
-            <div className="space-y-2">
+            <div className="space-yzinha-2">
               <p>
                 <span className="font-medium">Phim:</span> {movieInfo.movieName}
               </p>
@@ -275,7 +270,7 @@ const SeatSelection = () => {
                 {selectedSeats.map((seatRoom) => (
                   <span
                     key={seatRoom.id}
-                    className="px-2 py-1 bg-green-100 border border-green-500 rounded-md"
+                    className="px-2 py-1 bg-green-100 border border-green-500 rounded-md text-xs"
                   >
                     {seatRoom.seat?.name || "N/A"}
                   </span>
@@ -287,7 +282,6 @@ const SeatSelection = () => {
 
             {selectedSeats.length > 0 && (
               <div className="space-y-2 border-t pt-4">
-                {/* Hiển thị chi tiết từng loại ghế đã chọn */}
                 {selectedSeats.map((seatRoom) => (
                   <div key={seatRoom.id} className="flex justify-between">
                     <span>{seatRoom.seat?.name || "N/A"}:</span>
@@ -307,7 +301,7 @@ const SeatSelection = () => {
               selectedSeats.length > 0
                 ? "bg-blue-600 hover:bg-blue-700"
                 : "bg-gray-400 cursor-not-allowed"
-            }`}
+            } md:static fixed bottom-0 left-0 right-0 md:mx-0 mx-4 mb-4 md:mb-0 z-10 md:z-auto`}
             onClick={handleBooking}
             disabled={selectedSeats.length === 0}
           >
