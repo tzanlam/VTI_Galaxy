@@ -16,6 +16,6 @@ public interface GalaxyRepository extends JpaRepository<Galaxy, Integer> {
     @Query("select g.rooms from Galaxy g where g.id = :galaxyId")
     List<Room> findRooms(@Param("galaxyId") int galaxyId);
 
-    @Query("select g.others from Galaxy g where g.id = :galaxyId")
+    @Query("select g.others from Galaxy g where g.id = :galaxyId and g.others.status = 'ACTIVE' and g.others.otherStatus = 'AVAILABLE'")
     Optional<List<Other>> findOthers(@Param("galaxyId") int galaxyId);
 }

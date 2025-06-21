@@ -1,6 +1,7 @@
 package demo.services.impl;
 
 import demo.modal.constant.ActiveStatus;
+import demo.modal.constant.OtherStatus;
 import demo.modal.dto.OtherDto;
 import demo.modal.entity.Other;
 import demo.modal.request.OtherRequest;
@@ -24,7 +25,10 @@ public class OtherServiceImpl implements OtherService {
 
     @Override
     public List<OtherDto> getAllOthers() {
-        return otherRepository.findAll().stream().map(OtherDto::new).collect(Collectors.toList());
+        return otherRepository.findAll().stream()
+                .filter(other -> other.getStatus() == ActiveStatus.ACTIVE && other.getOtherStatus() == OtherStatus.ACTIVE)
+                .map(OtherDto::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -37,20 +41,24 @@ public class OtherServiceImpl implements OtherService {
 
     @Override
     public List<OtherDto> getOtherByGalaxyId(int galaxyId) {
-        List<Other> others = galaxyRepository.findOthers(galaxyId).orElseThrow(
-                () -> new IllegalArgumentException("not found")
-        );
+        List<Other> others = galaxyRepository.findOthers(galaxyId)
+                .orElseThrow(() -> new IllegalArgumentException("No active combos found for Galaxy ID: " + galaxyId));
         return others.stream().map(OtherDto::new).collect(Collectors.toList());
     }
 
     @Override
     public OtherDto createNew(OtherRequest request) {
-        try{
+        try {
             Other other = request.setOther();
+            other.setStatus(ActiveStatus.ACTIVE);
+            other.setOtherStatus(OtherStatus.ACTIVE);
+            other.setGalaxy(galaxyRepository.findById(request.getGalaxyId()).orElseThrow(
+                    () -> new IllegalArgumentException("Invalid Galaxy ID: " + request.getGalaxyId())
+            ));
             otherRepository.save(other);
             return new OtherDto(other);
-        }catch (Exception e){
-            throw new IllegalArgumentException("create failed");
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Create failed: " + e.getMessage());
         }
     }
 
@@ -61,10 +69,13 @@ public class OtherServiceImpl implements OtherService {
         );
         try{
             request.updateOther(other);
+            other.setGalaxy(galaxyRepository.findById(request.getGalaxyId()).orElseThrow(
+                    () -> new IllegalArgumentException("Invalid Galaxy ID: " + request.getGalaxyId())
+            ));
             otherRepository.save(other);
             return new OtherDto(other);
         }catch (Exception e){
-            throw new IllegalArgumentException("update failed");
+            throw new IllegalArgumentException("Update failed: " + e.getMessage());
         }
     }
 

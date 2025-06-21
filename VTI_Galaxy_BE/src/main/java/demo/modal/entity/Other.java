@@ -1,6 +1,7 @@
 package demo.modal.entity;
 
 import demo.modal.constant.ActiveStatus;
+import demo.modal.constant.OtherStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,17 +16,21 @@ public class Other extends Time{
     private int id;
 
     @Column
-    private String type;
-
-    @Column
     private String name;
 
+    @Column
+    private String description;
 
+    @Column
+    private String image_url;
     @Column
     private int price;
 
     @Column
     private int quantity;
+
+    @Column
+    private OtherStatus otherStatus;
 
     @ManyToOne
     @JoinColumn
@@ -34,4 +39,6 @@ public class Other extends Time{
     @Column
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
+
+
 }
