@@ -13,8 +13,8 @@ const { Header, Sider, Content } = Layout;
 const HomeAdmin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const accountId = localStorage.getItem("accountId");
-  const account = useSelector((state) => state.account);
+  // const accountId = localStorage.getItem("accountId");
+  // const account = useSelector((state) => state.account);
   const menuItems = [
     { key: "1", label: <Link to="/management/galaxy">Galaxy</Link> },
     { key: "2", label: <Link to="/management/room">Phòng chiếu</Link> },
@@ -31,9 +31,9 @@ const HomeAdmin = () => {
     navigate("/");
   };
 
-  useEffect(
-    () => (dispatch(fetchAccountById(accountId)), [dispatch, accountId])
-  );
+  // useEffect(
+    // () => (dispatch(fetchAccountById(accountId)), [dispatch, accountId])
+  // );
 
   const userMenu = (
     <Menu
@@ -90,7 +90,8 @@ const HomeAdmin = () => {
             <div className="flex items-center space-x-3 cursor-pointer">
               <Avatar icon={<UserOutlined />} className="bg-amber-400" />
               <span className="font-semibold text-amber-700">
-                ${account.fullName}
+                {/* ${account.fullName} */}
+                thông tin tài khoản
               </span>
             </div>
           </Dropdown>
