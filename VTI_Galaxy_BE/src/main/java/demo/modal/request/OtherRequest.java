@@ -6,7 +6,6 @@ import lombok.Data;
 
 @Data
 public class OtherRequest {
-    private String type;
     private String name;
     private String description;
     private String image_url;

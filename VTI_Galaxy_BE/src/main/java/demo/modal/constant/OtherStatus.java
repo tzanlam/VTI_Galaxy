@@ -1,5 +1,5 @@
 package demo.modal.constant;
 
 public enum OtherStatus {
-    ACTIVE, INACTIVE;
+    AVAILABLE, OUT_OF_STOCK, DELETE;
 }

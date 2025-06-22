@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface OtherRepository extends JpaRepository<Other,Integer> {
-    List<Other> findByGalaxyAndStatus(int galaxy, String status);
+public interface OtherRepository extends JpaRepository<Other, Integer> {
+    List<Other> findByGalaxyIdAndStatus(Integer galaxyId, String status);
 }

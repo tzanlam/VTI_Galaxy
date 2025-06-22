@@ -33,10 +33,10 @@ public class OtherController {
     }
 
     @GetMapping("/getOtherByGalaxyId")
-    public ResponseEntity<?> get(@RequestParam("galaxyId")int galaxyId) {
-        try{
+    public ResponseEntity<?> get(@RequestParam("galaxyId") int galaxyId) {
+        try {
             return ResponseEntity.ok(otherService.getOtherByGalaxyId(galaxyId));
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

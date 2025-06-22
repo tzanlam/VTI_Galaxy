@@ -26,7 +26,7 @@ public class OtherServiceImpl implements OtherService {
     @Override
     public List<OtherDto> getAllOthers() {
         return otherRepository.findAll().stream()
-                .filter(other -> other.getStatus() == ActiveStatus.ACTIVE && other.getOtherStatus() == OtherStatus.ACTIVE)
+                .filter(other -> other.getStatus() == ActiveStatus.ACTIVE && other.getOtherStatus() == OtherStatus.AVAILABLE)
                 .map(OtherDto::new)
                 .collect(Collectors.toList());
     }
@@ -41,8 +41,10 @@ public class OtherServiceImpl implements OtherService {
 
     @Override
     public List<OtherDto> getOtherByGalaxyId(int galaxyId) {
-        List<Other> others = galaxyRepository.findOthers(galaxyId)
-                .orElseThrow(() -> new IllegalArgumentException("No active combos found for Galaxy ID: " + galaxyId));
+        List<Other> others = galaxyRepository.findOthers(galaxyId, ActiveStatus.ACTIVE.name(), OtherStatus.AVAILABLE.name());
+        if (others.isEmpty()) {
+            throw new IllegalArgumentException("No active combos found for Galaxy ID: " + galaxyId);
+        }
         return others.stream().map(OtherDto::new).collect(Collectors.toList());
     }
 
@@ -51,7 +53,7 @@ public class OtherServiceImpl implements OtherService {
         try {
             Other other = request.setOther();
             other.setStatus(ActiveStatus.ACTIVE);
-            other.setOtherStatus(OtherStatus.ACTIVE);
+            other.setOtherStatus(OtherStatus.AVAILABLE);
             other.setGalaxy(galaxyRepository.findById(request.getGalaxyId()).orElseThrow(
                     () -> new IllegalArgumentException("Invalid Galaxy ID: " + request.getGalaxyId())
             ));
@@ -67,14 +69,14 @@ public class OtherServiceImpl implements OtherService {
         Other other = otherRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("There is no other with this id")
         );
-        try{
+        try {
             request.updateOther(other);
             other.setGalaxy(galaxyRepository.findById(request.getGalaxyId()).orElseThrow(
                     () -> new IllegalArgumentException("Invalid Galaxy ID: " + request.getGalaxyId())
             ));
             otherRepository.save(other);
             return new OtherDto(other);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IllegalArgumentException("Update failed: " + e.getMessage());
         }
     }
@@ -84,12 +86,12 @@ public class OtherServiceImpl implements OtherService {
         Other other = otherRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("There is no other with this id")
         );
-        try{
-            other.setStatus(ActiveStatus.DELETED);
+        try {
+            other.setOtherStatus(OtherStatus.DELETE);
             otherRepository.save(other);
             return new OtherDto(other);
-        }catch (Exception e){
-            throw new IllegalArgumentException("delete failed");
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Delete failed: " + e.getMessage());
         }
     }
 }

@@ -97,11 +97,11 @@ public class SeatRoomServiceImpl implements SeatRoomService {
             if (request.getQuantityColumn() > rowLabels.length) {
                 throw new RuntimeException("QuantityColumn exceeds maximum limit of " + rowLabels.length + " rows (A-Z).");
             }
-            if (request.getSeatPerRow() > 30) {
-                throw new RuntimeException("SeatPerRow exceeds maximum limit of 30 seats per row.");
+            if (request.getSeatPerRow() > 26) {
+                throw new RuntimeException("SeatPerRow exceeds maximum limit of 26 seats per row.");
             }
-            if (request.getQuantityColumn() * request.getSeatPerRow() > 780) {
-                throw new RuntimeException("Total seats exceed maximum limit of 780 (26 rows × 30 seats per row).");
+            if (request.getQuantityColumn() * request.getSeatPerRow() > 676) {
+                throw new RuntimeException("Total seats exceed maximum limit of 780 (26 rows × 26 seats per row).");
             }
 
             for (int i = 0; i < request.getQuantityColumn(); i++) {

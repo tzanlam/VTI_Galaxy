@@ -30,10 +30,11 @@ public class Other extends Time{
     private int quantity;
 
     @Column
+    @Enumerated(EnumType.ORDINAL)
     private OtherStatus otherStatus;
 
-    @ManyToOne
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "galaxy_id")
     private Galaxy galaxy;
 
     @Column
