@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import axiosClient from "../services/axiosClient";
 import {
   fetchSeatRoomsByShowtimeId,
   selectSeatRoom,

@@ -3,7 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import axiosClient from "../services/axiosClient";
-import { fetchOthers, clearOtherState } from "../redux/slices/otherSlice";
+import {
+  fetchOtherByGalaxyId,
+  fetchOthers, // Thêm import fetchOthers
+  clearOtherState,
+} from "../redux/slices/otherSlice";
 
 const Other = () => {
   const { state } = useLocation();
@@ -20,21 +24,28 @@ const Other = () => {
     galaxyName: movieInfo?.galaxyName || "Không có thông tin",
     date: movieInfo?.date || "Không có thông tin",
     time: movieInfo?.time || "Không có thông tin",
+    galaxyId: movieInfo?.galaxyId ?? null,
   };
 
-  // Khởi tạo selectedCombos dựa trên others
   useEffect(() => {
-    if (!showtimeId || !selectedSeats || !movieInfo) {
-      toast.error("Thiếu thông tin đặt vé");
-      navigate("/");
+    // Debug logs
+    console.log("State Received:", state);
+    console.log("MovieInfo:", movieInfo);
+    console.log("SafeMovieInfo:", safeMovieInfo);
+
+    // Kiểm tra state
+    if (!state || !showtimeId || !selectedSeats || !movieInfo) {
+      toast.error("Vui lòng chọn suất chiếu và ghế trước khi chọn combo");
+      navigate("/select-showtime");
       return;
     }
 
-    console.log("MovieInfo Received:", movieInfo);
-
-    // Chỉ fetch nếu others rỗng
-    if (others.length === 0) {
-      dispatch(fetchOthers());
+    // Kiểm tra galaxyId
+    if (safeMovieInfo.galaxyId == null) {
+      toast.warn("Không tìm thấy galaxyId, tải tất cả combo");
+      dispatch(fetchOthers()); // Gọi API lấy tất cả combo
+    } else {
+      dispatch(fetchOtherByGalaxyId(safeMovieInfo.galaxyId));
     }
 
     // Cleanup khi unmount
@@ -43,7 +54,6 @@ const Other = () => {
     };
   }, [showtimeId, selectedSeats, movieInfo, navigate, dispatch]);
 
-  // Cập nhật selectedCombos khi others thay đổi
   useEffect(() => {
     if (others.length > 0 && Object.keys(selectedCombos).length === 0) {
       const initialCombos = others.reduce((acc, combo) => {
@@ -100,6 +110,7 @@ const Other = () => {
         seatRoomIds,
         comboItems,
         totalPrice: calculateGrandTotal(),
+        galaxyId: safeMovieInfo.galaxyId, // Gửi galaxyId nếu có
       });
 
       if (response.data) {
@@ -126,10 +137,14 @@ const Other = () => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p>Đã xảy ra lỗi: {error.message || error}</p>
+          <p>Đã xảy ra lỗi khi tải combo: {error.message || error}</p>
           <button
             className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-            onClick={() => dispatch(fetchOthers())}
+            onClick={() =>
+              safeMovieInfo.galaxyId == null
+                ? dispatch(fetchOthers())
+                : dispatch(fetchOtherByGalaxyId(safeMovieInfo.galaxyId))
+            }
           >
             Thử lại
           </button>
@@ -190,7 +205,7 @@ const Other = () => {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500">Không có combo nào</p>
+            <p className="text-gray-500">Không có combo nào tại rạp này</p>
           )}
         </div>
 
