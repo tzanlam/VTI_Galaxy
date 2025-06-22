@@ -11,6 +11,7 @@ import RoomManagement from "../components/admin/RoomManagement";
 import MovieManagement from "../components/admin/MovieManagement";
 import SeatSelection from "../components/SeatSelection";
 import Other from "../components/Other";
+import Payment from "../components/Payment";
 
 const router = createBrowserRouter([
   {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: "/other",
         element: <Other />,
+      },
+      {
+        path: "/payment",
+        element: <Payment />,
       },
       {
         path: "*",
