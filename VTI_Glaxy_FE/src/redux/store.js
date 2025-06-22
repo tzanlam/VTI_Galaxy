@@ -10,6 +10,7 @@ import roomReducer from "./slices/roomSlice";
 import seatReducer from "./slices/seatSlice";
 import seatRoomReducer from "./slices/seatRoomSlice";
 import otherReducer from "./slices/otherSlice";
+import voucherReducer from "./slices/voucherSlice";
 
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
@@ -36,6 +37,7 @@ const store = configureStore({
     seat: seatReducer,
     seatRoom: seatRoomReducer,
     other: otherReducer,
+    voucher: voucherReducer,
   },
   preloadedState,
   // eslint-disable-next-line no-undef

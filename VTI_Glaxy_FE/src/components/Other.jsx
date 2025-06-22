@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import axiosClient from "../services/axiosClient";
 import {
   fetchOtherByGalaxyId,
-  fetchOthers, // Thêm import fetchOthers
+  fetchOthers,
   clearOtherState,
 } from "../redux/slices/otherSlice";
 
@@ -28,27 +28,23 @@ const Other = () => {
   };
 
   useEffect(() => {
-    // Debug logs
     console.log("State Received:", state);
     console.log("MovieInfo:", movieInfo);
     console.log("SafeMovieInfo:", safeMovieInfo);
 
-    // Kiểm tra state
     if (!state || !showtimeId || !selectedSeats || !movieInfo) {
       toast.error("Vui lòng chọn suất chiếu và ghế trước khi chọn combo");
       navigate("/select-showtime");
       return;
     }
 
-    // Kiểm tra galaxyId
     if (safeMovieInfo.galaxyId == null) {
       toast.warn("Không tìm thấy galaxyId, tải tất cả combo");
-      dispatch(fetchOthers()); // Gọi API lấy tất cả combo
+      dispatch(fetchOthers());
     } else {
       dispatch(fetchOtherByGalaxyId(safeMovieInfo.galaxyId));
     }
 
-    // Cleanup khi unmount
     return () => {
       dispatch(clearOtherState());
     };
@@ -79,7 +75,7 @@ const Other = () => {
   };
 
   const calculateGrandTotal = () => {
-    return totalSeatPrice + calculateComboTotal();
+    return (totalSeatPrice || 0) + calculateComboTotal();
   };
 
   const formatCurrency = (amount) => {
@@ -90,35 +86,90 @@ const Other = () => {
   };
 
   const handleConfirmBooking = async () => {
+    console.log("handleConfirmBooking - Input data:", {
+      selectedSeats,
+      safeMovieInfo,
+      showtimeId,
+      totalSeatPrice,
+      selectedCombos,
+    });
+
+    if (!selectedSeats || selectedSeats.length === 0) {
+      toast.error("Vui lòng chọn ít nhất một ghế");
+      navigate("/select-showtime");
+      return;
+    }
+
+    if (safeMovieInfo.galaxyId == null) {
+      toast.error("Thiếu thông tin galaxyId, vui lòng thử lại");
+      navigate("/select-showtime");
+      return;
+    }
+
+    // Kiểm tra trạng thái ghế trước khi đặt
     try {
       for (const seatRoom of selectedSeats) {
+        if (!seatRoom.id) {
+          toast.error(`Ghế ${seatRoom.seat?.name || "N/A"} thiếu ID`);
+          return;
+        }
+        console.log("Checking seatRoom status:", { seatRoomId: seatRoom.id });
+        const response = await axiosClient.get(
+          `/getSeatRoomStatus?seatRoomId=${seatRoom.id}`
+        );
+        if (response.data.status === "BOOKED") {
+          toast.error(`Ghế ${seatRoom.seat?.name || "N/A"} đã được đặt`);
+          return;
+        }
+      }
+
+      // Cập nhật trạng thái ghế
+      for (const seatRoom of selectedSeats) {
+        console.log("Updating seatRoom:", {
+          seatRoomId: seatRoom.id,
+          status: "BOOKED",
+        });
         await axiosClient.put(
           `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
         );
       }
 
+      // Chuẩn bị comboItems
       const comboItems = Object.entries(selectedCombos)
         .filter(([_, quantity]) => quantity > 0)
         .map(([comboId, quantity]) => ({
           comboId: parseInt(comboId),
           quantity,
+          name:
+            others.find((combo) => combo.id === parseInt(comboId))?.name ||
+            "Unknown",
         }));
 
-      const seatRoomIds = selectedSeats.map((seat) => seat.id);
-      const response = await axiosClient.post("/api/booking/create", {
-        showTimeId: showtimeId,
-        seatRoomIds,
+      console.log("Navigating to /payment with state:", {
+        showtimeId,
+        selectedSeats,
+        movieInfo: safeMovieInfo,
+        totalSeatPrice,
         comboItems,
-        totalPrice: calculateGrandTotal(),
-        galaxyId: safeMovieInfo.galaxyId, // Gửi galaxyId nếu có
+        totalComboPrice: calculateComboTotal(),
       });
 
-      if (response.data) {
-        toast.success("Đặt vé thành công!");
-        navigate("/");
-      }
+      navigate("/payment", {
+        state: {
+          showtimeId,
+          selectedSeats,
+          movieInfo: safeMovieInfo,
+          totalSeatPrice,
+          comboItems,
+          totalComboPrice: calculateComboTotal(),
+        },
+      });
     } catch (error) {
-      console.error("Lỗi khi đặt vé:", error);
+      console.error("Lỗi khi cập nhật trạng thái ghế:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
       toast.error(error.response?.data?.message || "Đã xảy ra lỗi khi đặt vé");
     }
   };
@@ -295,7 +346,7 @@ const Other = () => {
             className="w-full py-3 mt-6 rounded-lg text-white font-bold bg-blue-600 hover:bg-blue-700 md:static fixed bottom-0 left-0 right-0 md:mx-0 mx-4 mb-4 md:mb-0 z-10 md:z-auto"
             onClick={handleConfirmBooking}
           >
-            Xác nhận đặt vé
+            Tiếp tục thanh toán
           </button>
         </div>
       </div>
