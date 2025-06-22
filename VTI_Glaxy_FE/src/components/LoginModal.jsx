@@ -7,9 +7,9 @@ import {
   loginFailure,
 } from "../redux/slices/authSlice";
 import { validateLogin } from "../utils/Validation";
-import { login } from "../services/authService";
 import { IoIosEyeOff, IoMdEye } from "react-icons/io";
 import { toast } from "react-toastify";
+import { login } from "../services/AuthService";
 
 const LoginModal = () => {
   const { isLoginOpen } = useSelector((state) => state.modal);

@@ -1,21 +1,54 @@
-import React from 'react';
-import { Layout, Menu, Input, Avatar } from 'antd';
-import { Link, Outlet } from 'react-router-dom';
-import { SearchOutlined, UserOutlined } from '@ant-design/icons';
+import React, { useEffect } from "react";
+import { Layout, Menu, Input, Avatar, Dropdown } from "antd";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { SearchOutlined, UserOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearAccountSlice,
+  fetchAccountById,
+} from "../redux/slices/accountSlice";
 
 const { Header, Sider, Content } = Layout;
 
 const HomeAdmin = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  // const accountId = localStorage.getItem("accountId");
+  // const account = useSelector((state) => state.account);
   const menuItems = [
-    { key: '1', label: <Link to="/management/galaxy">Galaxy</Link> },
-    { key: '2', label: <Link to="/management/room">Phòng chiếu</Link> },
-    { key: '3', label: <Link to="/management/movie">Phim</Link> },
-    { key: '4', label: <Link to="/management/voucher">Voucher</Link> },
-    { key: '5', label: <Link to="/management/employee">Nhân viên</Link> },
-    { key: '6', label: <Link to="/management/statistics">Thống kê</Link> },
-    { key: '7', label: <Link to="/management/invoice">Hóa đơn điện tử</Link> },
-    { key: '8', label: <Link to="/management/report">Báo cáo</Link> },
+    { key: "1", label: <Link to="/management/galaxy">Galaxy</Link> },
+    { key: "2", label: <Link to="/management/room">Phòng chiếu</Link> },
+    { key: "3", label: <Link to="/management/movie">Phim</Link> },
+    { key: "4", label: <Link to="/management/voucher">Voucher</Link> },
+    { key: "5", label: <Link to="/management/employee">Nhân viên</Link> },
+    { key: "6", label: <Link to="/management/statistics">Thống kê</Link> },
+    { key: "7", label: <Link to="/management/invoice">Hóa đơn điện tử</Link> },
+    { key: "8", label: <Link to="/management/report">Báo cáo</Link> },
   ];
+
+  const handleLogout = () => {
+    dispatch(clearAccountSlice());
+    navigate("/");
+  };
+
+  // useEffect(
+    // () => (dispatch(fetchAccountById(accountId)), [dispatch, accountId])
+  // );
+
+  const userMenu = (
+    <Menu
+      items={[
+        {
+          key: "profile",
+          label: <Link to="/management/profile">Hồ sơ cá nhân</Link>,
+        },
+        {
+          key: "logout",
+          label: <span onClick={handleLogout}>Đăng xuất</span>,
+        },
+      ]}
+    />
+  );
 
   return (
     <Layout className="min-h-screen">
@@ -30,11 +63,11 @@ const HomeAdmin = () => {
         </div>
         <Menu
           mode="inline"
-          defaultSelectedKeys={['1']}
+          defaultSelectedKeys={["1"]}
           className="mt-2 bg-transparent text-amber-900 font-medium"
           items={menuItems}
           style={{
-            backgroundColor: 'transparent',
+            backgroundColor: "transparent",
           }}
         />
       </Sider>
@@ -52,11 +85,16 @@ const HomeAdmin = () => {
             />
           </div>
 
-          {/* User info */}
-          <div className="flex items-center space-x-3">
-            <Avatar icon={<UserOutlined />} className="bg-amber-400" />
-            <span className="font-semibold text-amber-700">Tài khoản của bạn</span>
-          </div>
+          {/* User info dropdown */}
+          <Dropdown overlay={userMenu} placement="bottomRight" arrow>
+            <div className="flex items-center space-x-3 cursor-pointer">
+              <Avatar icon={<UserOutlined />} className="bg-amber-400" />
+              <span className="font-semibold text-amber-700">
+                {/* ${account.fullName} */}
+                thông tin tài khoản
+              </span>
+            </div>
+          </Dropdown>
         </Header>
 
         {/* Content */}

@@ -3,7 +3,7 @@ import roomService from "../../services/roomService";
 
 export const fetchRooms = createAsyncThunk('room/fetchRooms', async(rejectWithValue)=>{
    try {
-      return (await roomService.fetchRooms).data
+      return (await roomService.fetchRooms(  )).data
    } catch (error) {
       return rejectWithValue(error.data)
    }
@@ -74,6 +74,8 @@ const roomSlice = createSlice({
          })
          .addCase(fetchRooms.fulfilled, (state, action)=>{
             state.loading = false,
+            console.log("data reducer fetchRooms", action.payload);
+            
             state.rooms = action.payload
          })
          .addCase(fetchRooms.rejected, (state, action)=>{
