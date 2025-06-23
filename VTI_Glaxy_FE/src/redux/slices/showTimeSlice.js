@@ -17,6 +17,14 @@ export const fetchShowTimes = createAsyncThunk(
   }
 );
 
+export const fetchShowTimeByRoom = createAsyncThunk('showTime/fetchShowTimeByRoom', async(roomId, {rejectWithValue})=>{
+  try {
+    return (await(showTimeService.fetchShowTimeByRoom(roomId))).data
+  } catch (error) {
+    return rejectWithValue(error.response?.data);
+  }
+})
+
 export const fetchShowTimeById = createAsyncThunk(
   "showtime/fetchShowTimeById",
   async (showTimeId, { rejectWithValue }) => {
@@ -165,6 +173,20 @@ const showTimeSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // fetch ShowTime By Room
+      .addCase(fetchShowTimeByRoom.pending, (state)=>{
+        state.loading = true,
+        state.error - null
+      })
+      .addCase(fetchShowTimeByRoom.fulfilled, (state, action)=>{
+        state.loading = false
+        state.showTimes = action.payload
+      })
+      .addCase(fetchShowTimeByRoom.rejected, (state, action)=>{
+        state.loading = false
+        state.error = action.payload
+      })
+
       .addCase(fetchShowTimes.pending, (state) => {
         state.loading = true;
         state.error = null;

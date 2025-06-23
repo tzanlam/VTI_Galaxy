@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { Button, Descriptions, Card, Spin, List, Typography, Divider } from 'antd';
+import { Button, Spin, List, Typography, Divider } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchShowTimeByRoom } from '../../redux/slices/showTimeSlice';
 import { useParams } from 'react-router-dom';
+import { fetchShowTimeByRoom } from '../../../redux/slices/showTimeSlice';
+import { FiInfo, FiCalendar } from 'react-icons/fi';
 
 const { Text, Title } = Typography;
 
 const RoomDetails = ({ room }) => {
- const roomId = useParams();
+  const { roomId } = useParams();
   const dispatch = useDispatch();
   const [showTimesVisible, setShowTimesVisible] = useState(false);
-
   const { showTimes = [], loading } = useSelector((state) => state.showTime || {});
 
   const handleViewShowTime = async () => {
@@ -18,7 +18,6 @@ const RoomDetails = ({ room }) => {
     setShowTimesVisible(true);
   };
   
-  // Gom nhóm suất chiếu theo ngày
   const groupedShowTimes = showTimes.reduce((acc, item) => {
     if (!acc[item.date]) {
       acc[item.date] = [];
@@ -28,47 +27,54 @@ const RoomDetails = ({ room }) => {
   }, {});
 
   return (
-    <Card
-      title={`Phòng ${room.name}`}
-      bordered={true}
-      style={{ maxWidth: 600, margin: '20px auto' }}
-    >
-      <Descriptions column={1}>
-        <Descriptions.Item label="ID">{room.id}</Descriptions.Item>
-        <Descriptions.Item label="Tên">{room.name}</Descriptions.Item>
-        <Descriptions.Item label="Loại màn hình">{room.typeScreen}</Descriptions.Item>
-        <Descriptions.Item label="Trạng thái">{room.status}</Descriptions.Item>
-        <Descriptions.Item label="Sức chứa">{room.capacity}</Descriptions.Item>
-      </Descriptions>
+    <div className="max-w-2xl mx-auto p-6 rounded-xl bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-300 shadow-lg">
+      <div className="flex items-center space-x-3">
+        <FiInfo className="text-amber-700 text-3xl" />
+        <h2 className="text-2xl font-bold text-amber-800">Phòng {room?.name}</h2>
+      </div>
+      <div className="text-amber-900 space-y-2 mt-3">
+        <div><span className="font-semibold">ID:</span> {room?.id}</div>
+        <div><span className="font-semibold">Tên:</span> {room?.name}</div>
+        <div><span className="font-semibold">Loại màn hình:</span> {room?.typeScreen}</div>
+        <div><span className="font-semibold">Trạng thái:</span> {room?.status}</div>
+        <div><span className="font-semibold">Sức chứa:</span> {room?.capacity}</div>
+      </div>
 
-      <div style={{ textAlign: 'center', marginTop: 20 }}>
+      <div className="text-center mt-6">
         <Button
+          icon={<FiCalendar />}
           type="primary"
           onClick={handleViewShowTime}
+          className="bg-amber-600 hover:bg-amber-700 rounded-full font-bold text-white flex items-center justify-center space-x-2"
         >
           Xem lịch chiếu
         </Button>
       </div>
 
       {showTimesVisible && (
-        <div style={{ marginTop: 30 }}>
+        <div className="mt-8">
           {loading && <Spin />}
-
+          
           {!loading && Object.keys(groupedShowTimes).length === 0 && (
-            <Text type="secondary">Chưa có lịch chiếu</Text>
+            <Text className="text-amber-800">Chưa có lịch chiếu</Text>
           )}
-
+          
           {!loading && Object.keys(groupedShowTimes).map((date) => (
             <div key={date}>
               <Divider />
-              <Title level={4}>{date}</Title>
+              <div className="flex items-center space-x-2">
+                <FiCalendar className="text-amber-700" />
+                <Title level={4} className="text-amber-800">{date}</Title>
+              </div>
               <List
                 dataSource={groupedShowTimes[date]}
                 renderItem={(showTime) => (
                   <List.Item>
                     <List.Item.Meta
-                      title={showTime.movieName}
-                      description={`Giờ chiếu: ${showTime.time}`}
+                      title={<span className="font-bold text-amber-900">{showTime.movieName}</span>}
+                      description={showTime.startTimes.length > 0
+                        ? `Giờ chiếu: ${showTime.startTimes.join(', ')}`
+                        : 'Chưa có giờ chiếu'}
                     />
                   </List.Item>
                 )}
@@ -77,7 +83,7 @@ const RoomDetails = ({ room }) => {
           ))}
         </div>
       )}
-    </Card>
+    </div>
   );
 };
 

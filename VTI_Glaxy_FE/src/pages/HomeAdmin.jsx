@@ -1,11 +1,9 @@
-import React, { useEffect } from "react";
 import { Layout, Menu, Input, Avatar, Dropdown } from "antd";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { SearchOutlined, UserOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   clearAccountSlice,
-  fetchAccountById,
 } from "../redux/slices/accountSlice";
 
 const { Header, Sider, Content } = Layout;
@@ -86,7 +84,7 @@ const HomeAdmin = () => {
           </div>
 
           {/* User info dropdown */}
-          <Dropdown overlay={userMenu} placement="bottomRight" arrow>
+          <Dropdown menu={{items: userMenu}} placement="bottomRight" arrow>
             <div className="flex items-center space-x-3 cursor-pointer">
               <Avatar icon={<UserOutlined />} className="bg-amber-400" />
               <span className="font-semibold text-amber-700">
