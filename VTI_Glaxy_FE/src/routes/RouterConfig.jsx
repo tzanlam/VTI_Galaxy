@@ -13,6 +13,7 @@ import SeatSelection from "../components/SeatSelection";
 import Other from "../components/Other";
 import Payment from "../components/Payment";
 import RoomDetails from "../components/admin/details/RoomDetails";
+import GalaxyDetails from "../components/admin/details/GalaxyDetails";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
       {
         element: <GalaxyManagement />,
         path: "galaxy",
+      },
+      {
+        element: <GalaxyDetails />,
+        path: "galaxy/:galaxyId"
       },
       {
         element: <RoomManagement />,

@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Button, Spin, Tag, Card } from 'antd';
+import { FiPlusCircle } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchRooms } from '../../redux/slices/roomSlice';
-import { Card, Tag, Spin } from 'antd';
+import { fetchRooms, createRoom } from '../../redux/slices/roomSlice';
 import { useNavigate } from 'react-router-dom';
+import CreateRoomModal from './model/CreateRoomModal';
 
 const RoomManagement = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { rooms = [], loading } = useSelector((state) => state.room || {});
+  const { rooms = [], loading, loadingCreate } = useSelector((state) => state.room || {});
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(fetchRooms());
@@ -21,11 +24,26 @@ const RoomManagement = () => {
     }
   };
   
+  const handleCreateRoom = async (values) => {
+    await dispatch(createRoom(values));
+    setIsCreateModalVisible(false);
+  };
+  
   if (loading) return <Spin />;
 
   return (
     <div style={{ padding: 24 }}>
-      <h2 style={{ marginBottom: 16 }}>Danh sách phòng chiếu</h2>
+      <div className="flex justify-between items-center">
+        <h2 style={{ marginBottom: 16 }}>Danh sách phòng chiếu</h2>
+        <Button
+          icon={<FiPlusCircle />}
+          type="primary"
+          onClick={() => setIsCreateModalVisible(true)}
+          className="bg-amber-600 hover:bg-amber-700 rounded-full font-bold text-white flex items-center justify-center space-x-2"
+        >
+          Tạo phòng mới
+        </Button>
+      </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
         {rooms.map((room) => (
           <Card
@@ -54,6 +72,13 @@ const RoomManagement = () => {
           </Card>
         ))}
       </div>
+
+      <CreateRoomModal
+        visible={isCreateModalVisible}
+        onCancel={() => setIsCreateModalVisible(false)}
+        onCreate={handleCreateRoom}
+        loading={loadingCreate}
+      />
     </div>
   );
 };

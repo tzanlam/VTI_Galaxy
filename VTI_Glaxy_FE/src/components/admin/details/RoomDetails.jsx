@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Spin, List, Typography, Divider } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { fetchShowTimeByRoom } from '../../../redux/slices/showTimeSlice';
+import { fetchRoomById } from '../../../redux/slices/roomSlice';
 import { FiInfo, FiCalendar } from 'react-icons/fi';
 
 const { Text, Title } = Typography;
 
-const RoomDetails = ({ room }) => {
-  const { roomId } = useParams();
+const RoomDetails = () => {
   const dispatch = useDispatch();
-  const [showTimesVisible, setShowTimesVisible] = useState(false);
+  const { roomId } = useParams();
+  const room = useSelector((state) => state.room?.room);
   const { showTimes = [], loading } = useSelector((state) => state.showTime || {});
+  const [showTimesVisible, setShowTimesVisible] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchRoomById(roomId)).unwrap();
+  }, [dispatch, roomId]);
 
   const handleViewShowTime = async () => {
-    await dispatch(fetchShowTimeByRoom(roomId));
+    await dispatch(fetchShowTimeByRoom(roomId)).unwrap();
     setShowTimesVisible(true);
   };
   
@@ -54,11 +60,11 @@ const RoomDetails = ({ room }) => {
       {showTimesVisible && (
         <div className="mt-8">
           {loading && <Spin />}
-          
+
           {!loading && Object.keys(groupedShowTimes).length === 0 && (
             <Text className="text-amber-800">Chưa có lịch chiếu</Text>
           )}
-          
+
           {!loading && Object.keys(groupedShowTimes).map((date) => (
             <div key={date}>
               <Divider />
@@ -74,7 +80,8 @@ const RoomDetails = ({ room }) => {
                       title={<span className="font-bold text-amber-900">{showTime.movieName}</span>}
                       description={showTime.startTimes.length > 0
                         ? `Giờ chiếu: ${showTime.startTimes.join(', ')}`
-                        : 'Chưa có giờ chiếu'}
+                        : 'Chưa có giờ chiếu'
+                      }
                     />
                   </List.Item>
                 )}
