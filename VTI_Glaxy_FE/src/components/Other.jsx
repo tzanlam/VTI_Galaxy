@@ -24,7 +24,7 @@ const Other = () => {
     galaxyName: movieInfo?.galaxyName || "Không có thông tin",
     date: movieInfo?.date || "Không có thông tin",
     time: movieInfo?.time || "Không có thông tin",
-    galaxyId: movieInfo?.galaxyId ?? null,
+    galaxyId: localStorage.getItem("selectedGalaxyId") || null, // Retrieve galaxyId from localStorage
   };
 
   useEffect(() => {
@@ -48,7 +48,14 @@ const Other = () => {
     return () => {
       dispatch(clearOtherState());
     };
-  }, [showtimeId, selectedSeats, movieInfo, navigate, dispatch]);
+  }, [
+    showtimeId,
+    selectedSeats,
+    movieInfo,
+    navigate,
+    dispatch,
+    safeMovieInfo.galaxyId,
+  ]);
 
   useEffect(() => {
     if (others.length > 0 && Object.keys(selectedCombos).length === 0) {
@@ -207,6 +214,10 @@ const Other = () => {
   if (!selectedSeats || !movieInfo) {
     return <div className="container mx-auto px-4 py-8">Đang tải...</div>;
   }
+
+  console.log("State Received:", state);
+  console.log("MovieInfo:", movieInfo);
+  console.log("SafeMovieInfo:", safeMovieInfo);
 
   return (
     <div className="container mx-auto px-4 py-8">
