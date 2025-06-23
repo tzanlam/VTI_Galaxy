@@ -2,10 +2,12 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRooms } from '../../redux/slices/roomSlice';
 import { Card, Tag, Spin } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 const RoomManagement = () => {
   const dispatch = useDispatch();
-  const { rooms , loading } = useSelector((state) => state.room || {});
+  const navigate = useNavigate();
+  const { rooms = [], loading } = useSelector((state) => state.room || {});
 
   useEffect(() => {
     dispatch(fetchRooms());
@@ -18,7 +20,7 @@ const RoomManagement = () => {
       return <Tag color="red">Inactive</Tag>;
     }
   };
-
+  
   if (loading) return <Spin />;
 
   return (
@@ -37,6 +39,7 @@ const RoomManagement = () => {
                 style={{ height: 320, objectFit: 'cover' }}
               />
             }
+            onClick={() => navigate(`/management/room/${room.id}`)}
           >
             <Card.Meta
               title={room.name}
