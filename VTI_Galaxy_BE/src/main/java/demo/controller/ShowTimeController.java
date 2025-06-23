@@ -41,6 +41,15 @@ public class ShowTimeController {
         }
     }
 
+    @GetMapping("/getShowTimeByRoom")
+    public ResponseEntity<?> getByRoom(@RequestParam("roomId") int roomId) {
+        try{
+            return ResponseEntity.ok(showTimeService.findShowTimeByRoom(roomId));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/getShowTimesByFilter")
     public ResponseEntity<?> getShowTimesByFilter(
             @RequestParam(value = "galaxyId", required = false) String galaxyId,

@@ -61,6 +61,7 @@ public class SecurityConfig {
                 .sessionManagement(i->i.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
+                                "/getShowTimeByRoom",
                                 "/getRooms",
                                 "/registerUser",
                                 "/postMovie",

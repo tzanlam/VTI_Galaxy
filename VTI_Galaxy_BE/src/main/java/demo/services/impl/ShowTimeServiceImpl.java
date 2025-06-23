@@ -51,6 +51,14 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
+    public List<ShowTimeDto> findShowTimeByRoom(int roomId) {
+        List<ShowTime> showTimes = showTimeRepository.findByRoom(roomId).orElseThrow(
+                () -> new RuntimeException("showtime is null with roomId you choose")
+        );
+        return showTimes.stream().map(ShowTimeDto::new).collect(Collectors.toList());
+    }
+
+    @Override
     public List<ShowTimeDto> findByFilter(Integer galaxyId, Integer movieId, String date) {
         LocalDate localDate = date != null ? convertToLocalDate(date) : null;
         List<ShowTime> showTimes = showTimeRepository.findByFilter(galaxyId, movieId, localDate);
