@@ -67,7 +67,7 @@ const router = createBrowserRouter([
         path: "room",
       },
       {
-        elememt: <RoomDetails />,
+        element: <RoomDetails />,
         path: "room/:roomId"
       },
       {

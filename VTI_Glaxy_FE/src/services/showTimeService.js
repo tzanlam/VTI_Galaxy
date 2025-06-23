@@ -12,6 +12,9 @@ const showTimeService = {
       params: { galaxyId, movieId, date },
     });
   },
+  fetchShowTimeByRoom(roomId){
+    return axiosClient.get(`getShowTimeByRoom?roomId=${roomId}`)
+  },
   createShowTime(showTimeRequest) {
     return axiosClient.post("/postShowTime", showTimeRequest);
   },
