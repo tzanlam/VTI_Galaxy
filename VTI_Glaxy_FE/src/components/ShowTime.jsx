@@ -56,10 +56,12 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
       console.log("Auto-selecting first cinema:", getCinemas[0].name);
       setSelectedCinema(getCinemas[0].name);
       setSelectedGalaxyId(getCinemas[0].id);
+      localStorage.setItem("selectedGalaxyId", getCinemas[0].id); // Store galaxyId
     } else {
       console.log("No cinemas available for city:", selectedCity);
       setSelectedCinema("Chọn rạp");
       setSelectedGalaxyId(null);
+      localStorage.removeItem("selectedGalaxyId"); // Clear localStorage when no cinema selected
     }
   }, [selectedCity, getCinemas]);
 
@@ -73,6 +75,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
       setIsCityOpen(false);
       setSelectedCinema("Chọn rạp");
       setSelectedGalaxyId(null);
+      localStorage.removeItem("selectedGalaxyId"); // Clear galaxyId when city changes
     },
     [onCityChange]
   );
@@ -81,6 +84,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
     console.log("Selected cinema:", cinema);
     setSelectedCinema(cinema.name);
     setSelectedGalaxyId(cinema.id);
+    localStorage.setItem("selectedGalaxyId", cinema.id); // Store selected galaxyId
     setIsCinemaOpen(false);
   }, []);
 
@@ -175,9 +179,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
                 key={index}
                 onClick={() => onSelect(item)}
                 className={`block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-500 hover:text-white transition-colors duration-200 ${
-                  selectedItem === (item.name || item)
-                    ? "bg-blue-500 text-white"
-                    : ""
+                  selectedItem === item.name ? "bg-blue-500 text-white" : ""
                 }`}
               >
                 {item.name || item}
@@ -219,6 +221,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
         galaxyName: showtime.galaxyName,
         date: selectedDay?.dateForApi,
         time: time,
+        galaxyId: selectedGalaxyId, // Pass galaxyId to state
       },
     });
   };
@@ -299,7 +302,6 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
               <h3 className="text-lg font-bold mb-2">
                 {showtime.galaxyName} - {showtime.movieName}
               </h3>
-
               <div className="flex flex-wrap gap-2">
                 {showtime.startTimes.length > 0 ? (
                   showtime.startTimes.map((time, timeIdx) => (
