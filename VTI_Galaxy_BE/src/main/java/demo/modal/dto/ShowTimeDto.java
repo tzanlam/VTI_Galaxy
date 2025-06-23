@@ -14,6 +14,7 @@ public class ShowTimeDto {
     private String galaxyName;
     private String movieName;
     private String date;
+    private int galaxyId;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<String> startTimes;
 
@@ -22,6 +23,7 @@ public class ShowTimeDto {
         this.galaxyName = getGalaxyName(showTime);
         this.movieName = getMovieName(showTime);
         this.date = formatDate(showTime);
+        this.galaxyId = showTime.getGalaxy().getId();
         this.startTimes = mapTime(showTime);
     }
 
