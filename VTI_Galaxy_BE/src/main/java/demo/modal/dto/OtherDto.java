@@ -11,6 +11,7 @@ public class OtherDto {
     private String image_url;
     private int price;
     private int quantity;
+    private int galaxyId;
     private String status;
 
     public OtherDto(Other other){
@@ -21,5 +22,6 @@ public class OtherDto {
         this.price = other.getPrice();
         this.quantity = other.getQuantity();
         this.status = other.getStatus() != null ? other.getStatus().toString() : null;
+        this.galaxyId = other.getGalaxy().getId();
     }
 }
