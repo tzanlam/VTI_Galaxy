@@ -1,7 +1,6 @@
 package demo.services.impl;
 
 import demo.modal.constant.ActiveStatus;
-import demo.modal.constant.OtherStatus;
 import demo.modal.dto.OtherDto;
 import demo.modal.entity.Other;
 import demo.modal.request.OtherRequest;
@@ -10,6 +9,7 @@ import demo.repository.OtherRepository;
 import demo.services.interfaceClass.OtherService;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,7 +26,7 @@ public class OtherServiceImpl implements OtherService {
     @Override
     public List<OtherDto> getAllOthers() {
         return otherRepository.findAll().stream()
-                .filter(other -> other.getStatus() == ActiveStatus.ACTIVE && other.getOtherStatus() == OtherStatus.AVAILABLE)
+                .filter(other -> other.getStatus() == ActiveStatus.ACTIVE)
                 .map(OtherDto::new)
                 .collect(Collectors.toList());
     }
@@ -41,11 +41,17 @@ public class OtherServiceImpl implements OtherService {
 
     @Override
     public List<OtherDto> getOtherByGalaxyId(int galaxyId) {
-        List<Other> others = galaxyRepository.findOthers(galaxyId, ActiveStatus.ACTIVE.name(), OtherStatus.AVAILABLE.name());
+        List<Other> others = galaxyRepository.findOthers(galaxyId);
         if (others.isEmpty()) {
             throw new IllegalArgumentException("No active combos found for Galaxy ID: " + galaxyId);
         }
-        return others.stream().map(OtherDto::new).collect(Collectors.toList());
+        List<Other> otherActive =  new ArrayList<>();
+        for (Other other : others) {
+            if (other.getStatus() == ActiveStatus.ACTIVE) {
+                otherActive.add(other);
+            }
+        }
+        return otherActive.stream().map(OtherDto::new).collect(Collectors.toList());
     }
 
     @Override
@@ -53,7 +59,6 @@ public class OtherServiceImpl implements OtherService {
         try {
             Other other = request.setOther();
             other.setStatus(ActiveStatus.ACTIVE);
-            other.setOtherStatus(OtherStatus.AVAILABLE);
             other.setGalaxy(galaxyRepository.findById(request.getGalaxyId()).orElseThrow(
                     () -> new IllegalArgumentException("Invalid Galaxy ID: " + request.getGalaxyId())
             ));
@@ -87,7 +92,6 @@ public class OtherServiceImpl implements OtherService {
                 () -> new IllegalArgumentException("There is no other with this id")
         );
         try {
-            other.setOtherStatus(OtherStatus.DELETE);
             otherRepository.save(other);
             return new OtherDto(other);
         } catch (Exception e) {

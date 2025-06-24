@@ -1,7 +1,6 @@
 package demo.modal.entity;
 
 import demo.modal.constant.ActiveStatus;
-import demo.modal.constant.OtherStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,10 +28,6 @@ public class Other extends Time{
     @Column
     private int quantity;
 
-    @Column
-    @Enumerated(EnumType.ORDINAL)
-    private OtherStatus otherStatus;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "galaxy_id")
     private Galaxy galaxy;
@@ -40,6 +35,4 @@ public class Other extends Time{
     @Column
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
-
-
 }

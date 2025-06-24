@@ -21,6 +21,7 @@ public class OtherRequest {
         other.setImage_url(image_url);
         other.setPrice(price);
         other.setQuantity(quantity);
+        other.setStatus((ActiveStatus.ACTIVE));
         return other;
     }
 
@@ -30,6 +31,5 @@ public class OtherRequest {
         other.setImage_url(image_url);
         other.setPrice(price);
         other.setQuantity(quantity);
-
     }
 }
