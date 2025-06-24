@@ -32,6 +32,10 @@ public class Other extends Time{
     @JoinColumn(name = "galaxy_id")
     private Galaxy galaxy;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id")
+    private Booking booking; // Thêm trường này để khớp với mappedBy
+
     @Column
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;

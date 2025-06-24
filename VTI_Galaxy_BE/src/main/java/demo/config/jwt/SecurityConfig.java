@@ -80,13 +80,15 @@ public class SecurityConfig {
                                 "/postSeat",
                                 "/getSeat",
                                 "/postRoom",
-                                "/getRoom",
+                                "/getRooms",
                                 "/postSeatRoom",
                                 "/getSeatRooms",
                                 "/getSeatRoomById",
+                                "/getSeatRoomStatus",
                                 "/postOther",
                                 "/getOthers",
-                                "/getOtherByGalaxyId").permitAll()
+                                "/getOtherByGalaxyId"
+                                ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);
         return http.build();

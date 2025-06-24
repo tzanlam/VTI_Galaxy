@@ -25,4 +25,8 @@ public class Voucher extends Time {
 
     @Column
     private LocalDateTime end_date;
+
+    @ManyToOne
+    @JoinColumn(name = "booking_id", nullable = false)
+    private Booking booking;
 }
