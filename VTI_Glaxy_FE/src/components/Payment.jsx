@@ -114,99 +114,182 @@ const Payment = () => {
     }
   };
 
-  return (
-    <div className="payment-container p-4 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Thanh Toán</h2>
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
 
-      <div className="order-summary mb-6 p-4 border rounded">
-        <h3 className="text-lg font-semibold">Tóm tắt đơn hàng</h3>
-        <p>Phim: {safeMovieInfo.movieName || "N/A"}</p>
-        <p>Rạp: {safeMovieInfo.galaxyName || "N/A"}</p>
-        <p>
-          Thời gian: {safeMovieInfo.date} {safeMovieInfo.time}
-        </p>
-        <p>
-          Ghế:{" "}
-          {selectedSeats
-            ?.map((seat) => seat.seat?.name || seat.name)
-            .join(", ") || "N/A"}
-        </p>
-        <p>
-          Combo:{" "}
-          {comboItems
-            ?.map((item) => `${item.name} x${item.quantity}`)
-            .join(", ") || "Không có"}
-        </p>
-        <p>Tổng tiền vé: {totalSeatPrice?.toLocaleString()} VNĐ</p>
-        <p>Tổng tiền combo: {totalComboPrice?.toLocaleString()} VNĐ</p>
-        <p>
-          Giảm giá:{" "}
-          {voucher ? voucher.discountAmount?.toLocaleString() || 0 : 0} VNĐ
-        </p>
-        <p className="font-bold">
-          Tổng cộng: {finalPrice.toLocaleString()} VNĐ
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-2">{safeMovieInfo.movieName}</h1>
+        <p className="text-lg">
+          {safeMovieInfo.galaxyName} | {safeMovieInfo.date} |{" "}
+          {safeMovieInfo.time}
         </p>
       </div>
 
-      <div className="voucher-section mb-6">
-        <h3 className="text-lg font-semibold mb-2">Mã khuyến mãi</h3>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={voucherCode}
-            onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
-            placeholder="Nhập mã khuyến mãi"
-            className="p-2 border rounded flex-grow"
-          />
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="md:w-2/3">
+          <div className="voucher-section mb-6">
+            <h3 className="text-lg font-semibold mb-2">Mã khuyến mãi</h3>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={voucherCode}
+                onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
+                placeholder="Nhập mã khuyến mãi"
+                className="p-2 border rounded flex-grow"
+              />
+              <button
+                onClick={handleApplyVoucher}
+                disabled={loading}
+                className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+              >
+                {loading ? "Đang xử lý..." : "Áp dụng"}
+              </button>
+            </div>
+          </div>
+
+          <div className="payment-method-section mb-6">
+            <h3 className="text-lg font-semibold mb-2">
+              Phương thức thanh toán
+            </h3>
+            <div className="flex flex-col gap-2">
+              <label>
+                <input
+                  type="radio"
+                  value="CREDIT_CARD"
+                  checked={paymentMethod === "CREDIT_CARD"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                Thẻ tín dụng/Thẻ ghi nợ
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="MOMO"
+                  checked={paymentMethod === "MOMO"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                Ví Momo
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="BANK_TRANSFER"
+                  checked={paymentMethod === "BANK_TRANSFER"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                Chuyển khoản ngân hàng
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className="md:w-1/3 bg-white p-6 rounded-lg shadow-md md:sticky md:top-4 max-w-sm mx-auto md:mx-0">
+          <div className="border-b pb-4 mb-4">
+            <h2 className="text-xl font-bold mb-4">Thông tin đặt vé</h2>
+            <div className="space-y-2">
+              <p>
+                <span className="font-medium">Phim:</span>{" "}
+                {safeMovieInfo.movieName}
+              </p>
+              <p>
+                <span className="font-medium">Rạp:</span>{" "}
+                {safeMovieInfo.galaxyName}
+              </p>
+              <p>
+                <span className="font-medium">Ngày chiếu:</span>{" "}
+                {safeMovieInfo.date}
+              </p>
+              <p>
+                <span className="font-medium">Giờ chiếu:</span>{" "}
+                {safeMovieInfo.time}
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <h2 className="text-xl font-bold mb-4">Ghế đã chọn</h2>
+            {selectedSeats?.length > 0 ? (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {selectedSeats.map((seatRoom) => (
+                  <span
+                    key={seatRoom.id}
+                    className="px-2 py-1 bg-green-100 border border-green-500 rounded-md text-xs"
+                  >
+                    {seatRoom.seat?.name || "N/A"}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 mb-4">Chưa chọn ghế nào</p>
+            )}
+            {selectedSeats?.length > 0 && (
+              <div className="space-y-2 border-t pt-4">
+                {selectedSeats.map((seatRoom) => (
+                  <div key={seatRoom.id} className="flex justify-between">
+                    <span>{seatRoom.seat?.name || "N/A"}:</span>
+                    <span>{formatCurrency(seatRoom.seat?.price || 0)}</span>
+                  </div>
+                ))}
+                <div className="flex justify-between font-bold border-t pt-2 mt-2">
+                  <span>Tổng tiền vé:</span>
+                  <span>{formatCurrency(totalSeatPrice || 0)}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <h2 className="text-xl font-bold mb-4">Combo đã chọn</h2>
+            {comboItems?.length > 0 ? (
+              <div className="space-y-2 border-t pt-4">
+                {comboItems.map((item) => (
+                  <div key={item.comboId} className="flex justify-between">
+                    <span>
+                      {item.name} x {item.quantity}
+                    </span>
+                    <span>
+                      {formatCurrency(item.quantity * (item.price || 0))}
+                    </span>
+                  </div>
+                ))}
+                <div className="flex justify-between font-bold border-t pt-2 mt-2">
+                  <span>Tổng tiền combo:</span>
+                  <span>{formatCurrency(totalComboPrice || 0)}</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-gray-500 mb-4">Chưa chọn combo nào</p>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <h2 className="text-xl font-bold mb-4">Thông tin khuyến mãi</h2>
+            <div className="space-y-2 border-t pt-4">
+              <div className="flex justify-between">
+                <span>Giảm giá:</span>
+                <span>{formatCurrency(voucher?.discountAmount || 0)}</span>
+              </div>
+              <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
+                <span>Tổng cộng:</span>
+                <span>{formatCurrency(finalPrice)}</span>
+              </div>
+            </div>
+          </div>
+
           <button
-            onClick={handleApplyVoucher}
-            disabled={loading}
-            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+            onClick={handleConfirmPayment}
+            className="w-full py-3 rounded-lg text-white font-bold bg-green-500 hover:bg-green-600 md:static fixed bottom-0 left-0 right-0 md:mx-0 mx-4 mb-4 md:mb-0 z-10 md:z-auto"
           >
-            {loading ? "Đang xử lý..." : "Áp dụng"}
+            Xác nhận thanh toán
           </button>
         </div>
       </div>
-
-      <div className="payment-method-section mb-6">
-        <h3 className="text-lg font-semibold mb-2">Phương thức thanh toán</h3>
-        <div className="flex flex-col gap-2">
-          <label>
-            <input
-              type="radio"
-              value="CREDIT_CARD"
-              checked={paymentMethod === "CREDIT_CARD"}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            />
-            Thẻ tín dụng/Thẻ ghi nợ
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="MOMO"
-              checked={paymentMethod === "MOMO"}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            />
-            Ví Momo
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="BANK_TRANSFER"
-              checked={paymentMethod === "BANK_TRANSFER"}
-              onChange={(e) => setPaymentMethod(e.target.value)}
-            />
-            Chuyển khoản ngân hàng
-          </label>
-        </div>
-      </div>
-
-      <button
-        onClick={handleConfirmPayment}
-        className="p-2 bg-green-500 text-white rounded hover:bg-green-600 w-full"
-      >
-        Xác nhận thanh toán
-      </button>
     </div>
   );
 };
