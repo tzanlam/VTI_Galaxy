@@ -95,8 +95,14 @@ const Payment = () => {
       });
 
       if (paymentResponse.data.redirectUrl) {
+        // Chuyển hướng đến URL thanh toán của VNPay, ZaloPay, hoặc cổng thanh toán khác
+        console.log(
+          "Redirecting to payment URL:",
+          paymentResponse.data.redirectUrl
+        );
         window.location.href = paymentResponse.data.redirectUrl;
       } else {
+        // Trường hợp thanh toán nội bộ (ví dụ: CREDIT_CARD, BANK_TRANSFER)
         const bookingResponse = await axiosClient.post(
           "/api/booking/create",
           bookingRequest
@@ -107,6 +113,11 @@ const Payment = () => {
         });
       }
     } catch (err) {
+      console.error("Payment error:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+      });
       toast.error(
         "Lỗi khi xử lý thanh toán: " +
           (err.response?.data?.message || err.message)
@@ -175,6 +186,24 @@ const Payment = () => {
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 />
                 Ví Momo
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="VNPAY"
+                  checked={paymentMethod === "VNPAY"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                VNPay (QR Code/Thẻ ngân hàng)
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="ZALOPAY"
+                  checked={paymentMethod === "ZALOPAY"}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                />
+                ZaloPay
               </label>
               <label>
                 <input
