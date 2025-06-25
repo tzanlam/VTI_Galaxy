@@ -19,11 +19,11 @@ public class MovieDto {
     private String modifiedDate;
     private String imageURL;
     private String trailerURL;
-    private String country; // Thêm trường country
-    private String producer; // Thêm trường producer
-    private int rating; // Thêm trường rating
-    private AgeLimit ageLimit; // Thêm trường ageLimitz
-    private ActiveStatus status; // Thêm trường status
+    private String country;
+    private String producer;
+    private int rating;
+    private AgeLimit ageLimit;
+    private ActiveStatus status;
 
     public MovieDto(Movie movie) {
         this.id = movie.getId();
