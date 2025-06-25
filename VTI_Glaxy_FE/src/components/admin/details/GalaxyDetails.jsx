@@ -10,12 +10,12 @@ const { Text, Title } = Typography;
 const GalaxyDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { galaxyId } = useParams();
   const { galaxy, loading } = useSelector((state) => state.galaxy || {});
 
   useEffect(() => {
-    dispatch(fetchGalaxyById(id));
-  }, [id, dispatch]);
+    dispatch(fetchGalaxyById(galaxyId));
+  }, [galaxyId, dispatch]);
 
   if (loading) return <Spin />;
 

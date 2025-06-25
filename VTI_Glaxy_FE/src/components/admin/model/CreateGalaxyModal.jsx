@@ -6,7 +6,7 @@ const CreateGalaxyModal = ({ visible, isEdit, onCancel, onSubmit, loading }) => 
 
   useEffect(() => {
     if (isEdit) {
-      // Khi chỉnh sửa thì dữ liệu được load sẵn bằng fetchGalaxyById (state.galaxy.galaxy)
+      // Khi chỉnh sửa có thể set value bằng form.setFieldsValue(...)
     } else {
       form.resetFields();
     }
