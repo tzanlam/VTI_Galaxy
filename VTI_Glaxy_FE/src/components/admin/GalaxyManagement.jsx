@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Spin, Card, Popconfirm, message } from 'antd';
+import { Button, Spin, Tag, Card, Popconfirm, message } from 'antd';
 import { FiPlusCircle, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -25,6 +25,14 @@ const GalaxyManagement = () => {
     dispatch(fetchGalaxies());
   }, [dispatch]);
 
+  const getStatusTag = (status) => {
+    if (status === 'ACTIVE') {
+      return <Tag color="green">Active</Tag>;
+    } else {
+      return <Tag color="red">Inactive</Tag>;
+    }
+  };
+  
   const handleCreate = () => {
     setIsEdit(false);
     setCurrentId(null);
@@ -78,7 +86,6 @@ const GalaxyManagement = () => {
             key={galaxy.id}
             hoverable
             style={{ width: 300 }}
-            onClick={() => navigate(`/management/galaxy/${galaxy.id}`)}
             cover={
               <img
                 alt={galaxy.name}
@@ -86,21 +93,30 @@ const GalaxyManagement = () => {
                 style={{ height: 200, objectFit: 'cover' }}
               />
             }
-            title={galaxy.name}
-            extra={
-              <div className="flex space-x-2" onClick={(e) => e.stopPropagation()}>
-                <Button icon={<FiEdit />} onClick={() => handleEdit(galaxy.id)} type="link" />
-                <Popconfirm
-                  title="Bạn có chắc chắn muốn xóa?"
-                  onConfirm={() => handleDelete(galaxy.id)}
-                  okText="Đồng ý"
-                  cancelText="Hủy"
-                >
-                  <Button icon={<FiTrash2 />} danger type="link" />
-                </Popconfirm>
-              </div>
-            }
-          />
+            onClick={() => navigate(`/management/galaxy/${galaxy.id}`)}
+          >
+            <Card.Meta
+              title={galaxy.name}
+              description={
+                <>
+                  {getStatusTag(galaxy.status)}
+                  <div>Địa chỉ: {galaxy.address}</div>
+                  <div>Thành phố: {galaxy.city}</div>
+                </>
+              }
+            />
+            <div className="flex justify-end space-x-2 mt-3" onClick={(e) => e.stopPropagation()}>
+              <Button icon={<FiEdit />} onClick={() => handleEdit(galaxy.id)} type="link" />
+              <Popconfirm
+                title="Bạn có chắc chắn muốn xóa?"
+                onConfirm={() => handleDelete(galaxy.id)}
+                okText="Đồng ý"
+                cancelText="Hủy"
+              >
+                <Button icon={<FiTrash2 />} danger type="link" />
+              </Popconfirm>
+            </div>
+          </Card>
         ))}
       </div>
 

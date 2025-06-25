@@ -14,6 +14,7 @@ import Other from "../components/Other";
 import Payment from "../components/Payment";
 import RoomDetails from "../components/admin/details/RoomDetails";
 import GalaxyDetails from "../components/admin/details/GalaxyDetails";
+import MovieDetailsAdmin from "../components/admin/details/MovieDetailsAdmin";
 
 const router = createBrowserRouter([
   {
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
         element: <MovieManagement />,
         path: "movie",
       },
+      {
+        element: <MovieDetailsAdmin />,
+        path: "movie/:movieId"
+      }
     ],
   },
 ]);
