@@ -5,16 +5,18 @@ import lombok.Data;
 
 @Data
 public class RoomDto {
-    private int id; // Đồng bộ với Long trong entity Room
+    private int id;
     private String name;
     private String typeScreen;
     private String status;
+    private String galaxyName;
     private int capacity;
 
     public RoomDto(Room room){
         this.id = room.getId();
         this.name = room.getName();
         this.typeScreen = room.getTypeScreen();
+        this.galaxyName = room.getGalaxy().getName();
         this.status = room.getStatus() != null ? room.getStatus().toString() : null;
         this.capacity = room.getCapacity() != 0 ? room.getCapacity() : 0;
     }
