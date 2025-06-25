@@ -11,7 +11,7 @@ import {
   clearGalaxySlice,
 } from '../../redux/slices/galaxySlice';
 import { useNavigate } from 'react-router-dom';
-import CreateGalaxyModal from './model/CreateGalaxyModal';
+import CreateGalaxyModal from './model/GalaxyAdminModal';
 
 const GalaxyManagement = () => {
   const dispatch = useDispatch();

@@ -1,16 +1,23 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, Button } from 'antd';
 
-const CreateGalaxyModal = ({ visible, isEdit, onCancel, onSubmit, loading }) => {
+const GalaxyAdminModal = ({ 
+  visible, 
+  isEdit, 
+  onCancel, 
+  onSubmit, 
+  loading, 
+  data
+}) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (isEdit) {
-      // Khi chỉnh sửa có thể set value bằng form.setFieldsValue(...)
+    if (isEdit && data) {
+      form.setFieldsValue(data);
     } else {
       form.resetFields();
     }
-  }, [isEdit, form]);
+  }, [isEdit, data, form]);
 
   return (
     <Modal
@@ -28,12 +35,21 @@ const CreateGalaxyModal = ({ visible, isEdit, onCancel, onSubmit, loading }) => 
         >
           <Input placeholder="Nhập tên Galaxy" />
         </Form.Item>
+
         <Form.Item
           label={<span className="font-bold text-amber-800">Mô tả</span>}
           name="description"
         >
           <Input.TextArea rows={4} placeholder="Nhập mô tả Galaxy" />
         </Form.Item>
+
+        <Form.Item
+          label={<span className="font-bold text-amber-800">Ảnh</span>}
+          name="image"
+        >
+          <Input placeholder="URL ảnh Galaxy" />
+        </Form.Item>
+
         <div className="text-right mt-4">
           <Button onClick={onCancel} className="mr-2">Hủy</Button>
           <Button
@@ -50,4 +66,4 @@ const CreateGalaxyModal = ({ visible, isEdit, onCancel, onSubmit, loading }) => 
   );
 };
 
-export default CreateGalaxyModal;
+export default GalaxyAdminModal;
