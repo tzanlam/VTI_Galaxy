@@ -76,7 +76,7 @@ const RoomManagement = () => {
           <>
             {getStatusTag(room.status)}
             <div>Loại màn hình: {room.typeScreen}</div>
-            <div>Galaxy: {room.galaxyId}</div>
+            <div>Galaxy: {room.galaxyName}</div>
           </>
         )}
       />
