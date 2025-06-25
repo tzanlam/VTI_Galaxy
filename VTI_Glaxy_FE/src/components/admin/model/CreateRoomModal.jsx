@@ -52,8 +52,8 @@ const CreateRoomModal = ({ visible, onCancel, onCreate, loading }) => {
           ]}
         >
           <Select placeholder="Chọn trạng thái">
-            <Select.Option value="ACTIVE">Hoạt động</Select.Option>
-            <Select.Option value="INACTIVE">Ngừng hoạt động</Select.Option>
+            <Select.Option value="OPEN">Hoạt động</Select.Option>
+            <Select.Option value="CLOSE">Ngừng hoạt động</Select.Option>
           </Select>
         </Form.Item>
 

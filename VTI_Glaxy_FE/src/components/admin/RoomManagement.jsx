@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Spin, Tag, Card } from 'antd';
-import { FiPlusCircle } from 'react-icons/fi';
+import { FiPlusCircle, FiHome } from 'react-icons/fi';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRooms, createRoom } from '../../redux/slices/roomSlice';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +27,7 @@ const RoomManagement = () => {
   const handleCreateRoom = async (values) => {
     await dispatch(createRoom(values));
     setIsCreateModalVisible(false);
+    window.location.reload();
   };
   
   if (loading) return <Spin />;
@@ -45,33 +46,44 @@ const RoomManagement = () => {
         </Button>
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-        {rooms.map((room) => (
-          <Card
-            key={room.id}
-            hoverable
-            style={{ width: 240 }}
-            cover={
-              <img
-                alt={room.name}
-                src={room.image || 'https://via.placeholder.com/240x320?text=No+Image'}
-                style={{ height: 320, objectFit: 'cover' }}
-              />
-            }
-            onClick={() => navigate(`/management/room/${room.id}`)}
-          >
-            <Card.Meta
-              title={room.name}
-              description={
-                <>
-                  {getStatusTag(room.status)}
-                  <div>Loại màn hình: {room.typeScreen}</div>
-                  <div>Galaxy: {room.galaxyId}</div>
-                </>
-              }
-            />
-          </Card>
-        ))}
-      </div>
+  {rooms.map((room) => (
+    <Card
+      key={room.id}
+      hoverable
+      style={{
+        width: 220,
+        backgroundColor: '#fff9e6',
+        borderRadius: 8,
+        boxShadow: '0px 2px 10px rgba(255, 215, 0, 0.3)',
+        transition: 'all 0.3s',
+      }}
+      onMouseEnter={(e) =>
+        (e.currentTarget.style.boxShadow = '0px 4px 15px rgba(255, 215, 0, 0.5)')
+      }
+      onMouseLeave={(e) =>
+        (e.currentTarget.style.boxShadow = '0px 2px 10px rgba(255, 215, 0, 0.3)')
+      }
+      onClick={() => navigate(`/management/room/${room.id}`)}
+    >
+      <Card.Meta
+        title={
+          <div className="flex items-center space-x-2">
+            <FiHome className="text-amber-600 text-lg" />
+            <span className="font-bold">{room.name}</span>
+          </div>
+        }
+        description={(
+          <>
+            {getStatusTag(room.status)}
+            <div>Loại màn hình: {room.typeScreen}</div>
+            <div>Galaxy: {room.galaxyId}</div>
+          </>
+        )}
+      />
+    </Card>
+  ))}
+</div>
+
 
       <CreateRoomModal
         visible={isCreateModalVisible}
