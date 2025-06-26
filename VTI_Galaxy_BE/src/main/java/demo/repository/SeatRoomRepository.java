@@ -1,5 +1,6 @@
 package demo.repository;
 
+import demo.modal.entity.Other;
 import demo.modal.entity.SeatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,4 +14,6 @@ public interface SeatRoomRepository extends JpaRepository<SeatRoom, Integer> {
     List<SeatRoom> findByShowTimeId(@Param("showtimeId") int showtimeId);
 
     List<SeatRoom> findByRoomId(int roomId);
+
+
 }

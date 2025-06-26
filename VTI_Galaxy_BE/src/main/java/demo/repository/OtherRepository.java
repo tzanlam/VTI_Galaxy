@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface OtherRepository extends JpaRepository<Other, Integer> {
     List<Other> findByGalaxyIdAndStatus(Integer galaxyId, String status);
+
 }
