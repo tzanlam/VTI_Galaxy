@@ -10,6 +10,7 @@ public class RoomRequest {
     private String typeScreen;
     private OpenStatus status;
     private int capacity;
+    private int galaxyId;
 
     public Room addRoom(){
         Room room = new Room();

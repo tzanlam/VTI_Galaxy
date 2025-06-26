@@ -2,6 +2,7 @@ package demo.services.impl;
 
 import demo.modal.constant.OpenStatus;
 import demo.modal.dto.RoomDto;
+import demo.modal.entity.Galaxy;
 import demo.modal.entity.Room;
 import demo.modal.request.RoomRequest;
 import demo.repository.GalaxyRepository;
@@ -42,7 +43,11 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public RoomDto createRoom(RoomRequest request) {
+        Galaxy galaxy = galaxyRepository.findById(request.getGalaxyId()).orElseThrow(
+                () -> new NullPointerException("Galaxy not found with id: " + request.getGalaxyId())
+        );
         Room room = request.addRoom();
+        room.setGalaxy(galaxy);
         try {
             roomRepository.save(room);
             return new RoomDto(room);

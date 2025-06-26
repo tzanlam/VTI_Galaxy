@@ -30,8 +30,8 @@ public class Room extends Time{
     @Column
     private int capacity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "galaxy_id")
+    @ManyToOne
+    @JoinColumn
     private Galaxy galaxy;
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
