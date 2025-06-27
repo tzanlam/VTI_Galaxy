@@ -22,6 +22,4 @@ public interface SeatRoomService {
 
     // get by showtime
     List<SeatRoomDto> getSeatRoomsByShowtime(int showtimeId);
-
-
 }

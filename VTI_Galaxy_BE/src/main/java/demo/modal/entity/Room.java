@@ -4,9 +4,6 @@ import demo.modal.constant.OpenStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.minidev.json.annotate.JsonIgnore;
-
-import java.util.List;
 
 @Entity
 @Table
@@ -33,8 +30,4 @@ public class Room extends Time{
     @ManyToOne
     @JoinColumn
     private Galaxy galaxy;
-
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<Seat> seats;
 }

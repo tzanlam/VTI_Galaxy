@@ -16,8 +16,6 @@ public class Booking extends Time{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    
-
     @ManyToMany
     @JoinTable(
             name = "booking_seat_rooms",
@@ -27,28 +25,28 @@ public class Booking extends Time{
     private List<SeatRoom> seatRooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Other> Other; // Danh sách combo
+    private List<Other> Other;
 
     @Column(nullable = false)
-    private long totalPrice; // Tổng tiền
+    private int totalPrice;
 
     @ManyToOne
-    @JoinColumn(name = "galaxy_id", nullable = false)
-    private Galaxy galaxy; // Rạp chiếu
+    @JoinColumn(nullable = false)
+    private Galaxy galaxy;
 
     @ManyToOne
-    @JoinColumn(name = "voucher_id", nullable = true)
+    @JoinColumn
     private Voucher voucher;
 
-    @Column(nullable = false)
+    @Column
     @Enumerated(EnumType.STRING)
-    private PaymentMethod paymentMethod; // Phương thức thanh toán
+    private PaymentMethod paymentMethod;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private BookingStatus status; // Trạng thái đặt vé (PENDING, CONFIRMED, CANCELLED)
+    private BookingStatus status;
 
-    @OneToOne(cascade = CascadeType.ALL) // Mối quan hệ @OneToOne với VnpayTransaction nên có chiến lược cascade để quản lý vòng đời (ví dụ: xóa giao dịch khi xóa đặt vé).
-    @JoinColumn(name = "vnpay_transaction_id")
-    private VnpayTransaction vnpayTransaction;
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @JoinColumn(name = "vnpay_transaction_id")
+//    private VnpayTransaction vnpayTransaction;
 }

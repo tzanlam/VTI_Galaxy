@@ -40,6 +40,6 @@ public class VnpayTransaction {
     @Column
     private LocalDateTime updateDate; // Thời gian cập nhật
 
-    @OneToOne(mappedBy = "vnpayTransaction")
-    private Booking booking; // Liên kết với đặt vé
+//    @OneToOne(mappedBy = "vnpayTransaction")
+//    private Booking booking;
 }

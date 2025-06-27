@@ -1,10 +1,10 @@
 package demo.services.impl;
 
+import demo.modal.constant.BookingStatus;
 import demo.modal.dto.BookingDto;
 import demo.modal.entity.Booking;
 import demo.modal.entity.Other;
 import demo.modal.entity.SeatRoom;
-import demo.modal.entity.Voucher;
 import demo.modal.request.BookingRequest;
 import demo.repository.*;
 import demo.services.interfaceClass.BookingService;
@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static demo.support.MethodSupport.calculatePriceBooking;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -53,14 +55,14 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto createBooking(BookingRequest request) {
+        Booking booking = new Booking();
         try {
-            Booking booking = request.setBooking();
-            if (Objects.nonNull(request.getVoucherId())){
-                Voucher voucher = voucherRepository.findById(request.getVoucherId()).orElseThrow(
-                        () -> new RuntimeException(" không tim thấy mã voucher")
+            if (Objects.nonNull(request.getVoucherId())) {
+                voucherRepository.findById(request.getVoucherId()).ifPresentOrElse(
+                        booking::setVoucher,
+                        () -> booking.setVoucher(null)
                 );
-                booking.setVoucher(voucher);
-            } else if (Objects.isNull(request.getVoucherId())) {
+            } else {
                 booking.setVoucher(null);
             }
             booking.setGalaxy(galaxyRepository.findById(request.getGalaxyId())
@@ -83,6 +85,8 @@ public class BookingServiceImpl implements BookingService {
                 }
                 booking.getSeatRooms().add(seatRoom);
             }
+            booking.setTotalPrice(calculatePriceBooking(booking.getSeatRooms(), booking.getOther(), booking.getVoucher()));
+            booking.setStatus(BookingStatus.PENDING);
             bookingRepository.save(booking);
             return new BookingDto(booking);
         }catch(Exception e){

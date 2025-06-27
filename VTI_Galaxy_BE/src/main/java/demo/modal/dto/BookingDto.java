@@ -3,8 +3,6 @@ package demo.modal.dto;
 import demo.modal.constant.BookingStatus;
 import demo.modal.constant.PaymentMethod;
 import demo.modal.entity.Booking;
-import demo.modal.entity.Other;
-import demo.modal.entity.SeatRoom;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.minidev.json.annotate.JsonIgnore;
@@ -17,10 +15,10 @@ import java.util.List;
 public class BookingDto {
     private String id;
     @JsonIgnore
-    private List<String> seatRoomIds = new ArrayList<>();
+    private List<String> seatRoomIds;
     @JsonIgnore
-    private List<String> otherIds = new ArrayList<>();
-    private Long totalPrice;
+    private List<String> otherIds;
+    private int totalPrice;
     private String galaxyId;
     private String voucherId;
     private PaymentMethod paymentMethod;

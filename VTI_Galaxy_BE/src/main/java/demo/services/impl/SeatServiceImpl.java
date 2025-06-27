@@ -1,6 +1,5 @@
 package demo.services.impl;
 
-import demo.modal.constant.OpenStatus;
 import demo.modal.dto.SeatDto;
 import demo.modal.entity.Seat;
 import demo.modal.request.SeatRequest;
@@ -55,24 +54,6 @@ public class SeatServiceImpl implements SeatService {
             return new SeatDto(seat);
         }catch (Exception e){
             throw new RuntimeException("updated seat fail");
-        }
-    }
-
-    @Override
-    public SeatDto closedSeat(int id) {
-        Seat seat = seatRepository.findById(id).orElseThrow(
-                () -> new NullPointerException("Seat not found")
-        );
-        try{
-            if (seat.getStatus().equals(OpenStatus.OPEN)){
-                seat.setStatus(OpenStatus.CLOSED);
-            }else {
-                seat.setStatus(OpenStatus.OPEN);
-            }
-            seatRepository.save(seat);
-            return new SeatDto(seat);
-        }catch (Exception e){
-            throw new RuntimeException("change status seat fail");
         }
     }
 }

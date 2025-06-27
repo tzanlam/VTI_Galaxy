@@ -49,14 +49,4 @@ public class SeatController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-    @PutMapping("/putStatusSeat")
-    public ResponseEntity<?> updateSeatStatus(@RequestParam("seatId") int id) {
-        try{
-            seatService.closedSeat(id);
-            return ResponseEntity.ok("Seat status updated to BOOKED");
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
 }

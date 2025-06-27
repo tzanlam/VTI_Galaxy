@@ -1,17 +1,13 @@
 package demo.services.impl;
 
-import demo.modal.constant.SeatType;
-import demo.modal.constant.OpenStatus;
 import demo.modal.dto.SeatRoomDto;
 import demo.modal.entity.Room;
 import demo.modal.entity.Seat;
 import demo.modal.entity.SeatRoom;
-import demo.modal.entity.ShowTime;
 import demo.modal.request.SeatRoomRequest;
 import demo.repository.RoomRepository;
 import demo.repository.SeatRepository;
 import demo.repository.SeatRoomRepository;
-import demo.repository.ShowTimeRepository;
 import demo.services.interfaceClass.SeatRoomService;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +20,12 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     private final SeatRoomRepository seatRoomRepository;
     private final SeatRepository seatRepository;
     private final RoomRepository roomRepository;
-    private final ShowTimeRepository showTimeRepository;
 
     public SeatRoomServiceImpl(SeatRoomRepository seatRoomRepository, SeatRepository seatRepository,
-                               RoomRepository roomRepository, ShowTimeRepository showTimeRepository) {
+                               RoomRepository roomRepository) {
         this.seatRoomRepository = seatRoomRepository;
         this.seatRepository = seatRepository;
         this.roomRepository = roomRepository;
-        this.showTimeRepository = showTimeRepository;
     }
 
     @Override
@@ -84,59 +78,37 @@ public class SeatRoomServiceImpl implements SeatRoomService {
         Room room = roomRepository.findById(request.getRoomId()).orElseThrow(
                 () -> new RuntimeException("No room found with id: " + request.getRoomId())
         );
-        ShowTime showTime = showTimeRepository.findById(request.getShowtimeId()).orElseThrow(
-                () -> new RuntimeException("No showtime found with id: " + request.getShowtimeId())
+        Seat seat = seatRepository.findById(request.getSeatId()).orElseThrow(
+                () -> new RuntimeException("No seat found with id: " + request.getSeatId())
         );
 
-        List<SeatRoomDto> seatRoomDtos = new ArrayList<>();
-        String[] rowLabels = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
-        int seatNumber = 1; // Biến đếm số thứ tự liên tục
+        String[] rowLabels = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+                "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+                "U", "V", "W", "X", "Y", "Z"};
 
-        try {
-            // Kiểm tra giới hạn cột (A-Z) và hàng (tối đa 30 ghế mỗi cột)
-            if (request.getQuantityColumn() > rowLabels.length) {
-                throw new RuntimeException("QuantityColumn exceeds maximum limit of " + rowLabels.length + " rows (A-Z).");
-            }
-            if (request.getSeatPerRow() > 26) {
-                throw new RuntimeException("SeatPerRow exceeds maximum limit of 26 seats per row.");
-            }
-            if (request.getQuantityColumn() * request.getSeatPerRow() > 676) {
-                throw new RuntimeException("Total seats exceed maximum limit of 780 (26 rows × 26 seats per row).");
-            }
-
-            for (int i = 0; i < request.getQuantityColumn(); i++) {
-                for (int j = 1; j <= request.getSeatPerRow(); j++) {
-                    Seat seat = new Seat();
-                    String seatName = rowLabels[i] + seatNumber; // Sử dụng seatNumber để đánh số liên tục
-                    seat.setName(seatName);
-                    if (i == 0) {
-                        seat.setType(SeatType.VIP);
-                        seat.setPrice(180000);
-                    } else if (i == request.getQuantityColumn() - 1) {
-                        seat.setType(SeatType.DOUBLE);
-                        seat.setPrice(120000);
-                    } else {
-                        seat.setType(SeatType.STANDARD);
-                        seat.setPrice(90000);
-                    }
-                    seat.setRoom(room);
-                    seat.setStatus(OpenStatus.OPEN);
-                    Seat savedSeat = seatRepository.save(seat);
-
-                    SeatRoom seatRoom = new SeatRoom();
-                    seatRoom.setSeat(savedSeat);
-                    seatRoom.setRoom(room);
-                    seatRoom.setShowTime(showTime);
-                    seatRoom.setStatus(SeatRoom.BookedStatus.AVAILABLE);
-                    SeatRoom savedSeatRoom = seatRoomRepository.save(seatRoom);
-                    seatRoomDtos.add(new SeatRoomDto(savedSeatRoom));
-                    seatNumber++; // Tăng số thứ tự
-                }
-            }
-            return seatRoomDtos;
-        } catch (Exception e) {
-            throw new RuntimeException("Seat room creation failed: " + e.getMessage());
+        int totalSeats = request.getQuantityColumn() * request.getSeatPerRow();
+        if (request.getQuantityColumn() > rowLabels.length) {
+            throw new RuntimeException("QuantityColumn exceeds maximum row limit: " + rowLabels.length);
         }
+        if (totalSeats > room.getCapacity()) {
+            throw new RuntimeException("Requested seats exceed room capacity: " + room.getCapacity());
+        }
+
+        List<SeatRoom> seatRoomList = new ArrayList<>();
+
+        for (int i = 0; i < request.getQuantityColumn(); i++) {
+            String row = rowLabels[i];
+            for (int j = 1; j <= request.getSeatPerRow(); j++) {
+                SeatRoom seatRoom = new SeatRoom();
+                seatRoom.setName(row + j); // VD: A1, A2, ...
+                seatRoom.setRoom(room);
+                seatRoom.setSeat(seat);
+                seatRoom.setStatus(SeatRoom.BookedStatus.AVAILABLE);
+                seatRoomList.add(seatRoom);
+            }
+        }
+        seatRoomRepository.saveAll(seatRoomList);
+        return seatRoomList.stream().map(seatRoom -> new SeatRoomDto(seatRoom)).collect(Collectors.toList());
     }
 
 

@@ -22,6 +22,7 @@ public class Other extends Time{
 
     @Column
     private String image_url;
+
     @Column
     private int price;
 
@@ -29,14 +30,14 @@ public class Other extends Time{
     private int quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "galaxy_id")
+    @JoinColumn
     private Galaxy galaxy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id")
-    private Booking booking; // Thêm trường này để khớp với mappedBy
 
     @Column
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
+
+    @ManyToOne
+    @JoinColumn
+    private Booking booking;
 }

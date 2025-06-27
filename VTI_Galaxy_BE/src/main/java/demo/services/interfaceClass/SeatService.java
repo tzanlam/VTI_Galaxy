@@ -15,7 +15,4 @@ public interface SeatService {
 
     // put
     SeatDto updateSeat(SeatRequest request, int id);
-
-    //close
-    SeatDto closedSeat(int id);
 }

@@ -11,27 +11,24 @@ public class SeatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column
+    private String name; // vd a1, a2
+
     @ManyToOne
     @JoinColumn
     private Seat seat;
 
     @ManyToOne
     @JoinColumn
-    private Room room;
+    private ShowTime showTime;
 
     @ManyToOne
-    @JoinColumn(name = "showtime_id")
-    private ShowTime showTime;
+    @JoinColumn
+    private Room room;
 
     @Column
     @Enumerated(EnumType.STRING)
     private BookedStatus status;
-
-    @Column
-    private String seatPerRow;
-
-    @Column
-    private int quantityColumn;
 
     public enum BookedStatus {
         AVAILABLE,

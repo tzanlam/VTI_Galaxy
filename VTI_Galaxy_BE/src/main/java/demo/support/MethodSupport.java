@@ -1,10 +1,15 @@
 package demo.support;
 
+import demo.modal.entity.Other;
+import demo.modal.entity.SeatRoom;
+import demo.modal.entity.Voucher;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Random;
 
 public class MethodSupport {
@@ -56,4 +61,34 @@ public class MethodSupport {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         return LocalDateTime.of(LocalDate.parse(date, dateFormatter), LocalTime.parse(time, timeFormatter));
     }
+
+    public static int calculatePriceBooking(List<SeatRoom> seats,
+                                            List<Other> others,
+                                            Voucher voucher) {
+        int totalPrice = 0;
+
+        if (seats != null && !seats.isEmpty()) {
+            for (SeatRoom seat : seats) {
+                if (seat != null && seat.getSeat().getPrice() > 0) {
+                    totalPrice += seat.getSeat().getPrice();
+                }
+            }
+        }
+
+        if (others != null && !others.isEmpty()) {
+            for (Other other : others) {
+                if (other != null && other.getPrice() > 0) {
+                    totalPrice += other.getPrice();
+                }
+            }
+        }
+
+        if (voucher != null && voucher.getDiscount() > 0) {
+            totalPrice -= voucher.getDiscount();
+        }
+
+        return Math.max(totalPrice, 0);
+    }
+
+
 }

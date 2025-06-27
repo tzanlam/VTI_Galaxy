@@ -2,6 +2,7 @@ package demo.modal.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Voucher extends Time {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +29,6 @@ public class Voucher extends Time {
     private LocalDateTime end_date;
 
     @ManyToOne
-    @JoinColumn(name = "booking_id", nullable = false)
+    @JoinColumn
     private Booking booking;
 }
