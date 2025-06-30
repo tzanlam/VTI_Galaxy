@@ -24,12 +24,17 @@ export const fetchSeatRoomsByShowtimeId = createAsyncThunk(
       const response = await seatRoomService.fetchSeatRoomsByShowtimeId(
         showtimeId
       );
-      console.log("fetchSeatRoomsByShowtimeId response:", response.data);
+      console.log(
+        "fetchSeatRoomsByShowtimeId response for showtimeId",
+        showtimeId,
+        ":",
+        response.data
+      );
       return response.data;
     } catch (error) {
       console.error("fetchSeatRoomsByShowtimeId error:", error);
       return rejectWithValue(
-        error.response?.data ||
+        error.response?.data?.message ||
           "Lỗi khi lấy danh sách ghế phòng theo suất chiếu"
       );
     }
@@ -48,7 +53,7 @@ export const updateSeatRoomStatus = createAsyncThunk(
     } catch (error) {
       console.error("updateSeatRoomStatus error:", error);
       return rejectWithValue(
-        error.response?.data || "Lỗi khi cập nhật trạng thái ghế"
+        error.response?.data?.message || "Lỗi khi cập nhật trạng thái ghế"
       );
     }
   }
@@ -63,7 +68,7 @@ export const fetchSeatRoomById = createAsyncThunk(
     } catch (error) {
       console.error("fetchSeatRoomById error:", error);
       return rejectWithValue(
-        error.response?.data || "Lỗi khi lấy thông tin ghế phòng"
+        error.response?.data?.message || "Lỗi khi lấy thông tin ghế phòng"
       );
     }
   }
@@ -71,13 +76,24 @@ export const fetchSeatRoomById = createAsyncThunk(
 
 export const createSeatRoom = createAsyncThunk(
   "seatRoom/createSeatRoom",
-  async (request, { rejectWithValue }) => {
+  async (seatRoomRequest, { rejectWithValue }) => {
     try {
+      const request = {
+        id: parseInt(seatRoomRequest.id),
+        seatId: parseInt(seatRoomRequest.seatId),
+        roomId: parseInt(seatRoomRequest.roomId),
+        seatPerRow: parseInt(seatRoomRequest.seatPerRow),
+        quantityColumn: parseInt(seatRoomRequest.quantityColumn),
+      };
+      console.log("Sending SeatRoomRequest:", request);
       const response = await seatRoomService.createSeatRoom(request);
+      console.log("createSeatRoom response:", response.data);
       return response.data;
     } catch (error) {
       console.error("createSeatRoom error:", error);
-      return rejectWithValue(error.response?.data || "Lỗi khi tạo ghế phòng");
+      return rejectWithValue(
+        error.response?.data?.message || "Lỗi khi tạo ghế phòng"
+      );
     }
   }
 );
@@ -114,7 +130,6 @@ const seatRoomSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // fetch seat rooms
       .addCase(fetchSeatRooms.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -128,7 +143,6 @@ const seatRoomSlice = createSlice({
         state.loading = false;
         state.seatRooms = [];
       })
-      // fetch seat rooms by showtime id
       .addCase(fetchSeatRoomsByShowtimeId.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -142,7 +156,6 @@ const seatRoomSlice = createSlice({
         state.loading = false;
         state.seatRooms = [];
       })
-      // update seat room status
       .addCase(updateSeatRoomStatus.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -156,6 +169,18 @@ const seatRoomSlice = createSlice({
         state.loading = false;
       })
       .addCase(updateSeatRoomStatus.rejected, (state, action) => {
+        state.error = action.payload;
+        state.loading = false;
+      })
+      .addCase(createSeatRoom.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createSeatRoom.fulfilled, (state, action) => {
+        state.seatRooms.push(action.payload);
+        state.loading = false;
+      })
+      .addCase(createSeatRoom.rejected, (state, action) => {
         state.error = action.payload;
         state.loading = false;
       });

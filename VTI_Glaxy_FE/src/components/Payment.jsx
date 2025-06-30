@@ -36,25 +36,63 @@ const Payment = () => {
       comboItems,
       totalComboPrice,
     });
-    if (!safeMovieInfo.galaxyId) {
-      toast.warn("Không tìm thấy galaxyId, vui lòng thử lại");
+    if (
+      !safeMovieInfo.galaxyId ||
+      !selectedSeats ||
+      selectedSeats.length === 0
+    ) {
+      toast.warn("Thiếu thông tin đặt vé, vui lòng thử lại");
       navigate("/seat-selection");
-    }
-  }, [safeMovieInfo, navigate]);
-
-  const handleApplyVoucher = async () => {
-    console.log("Applying voucher:", { voucherCode, totalPrice });
-    if (!voucherCode) {
-      toast.error("Vui lòng nhập mã khuyến mãi");
       return;
     }
-    try {
-      dispatch(fetchVoucher({ code: voucherCode, totalPrice }));
-    } catch (err) {
-      console.error("Voucher error:", err);
-      toast.error("Mã khuyến mãi không hợp lệ");
-    }
-  };
+
+    // Đặt trạng thái ghế thành SELECTED khi vào trang thanh toán
+    const setSeatsToSelected = async () => {
+      try {
+        for (const seatRoom of selectedSeats) {
+          if (!seatRoom.id) {
+            toast.error(`Ghế ${seatRoom.name || "N/A"} thiếu ID`);
+            navigate("/seat-selection");
+            return;
+          }
+          console.log("Updating seatRoom to SELECTED:", {
+            seatRoomId: seatRoom.id,
+          });
+          await axiosClient.put(
+            `/api/seat-rooms/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=SELECTED`
+          );
+        }
+      } catch (err) {
+        console.error("Error setting seats to SELECTED:", err);
+        toast.error("Lỗi khi tạm giữ ghế, vui lòng thử lại");
+        navigate("/seat-selection");
+      }
+    };
+
+    setSeatsToSelected();
+
+    // Rollback trạng thái ghế khi component unmount (quay lại)
+    return () => {
+      const rollbackSeats = async () => {
+        try {
+          for (const seatRoom of selectedSeats) {
+            if (seatRoom.id) {
+              console.log("Rolling back seatRoom to AVAILABLE:", {
+                seatRoomId: seatRoom.id,
+              });
+              await axiosClient.put(
+                `/api/seat-rooms/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
+              );
+            }
+          }
+        } catch (err) {
+          console.error("Rollback error:", err);
+          toast.error("Lỗi khi đặt lại trạng thái ghế");
+        }
+      };
+      rollbackSeats();
+    };
+  }, [safeMovieInfo, selectedSeats, navigate]);
 
   useEffect(() => {
     if (voucher) {
@@ -70,6 +108,20 @@ const Payment = () => {
     }
   }, [voucher, error, totalPrice, voucherCode, dispatch]);
 
+  const handleApplyVoucher = async () => {
+    console.log("Applying voucher:", { voucherCode, totalPrice });
+    if (!voucherCode) {
+      toast.error("Vui lòng nhập mã khuyến mãi");
+      return;
+    }
+    try {
+      dispatch(fetchVoucher({ code: voucherCode, totalPrice }));
+    } catch (err) {
+      console.error("Voucher error:", err);
+      toast.error("Mã khuyến mãi không hợp lệ");
+    }
+  };
+
   const handleConfirmPayment = async () => {
     if (!paymentMethod) {
       toast.error("Vui lòng chọn phương thức thanh toán");
@@ -77,6 +129,19 @@ const Payment = () => {
     }
 
     try {
+      // Kiểm tra trạng thái ghế trước khi thanh toán
+      for (const seatRoom of selectedSeats) {
+        console.log("Checking seatRoom status:", { seatRoomId: seatRoom.id });
+        const response = await axiosClient.get(
+          `/api/seat-rooms/getSeatRoomById?seatRoomId=${seatRoom.id}`
+        );
+        if (response.data.status === "BOOKED") {
+          toast.error(`Ghế ${seatRoom.name || "N/A"} đã được đặt`);
+          navigate("/seat-selection");
+          return;
+        }
+      }
+
       const seatRoomIds = selectedSeats.map((seat) => seat.id);
       const bookingRequest = {
         showTimeId: showtimeId,
@@ -88,6 +153,7 @@ const Payment = () => {
         paymentMethod,
       };
 
+      // Gửi yêu cầu thanh toán
       const paymentResponse = await axiosClient.post("/api/payment/initiate", {
         bookingRequest,
         paymentMethod,
@@ -95,18 +161,28 @@ const Payment = () => {
       });
 
       if (paymentResponse.data.redirectUrl) {
-        // Chuyển hướng đến URL thanh toán của VNPay, ZaloPay, hoặc cổng thanh toán khác
         console.log(
           "Redirecting to payment URL:",
           paymentResponse.data.redirectUrl
         );
         window.location.href = paymentResponse.data.redirectUrl;
       } else {
-        // Trường hợp thanh toán nội bộ (ví dụ: CREDIT_CARD, BANK_TRANSFER)
+        // Thanh toán nội bộ
         const bookingResponse = await axiosClient.post(
           "/api/booking/create",
           bookingRequest
         );
+
+        // Cập nhật trạng thái ghế thành BOOKED sau khi thanh toán thành công
+        for (const seatRoom of selectedSeats) {
+          console.log("Updating seatRoom to BOOKED:", {
+            seatRoomId: seatRoom.id,
+          });
+          await axiosClient.put(
+            `/api/seat-rooms/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
+          );
+        }
+
         toast.success("Đặt vé thành công!");
         navigate("/booking-success", {
           state: { booking: bookingResponse.data },
@@ -118,10 +194,29 @@ const Payment = () => {
         response: err.response?.data,
         status: err.response?.status,
       });
+
+      // Rollback trạng thái ghế về AVAILABLE nếu thanh toán thất bại
+      for (const seatRoom of selectedSeats) {
+        console.log("Rolling back seatRoom to AVAILABLE:", {
+          seatRoomId: seatRoom.id,
+        });
+        await axiosClient
+          .put(
+            `/api/seat-rooms/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
+          )
+          .catch((rollbackErr) => {
+            console.error("Rollback error:", rollbackErr);
+            toast.error(
+              `Lỗi khi đặt lại trạng thái ghế ${seatRoom.name || "N/A"}`
+            );
+          });
+      }
+
       toast.error(
         "Lỗi khi xử lý thanh toán: " +
           (err.response?.data?.message || err.message)
       );
+      navigate("/seat-selection");
     }
   };
 
@@ -140,6 +235,12 @@ const Payment = () => {
           {safeMovieInfo.galaxyName} | {safeMovieInfo.date} |{" "}
           {safeMovieInfo.time}
         </p>
+        <button
+          className="mt-4 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+          onClick={() => navigate(-1)} // Quay lại trang trước
+        >
+          Quay lại
+        </button>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
@@ -250,7 +351,7 @@ const Payment = () => {
                     key={seatRoom.id}
                     className="px-2 py-1 bg-green-100 border border-green-500 rounded-md text-xs"
                   >
-                    {seatRoom.seat?.name || "N/A"}
+                    {seatRoom.name || "N/A"}
                   </span>
                 ))}
               </div>
@@ -261,11 +362,11 @@ const Payment = () => {
               <div className="space-y-2 border-t pt-4">
                 {selectedSeats.map((seatRoom) => (
                   <div key={seatRoom.id} className="flex justify-between">
-                    <span>{seatRoom.seat?.name || "N/A"}:</span>
-                    <span>{formatCurrency(seatRoom.seat?.price || 0)}</span>
+                    <span>{seatRoom.name || "N/A"}:</span>
+                    <span>{formatCurrency(seatRoom.price || 0)}</span>
                   </div>
                 ))}
-                <div className="flex justify-between font-bold border-t pt-2 mt-2">
+                <div className="flex guanine-between font-bold border-t pt-2 mt-2">
                   <span>Tổng tiền vé:</span>
                   <span>{formatCurrency(totalSeatPrice || 0)}</span>
                 </div>

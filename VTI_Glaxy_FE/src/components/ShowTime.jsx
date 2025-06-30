@@ -219,7 +219,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
         showtimeId: showtime.id,
         movieName: showtime.movieName,
         galaxyName: showtime.galaxyName,
-        date: selectedDay?.dateForApi,
+        date: selectedDay?.date,
         time: time,
         galaxyId: selectedGalaxyId, // Pass galaxyId to state
       },

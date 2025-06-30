@@ -7,7 +7,6 @@ import {
   selectSeatRoom,
   unselectSeatRoom,
   clearSeatRoomState,
-  updateSeatRoomStatus,
 } from "../redux/slices/seatRoomSlice";
 
 const SeatSelection = () => {
@@ -16,7 +15,7 @@ const SeatSelection = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { movieName, galaxyName, date, time } = location.state || {};
+  const { movieName, galaxyName, date, time, galaxyId } = location.state || {};
   const { seatRooms, loading, error } = useSelector((state) => state.seatRoom);
 
   const [movieInfo, setMovieInfo] = useState({
@@ -24,6 +23,7 @@ const SeatSelection = () => {
     galaxyName: galaxyName || "Không có thông tin",
     date: date || "Không có thông tin",
     time: time || "Không có thông tin",
+    galaxyId: galaxyId || null,
   });
 
   const [selectedSeats, setSelectedSeats] = useState([]);
@@ -44,6 +44,8 @@ const SeatSelection = () => {
       dispatch(fetchSeatRoomsByShowtimeId(showtimeId));
     } else {
       console.error("Missing showtimeId parameter");
+      toast.error("Không tìm thấy suất chiếu");
+      navigate("/select-showtime");
     }
 
     return () => {
@@ -52,21 +54,15 @@ const SeatSelection = () => {
   }, [showtimeId, dispatch, navigate]);
 
   const handleSeatClick = (seatRoom) => {
-    if (!seatRoom.seat || seatRoom.status === "BOOKED") return;
+    if (!seatRoom || seatRoom.status === "BOOKED") return;
 
     const isSelected = selectedSeats.some((s) => s.id === seatRoom.id);
     if (isSelected) {
       setSelectedSeats(selectedSeats.filter((s) => s.id !== seatRoom.id));
       dispatch(unselectSeatRoom(seatRoom.id));
-      dispatch(
-        updateSeatRoomStatus({ seatRoomId: seatRoom.id, status: "AVAILABLE" })
-      );
     } else {
       setSelectedSeats([...selectedSeats, seatRoom]);
-      dispatch(selectSeatRoom(seatRoom.id));
-      dispatch(
-        updateSeatRoomStatus({ seatRoomId: seatRoom.id, status: "SELECTED" })
-      );
+      dispatch(selectSeatRoom(seatRoom));
     }
   };
 
@@ -76,7 +72,6 @@ const SeatSelection = () => {
       return;
     }
 
-    // Chuyển hướng đến trang chọn combo
     navigate("/other", {
       state: {
         showtimeId,
@@ -85,6 +80,13 @@ const SeatSelection = () => {
         totalSeatPrice: calculateTotal(),
       },
     });
+  };
+
+  const handleRefresh = () => {
+    if (showtimeId) {
+      console.log("Refreshing seat rooms for showtime ID:", showtimeId);
+      dispatch(fetchSeatRoomsByShowtimeId(showtimeId));
+    }
   };
 
   const seatStyles = {
@@ -96,15 +98,15 @@ const SeatSelection = () => {
   };
 
   const getSeatStatus = (seatRoom) => {
-    if (!seatRoom.seat || seatRoom.status === "BOOKED")
-      return seatStyles.BOOKED;
-    if (seatRoom.status === "SELECTED") return seatStyles.SELECTED;
-    return seatStyles[seatRoom.seat.type] || seatStyles.STANDARD;
+    if (!seatRoom || seatRoom.status === "BOOKED") return seatStyles.BOOKED;
+    if (selectedSeats.some((s) => s.id === seatRoom.id))
+      return seatStyles.SELECTED;
+    return seatStyles[seatRoom.type?.toUpperCase()] || seatStyles.STANDARD;
   };
 
   const calculateTotal = () => {
     return selectedSeats.reduce((total, seatRoom) => {
-      return total + (seatRoom.seat?.price || 0);
+      return total + (seatRoom.price || 0);
     }, 0);
   };
 
@@ -132,10 +134,10 @@ const SeatSelection = () => {
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           <p>Đã xảy ra lỗi: {error.message || error}</p>
           <button
-            className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-            onClick={() => dispatch(fetchSeatRoomsByShowtimeId(showtimeId))}
+            className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+            onClick={handleRefresh}
           >
-            Thử lại
+            Làm mới
           </button>
         </div>
       </div>
@@ -144,15 +146,26 @@ const SeatSelection = () => {
 
   const seatsByRow = (Array.isArray(seatRooms) ? seatRooms : []).reduce(
     (acc, seatRoom) => {
-      if (seatRoom.seat && seatRoom.seat.name) {
-        const row = seatRoom.seat.name.charAt(0);
+      if (
+        seatRoom &&
+        typeof seatRoom === "object" &&
+        seatRoom.name &&
+        typeof seatRoom.name === "string" &&
+        seatRoom.name.length > 0
+      ) {
+        const row = seatRoom.name.charAt(0).toUpperCase();
         if (!acc[row]) acc[row] = [];
         acc[row].push(seatRoom);
+      } else {
+        console.warn("Dữ liệu ghế phòng không hợp lệ:", seatRoom);
       }
       return acc;
     },
     {}
   );
+
+  console.log("Danh sách ghế thô:", seatRooms);
+  console.log("Ghế theo hàng:", seatsByRow);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -161,6 +174,12 @@ const SeatSelection = () => {
         <p className="text-lg">
           {movieInfo.galaxyName} | {movieInfo.date} | {movieInfo.time}
         </p>
+        <button
+          className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+          onClick={handleRefresh}
+        >
+          Làm mới ghế
+        </button>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
@@ -170,37 +189,51 @@ const SeatSelection = () => {
           </div>
 
           <div className="mb-8">
-            {Object.keys(seatsByRow)
-              .sort()
-              .map((row) => (
-                <div key={row} className="flex justify-start mb-2 min-w-max">
-                  <div className="w-8 flex items-center justify-center font-bold text-gray-600 text-sm">
-                    {row}
+            {Object.keys(seatsByRow).length > 0 ? (
+              Object.keys(seatsByRow)
+                .sort()
+                .map((row) => (
+                  <div key={row} className="flex justify-start mb-2 min-w-max">
+                    <div className="w-8 flex items-center justify-center font-bold text-gray-600 text-sm">
+                      {row}
+                    </div>
+                    <div className="flex gap-0.5">
+                      {seatsByRow[row]
+                        .sort((a, b) => {
+                          const numA = parseInt(a.name.substring(1)) || 0;
+                          const numB = parseInt(b.name.substring(1)) || 0;
+                          return numA - numB;
+                        })
+                        .map((seatRoom) => (
+                          <button
+                            key={seatRoom.id}
+                            className={`${baseSeatClass} ${
+                              seatRoom.type?.toUpperCase() === "DOUBLE"
+                                ? "w-16"
+                                : "w-8"
+                            } ${getSeatStatus(seatRoom)}`}
+                            onClick={() => handleSeatClick(seatRoom)}
+                            disabled={seatRoom.status === "BOOKED"}
+                            title={`Ghế ${seatRoom.name} (${seatRoom.type})`}
+                          >
+                            {seatRoom.name.substring(1) || "N/A"}
+                          </button>
+                        ))}
+                    </div>
                   </div>
-                  <div className="flex gap-0.5">
-                    {seatsByRow[row]
-                      .sort((a, b) => {
-                        const numA = parseInt(a.seat.name.substring(1));
-                        const numB = parseInt(b.seat.name.substring(1));
-                        return numA - numB;
-                      })
-                      .map((seatRoom) => (
-                        <button
-                          key={seatRoom.id}
-                          className={`${baseSeatClass} ${
-                            seatRoom.seat.type === "DOUBLE" ? "w-16" : "w-8"
-                          } ${getSeatStatus(seatRoom)}`}
-                          onClick={() => handleSeatClick(seatRoom)}
-                          disabled={
-                            !seatRoom.seat || seatRoom.status === "BOOKED"
-                          }
-                        >
-                          {seatRoom.seat?.name.substring(1) || "N/A"}
-                        </button>
-                      ))}
-                  </div>
-                </div>
-              ))}
+                ))
+            ) : (
+              <div className="text-gray-500 text-center">
+                <p>Không có ghế nào để hiển thị.</p>
+                <p>Vui lòng làm mới hoặc kiểm tra suất chiếu.</p>
+                <button
+                  className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                  onClick={handleRefresh}
+                >
+                  Làm mới
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 mb-6">
@@ -256,7 +289,7 @@ const SeatSelection = () => {
                     key={seatRoom.id}
                     className="px-2 py-1 bg-green-100 border border-green-500 rounded-md text-xs"
                   >
-                    {seatRoom.seat?.name || "N/A"}
+                    {seatRoom.name || "N/A"}
                   </span>
                 ))}
               </div>
@@ -268,8 +301,8 @@ const SeatSelection = () => {
               <div className="space-y-2 border-t pt-4">
                 {selectedSeats.map((seatRoom) => (
                   <div key={seatRoom.id} className="flex justify-between">
-                    <span>{seatRoom.seat?.name || "N/A"}:</span>
-                    <span>{formatCurrency(seatRoom.seat?.price || 0)}</span>
+                    <span>{seatRoom.name || "N/A"}:</span>
+                    <span>{formatCurrency(seatRoom.price || 0)}</span>
                   </div>
                 ))}
                 <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
