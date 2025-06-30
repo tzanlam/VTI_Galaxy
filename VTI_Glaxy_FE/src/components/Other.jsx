@@ -24,7 +24,7 @@ const Other = () => {
     galaxyName: movieInfo?.galaxyName || "Không có thông tin",
     date: movieInfo?.date || "Không có thông tin",
     time: movieInfo?.time || "Không có thông tin",
-    galaxyId: localStorage.getItem("selectedGalaxyId") || null, // Retrieve galaxyId from localStorage
+    galaxyId: localStorage.getItem("selectedGalaxyId") || null,
   };
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const Other = () => {
 
     if (!state || !showtimeId || !selectedSeats || !movieInfo) {
       toast.error("Vui lòng chọn suất chiếu và ghế trước khi chọn combo");
-      navigate("/select-showtime");
+      navigate("/seat-selection");
       return;
     }
 
@@ -103,45 +103,33 @@ const Other = () => {
 
     if (!selectedSeats || selectedSeats.length === 0) {
       toast.error("Vui lòng chọn ít nhất một ghế");
-      navigate("/select-showtime");
+      navigate("/seat-selection");
       return;
     }
 
     if (safeMovieInfo.galaxyId == null) {
       toast.error("Thiếu thông tin galaxyId, vui lòng thử lại");
-      navigate("/select-showtime");
+      navigate("/seat-selection");
       return;
     }
 
-    // Kiểm tra trạng thái ghế trước khi đặt
     try {
       for (const seatRoom of selectedSeats) {
         if (!seatRoom.id) {
-          toast.error(`Ghế ${seatRoom.seat?.name || "N/A"} thiếu ID`);
+          toast.error(`Ghế ${seatRoom.name || "N/A"} thiếu ID`);
           return;
         }
         console.log("Checking seatRoom status:", { seatRoomId: seatRoom.id });
         const response = await axiosClient.get(
-          `/getSeatRoomById?seatRoomId=${seatRoom.id}`
+          `/api/seat-rooms/getSeatRoomById?seatRoomId=${seatRoom.id}`
         );
         if (response.data.status === "BOOKED") {
-          toast.error(`Ghế ${seatRoom.seat?.name || "N/A"} đã được đặt`);
+          toast.error(`Ghế ${seatRoom.name || "N/A"} đã được đặt`);
+          navigate("/seat-selection");
           return;
         }
       }
 
-      // Cập nhật trạng thái ghế
-      for (const seatRoom of selectedSeats) {
-        console.log("Updating seatRoom:", {
-          seatRoomId: seatRoom.id,
-          status: "BOOKED",
-        });
-        await axiosClient.put(
-          `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
-        );
-      }
-
-      // Chuẩn bị comboItems
       const comboItems = Object.entries(selectedCombos)
         .filter(([_, quantity]) => quantity > 0)
         .map(([comboId, quantity]) => ({
@@ -150,6 +138,8 @@ const Other = () => {
           name:
             others.find((combo) => combo.id === parseInt(comboId))?.name ||
             "Unknown",
+          price:
+            others.find((combo) => combo.id === parseInt(comboId))?.price || 0,
         }));
 
       console.log("Navigating to /payment with state:", {
@@ -172,12 +162,15 @@ const Other = () => {
         },
       });
     } catch (error) {
-      console.error("Lỗi khi cập nhật trạng thái ghế:", {
+      console.error("Lỗi khi kiểm tra trạng thái ghế:", {
         message: error.message,
         response: error.response?.data,
         status: error.response?.status,
       });
-      toast.error(error.response?.data?.message || "Đã xảy ra lỗi khi đặt vé");
+      toast.error(
+        error.response?.data?.message || "Đã xảy ra lỗi khi kiểm tra ghế"
+      );
+      navigate("/seat-selection");
     }
   };
 
@@ -214,10 +207,6 @@ const Other = () => {
   if (!selectedSeats || !movieInfo) {
     return <div className="container mx-auto px-4 py-8">Đang tải...</div>;
   }
-
-  console.log("State Received:", state);
-  console.log("MovieInfo:", movieInfo);
-  console.log("SafeMovieInfo:", safeMovieInfo);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -302,15 +291,15 @@ const Other = () => {
                   key={seatRoom.id}
                   className="px-2 py-1 bg-green-100 border border-green-500 rounded-md text-xs"
                 >
-                  {seatRoom.seat?.name || "N/A"}
+                  {seatRoom.name || "N/A"}
                 </span>
               ))}
             </div>
             <div className="space-y-2 border-t pt-4">
               {selectedSeats.map((seatRoom) => (
                 <div key={seatRoom.id} className="flex justify-between">
-                  <span>{seatRoom.seat?.name || "N/A"}:</span>
-                  <span>{formatCurrency(seatRoom.seat?.price || 0)}</span>
+                  <span>{seatRoom.name || "N/A"}:</span>
+                  <span>{formatCurrency(seatRoom.price || 0)}</span>
                 </div>
               ))}
               <div className="flex justify-between font-bold border-t pt-2 mt-2">
