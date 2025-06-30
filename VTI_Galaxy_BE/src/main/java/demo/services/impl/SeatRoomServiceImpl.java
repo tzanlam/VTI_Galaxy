@@ -4,10 +4,12 @@ import demo.modal.dto.SeatRoomDto;
 import demo.modal.entity.Room;
 import demo.modal.entity.Seat;
 import demo.modal.entity.SeatRoom;
+import demo.modal.entity.ShowTime;
 import demo.modal.request.SeatRoomRequest;
 import demo.repository.RoomRepository;
 import demo.repository.SeatRepository;
 import demo.repository.SeatRoomRepository;
+import demo.repository.ShowTimeRepository;
 import demo.services.interfaceClass.SeatRoomService;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +22,14 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     private final SeatRoomRepository seatRoomRepository;
     private final SeatRepository seatRepository;
     private final RoomRepository roomRepository;
+    private final ShowTimeRepository showTimeRepository; // Thêm
 
     public SeatRoomServiceImpl(SeatRoomRepository seatRoomRepository, SeatRepository seatRepository,
-                               RoomRepository roomRepository) {
+                               RoomRepository roomRepository, ShowTimeRepository showTimeRepository) {
         this.seatRoomRepository = seatRoomRepository;
         this.seatRepository = seatRepository;
         this.roomRepository = roomRepository;
+        this.showTimeRepository = showTimeRepository;
     }
 
     @Override
@@ -39,10 +43,10 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     @Override
     public SeatRoomDto getSeatRoomById(int id) {
         SeatRoom seatRoom = seatRoomRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("No seat room found with id: " + id)
+                () -> new RuntimeException("Không tìm thấy ghế phòng với id: " + id)
         );
         if (seatRoom.getSeat() == null) {
-            throw new RuntimeException("SeatRoom with id " + id + " has no associated seat");
+            throw new RuntimeException("Ghế phòng với id " + id + " không có ghế liên kết");
         }
         return new SeatRoomDto(seatRoom);
     }
@@ -56,7 +60,7 @@ public class SeatRoomServiceImpl implements SeatRoomService {
                     .map(SeatRoomDto::new)
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve seat rooms: " + e.getMessage());
+            throw new RuntimeException("Không thể lấy danh sách ghế phòng: " + e.getMessage());
         }
     }
 
@@ -69,17 +73,20 @@ public class SeatRoomServiceImpl implements SeatRoomService {
                     .map(SeatRoomDto::new)
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve seat rooms: " + e.getMessage());
+            throw new RuntimeException("Không thể lấy danh sách ghế phòng: " + e.getMessage());
         }
     }
 
     @Override
     public List<SeatRoomDto> createSeatRoom(SeatRoomRequest request) {
         Room room = roomRepository.findById(request.getRoomId()).orElseThrow(
-                () -> new RuntimeException("No room found with id: " + request.getRoomId())
+                () -> new RuntimeException("Không tìm thấy phòng với id: " + request.getRoomId())
         );
         Seat seat = seatRepository.findById(request.getSeatId()).orElseThrow(
-                () -> new RuntimeException("No seat found with id: " + request.getSeatId())
+                () -> new RuntimeException("Không tìm thấy ghế với id: " + request.getSeatId())
+        );
+        ShowTime showTime = showTimeRepository.findById(request.getShowtimeId()).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy suất chiếu với id: " + request.getShowtimeId())
         );
 
         String[] rowLabels = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
@@ -88,44 +95,46 @@ public class SeatRoomServiceImpl implements SeatRoomService {
 
         int totalSeats = request.getQuantityColumn() * request.getSeatPerRow();
         if (request.getQuantityColumn() > rowLabels.length) {
-            throw new RuntimeException("QuantityColumn exceeds maximum row limit: " + rowLabels.length);
+            throw new RuntimeException("Số lượng cột vượt quá giới hạn hàng tối đa: " + rowLabels.length);
         }
         if (totalSeats > room.getCapacity()) {
-            throw new RuntimeException("Requested seats exceed room capacity: " + room.getCapacity());
+            throw new RuntimeException("Số ghế yêu cầu vượt quá sức chứa phòng: " + room.getCapacity());
         }
 
         List<SeatRoom> seatRoomList = new ArrayList<>();
+        int baseId = request.getId(); // Sử dụng id từ yêu cầu làm cơ sở
 
         for (int i = 0; i < request.getQuantityColumn(); i++) {
             String row = rowLabels[i];
             for (int j = 1; j <= request.getSeatPerRow(); j++) {
                 SeatRoom seatRoom = new SeatRoom();
-                seatRoom.setName(row + j); // VD: A1, A2, ...
+                seatRoom.setId(baseId++); // Tăng id cho mỗi ghế
+                seatRoom.setName(row + j); // Ví dụ: A1, A2, ...
                 seatRoom.setRoom(room);
                 seatRoom.setSeat(seat);
+                seatRoom.setShowTime(showTime); // Đặt suất chiếu
                 seatRoom.setStatus(SeatRoom.BookedStatus.AVAILABLE);
                 seatRoomList.add(seatRoom);
             }
         }
         seatRoomRepository.saveAll(seatRoomList);
-        return seatRoomList.stream().map(seatRoom -> new SeatRoomDto(seatRoom)).collect(Collectors.toList());
+        return seatRoomList.stream().map(SeatRoomDto::new).collect(Collectors.toList());
     }
-
 
     @Override
     public SeatRoomDto changeStatus(int seatRoomId, SeatRoom.BookedStatus status) {
         SeatRoom seatRoom = seatRoomRepository.findById(seatRoomId).orElseThrow(
-                () -> new RuntimeException("No seat room found with id: " + seatRoomId)
+                () -> new RuntimeException("Không tìm thấy ghế phòng với id: " + seatRoomId)
         );
         if (seatRoom.getSeat() == null) {
-            throw new RuntimeException("SeatRoom with id " + seatRoomId + " has no associated seat");
+            throw new RuntimeException("Ghế phòng với id " + seatRoomId + " không có ghế liên kết");
         }
         try {
             seatRoom.setStatus(status);
             seatRoomRepository.save(seatRoom);
             return new SeatRoomDto(seatRoom);
         } catch (Exception e) {
-            throw new RuntimeException("Seat room status change failed: " + e.getMessage());
+            throw new RuntimeException("Thay đổi trạng thái ghế phòng thất bại: " + e.getMessage());
         }
     }
 }
