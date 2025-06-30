@@ -61,6 +61,9 @@ public class SecurityConfig {
                 .sessionManagement(i->i.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
+                                "/getVouchers",
+                                "/getVoucherById",
+                                "/postVoucher",
                                 "/postRoom",
                                 "/postImg",
                                 "/getMovieById",

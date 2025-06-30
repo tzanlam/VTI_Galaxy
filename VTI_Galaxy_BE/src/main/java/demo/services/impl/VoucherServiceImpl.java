@@ -1,8 +1,6 @@
 package demo.services.impl;
 
-import demo.modal.dto.RoomDto;
 import demo.modal.dto.VoucherDto;
-import demo.modal.entity.Room;
 import demo.modal.entity.Voucher;
 import demo.modal.request.VoucherRequest;
 import demo.repository.VoucherRepository;
@@ -36,7 +34,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public VoucherDto createVoucher(VoucherRequest request) {
-        Voucher voucher = new Voucher();
+        Voucher voucher = request.setVoucher();
         try{
             voucherRepository.save(voucher);
             return new VoucherDto(voucher);

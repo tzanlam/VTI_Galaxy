@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -17,18 +18,17 @@ public class Voucher extends Time {
     private int id;
 
     @Column
-    private String voucherName;
+    private String name;
 
     @Column
     private int discount;
 
     @Column
-    private LocalDateTime start_date;
+    private LocalDateTime startDate;
 
     @Column
-    private LocalDateTime end_date;
+    private LocalDateTime endDate;
 
-    @ManyToOne
-    @JoinColumn
-    private Booking booking;
+    @OneToMany(mappedBy = "voucher")
+    private List<Booking> bookings;
 }

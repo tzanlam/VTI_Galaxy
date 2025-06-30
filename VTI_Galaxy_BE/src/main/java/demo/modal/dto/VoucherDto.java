@@ -3,21 +3,19 @@ package demo.modal.dto;
 import demo.modal.entity.Voucher;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 @Data
 public class VoucherDto {
     private int id;
-    private String voucherName;
+    private String name;
     private int discount;
-    private LocalDateTime start_date;
-    private LocalDateTime end_date;
+    private String startDate;
+    private String  endDate;
 
     public VoucherDto(Voucher voucher){
         this.id = voucher.getId();
-        this.voucherName = voucher.getVoucherName();
+        this.name = voucher.getName();
         this.discount = voucher.getDiscount();
-        this.start_date = voucher.getStart_date();
-        this.end_date = voucher.getEnd_date();
-
+        this.startDate = voucher.getStartDate() != null ? voucher.getStartDate().toString() :  "not found";
+        this.endDate = voucher.getEndDate() != null ? voucher.getEndDate().toString() :   "not found";
     }
 }

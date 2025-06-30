@@ -24,6 +24,9 @@ public class Galaxy extends Time{
     private String address;
 
     @Column
+    private  String image;
+
+    @Column
     private String city;
 
     @Column

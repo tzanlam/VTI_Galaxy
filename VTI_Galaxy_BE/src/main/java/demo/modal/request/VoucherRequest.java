@@ -3,29 +3,30 @@ package demo.modal.request;
 import demo.modal.entity.Voucher;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+
+import static demo.support.MethodSupport.buildLocalDateTime;
 
 @Data
 
 public class VoucherRequest {
     private String voucherName;
     private int discount;
-    private LocalDateTime start_date;
-    private LocalDateTime end_date;
+    private String startDate;
+    private String  endDate;
 
    public Voucher setVoucher(){
        Voucher voucher = new Voucher();
-       voucher.setVoucherName(voucherName);
+       voucher.setName(voucherName);
        voucher.setDiscount(discount);
-       voucher.setStart_date(start_date);
-       voucher.setEnd_date(end_date);
+       voucher.setStartDate(buildLocalDateTime(startDate, "00:00"));
+       voucher.setEndDate(buildLocalDateTime(endDate, "23:59"));
        return voucher;
    }
    public void updateVoucher(Voucher voucher){
-       voucher.setVoucherName(voucherName);
+       voucher.setName(voucherName);
        voucher.setDiscount(discount);
-       voucher.setStart_date(start_date);
-       voucher.setEnd_date(end_date);
+       voucher.setStartDate(buildLocalDateTime(startDate, "00:00"));
+       voucher.setEndDate(buildLocalDateTime(endDate, "23:59"));
 
    }
 
