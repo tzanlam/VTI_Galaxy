@@ -17,6 +17,8 @@ import GalaxyDetails from "../components/admin/details/GalaxyDetails";
 import MovieDetailsAdmin from "../components/admin/details/MovieDetailsAdmin";
 import VoucherManagement from "../components/admin/VoucherManagement";
 import VoucherDetails from "../components/admin/details/VoucherDetails";
+import OtherManagement from "../components/admin/OtherManagement";
+import OtherDetails from "../components/admin/details/OtherDetails";
 
 const router = createBrowserRouter([
   {
@@ -93,6 +95,14 @@ const router = createBrowserRouter([
       {
         element: <VoucherDetails />,
         path: "voucher/:voucherId"
+      },
+      {
+        element: <OtherManagement />,
+        path: "other"
+      },
+      {
+        element: <OtherDetails />,
+        path: "other/:otherId"
       }
     ],
   },
