@@ -19,6 +19,8 @@ import VoucherManagement from "../components/admin/VoucherManagement";
 import VoucherDetails from "../components/admin/details/VoucherDetails";
 import OtherManagement from "../components/admin/OtherManagement";
 import OtherDetails from "../components/admin/details/OtherDetails";
+import EmployeeManagement from "../components/admin/EmployeeManagement";
+import EmployeeDetails from "../components/admin/details/EmployeeDetails";
 
 const router = createBrowserRouter([
   {
@@ -103,6 +105,14 @@ const router = createBrowserRouter([
       {
         element: <OtherDetails />,
         path: "other/:otherId"
+      },
+      {
+        element: <EmployeeManagement />,
+        path: "employee"
+      },
+      {
+        element: <EmployeeDetails />,
+        peth: "employee/:employeeId"
       }
     ],
   },
