@@ -7,7 +7,7 @@ import demo.services.interfaceClass.SeatRoomService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("/api/seat-rooms")
+@RestController
 @CrossOrigin("*")
 public class SeatRoomController {
     private final SeatRoomService seatRoomService;

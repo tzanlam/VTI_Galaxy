@@ -102,13 +102,11 @@ public class SeatRoomServiceImpl implements SeatRoomService {
         }
 
         List<SeatRoom> seatRoomList = new ArrayList<>();
-        int baseId = request.getId(); // Sử dụng id từ yêu cầu làm cơ sở
 
         for (int i = 0; i < request.getQuantityColumn(); i++) {
             String row = rowLabels[i];
             for (int j = 1; j <= request.getSeatPerRow(); j++) {
                 SeatRoom seatRoom = new SeatRoom();
-                seatRoom.setId(baseId++); // Tăng id cho mỗi ghế
                 seatRoom.setName(row + j); // Ví dụ: A1, A2, ...
                 seatRoom.setRoom(room);
                 seatRoom.setSeat(seat);

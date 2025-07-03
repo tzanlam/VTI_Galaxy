@@ -32,15 +32,6 @@ public class BookingController {
         }
     }
 
-//    @GetMapping("/getOtherByGalaxyId") // ???
-//    public ResponseEntity<?> get(@RequestParam("galaxyId") int galaxyId) {
-//        try {
-//            return ResponseEntity.ok(bookingService.getBookingById(galaxyId));
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
-
     @PostMapping("/postBooking")
     public ResponseEntity<?> postBooking(@RequestBody BookingRequest request){
         try{

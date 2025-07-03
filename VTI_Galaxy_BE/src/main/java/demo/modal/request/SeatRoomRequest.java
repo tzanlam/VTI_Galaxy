@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class SeatRoomRequest {
-    private int id; // Note: May not be needed for creating multiple seats
+    private int id;
     private int seatId;
     private int roomId;
     private int showtimeId; // Ensure this field is present
