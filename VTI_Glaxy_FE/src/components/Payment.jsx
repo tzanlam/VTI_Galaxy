@@ -59,7 +59,7 @@ const Payment = () => {
             seatRoomId: seatRoom.id,
           });
           await axiosClient.put(
-            `/api/seat-rooms/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=SELECTED`
+            `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=SELECTED`
           );
         }
       } catch (err) {
@@ -81,7 +81,7 @@ const Payment = () => {
                 seatRoomId: seatRoom.id,
               });
               await axiosClient.put(
-                `/api/seat-rooms/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
+                `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
               );
             }
           }

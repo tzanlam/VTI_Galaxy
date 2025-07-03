@@ -121,7 +121,7 @@ const Other = () => {
         }
         console.log("Checking seatRoom status:", { seatRoomId: seatRoom.id });
         const response = await axiosClient.get(
-          `/api/seat-rooms/getSeatRoomById?seatRoomId=${seatRoom.id}`
+          `/getSeatRoomById?seatRoomId=${seatRoom.id}`
         );
         if (response.data.status === "BOOKED") {
           toast.error(`Ghế ${seatRoom.name || "N/A"} đã được đặt`);
