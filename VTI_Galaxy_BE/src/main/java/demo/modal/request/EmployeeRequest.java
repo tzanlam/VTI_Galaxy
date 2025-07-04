@@ -18,8 +18,6 @@ public class EmployeeRequest {
     private int numberOfWorkingHours;
     private String startDateWorking;
     private int galaxyId;
-    private int wage;
-
 
     public Employee setEmployee(){
         Employee employee = new Employee();
@@ -29,10 +27,9 @@ public class EmployeeRequest {
         employee.setAddress(address);
         employee.setDateOfBirth(convertToLocalDate(dateOfBirth));
         employee.setJobTitle(jobTitle);
-        employee.setEvaluate("");
+        employee.setEvaluate(evaluate);
         employee.setNumberOfWorkingHours(0);
         employee.setStartDateWorking(convertToLocalDate(startDateWorking));
-        employee.setWage(wage);
         employee.setStatus(ActiveStatus.ACTIVE);
         return employee;
     }
@@ -44,6 +41,5 @@ public class EmployeeRequest {
         employee.setAddress(address);
         employee.setNumberOfWorkingHours(numberOfWorkingHours);
         employee.setStartDateWorking(convertToLocalDate(startDateWorking));
-        employee.setWage(wage);
     }
 }

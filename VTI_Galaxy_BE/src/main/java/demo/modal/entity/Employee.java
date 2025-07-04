@@ -42,9 +42,6 @@ public class Employee {
     private LocalDate startDateWorking;
 
     @Column
-    private int wage; // ( số tiền trong 1h)
-
-    @Column
     private int salary;
 
     @ManyToOne
