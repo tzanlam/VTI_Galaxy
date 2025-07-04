@@ -11,6 +11,7 @@ import seatReducer from "./slices/seatSlice";
 import seatRoomReducer from "./slices/seatRoomSlice";
 import otherReducer from "./slices/otherSlice";
 import voucherReducer from "./slices/voucherSlice";
+import employeeReducer from "./slices/employeeSlice"
 
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
@@ -38,6 +39,7 @@ const store = configureStore({
     seatRoom: seatRoomReducer,
     other: otherReducer,
     voucher: voucherReducer,
+    employee: employeeReducer
   },
   preloadedState,
   // eslint-disable-next-line no-undef

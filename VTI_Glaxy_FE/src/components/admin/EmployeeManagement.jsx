@@ -1,4 +1,3 @@
-// EmployeeManagement.jsx
 import React, { useEffect, useState } from 'react';
 import { Button, Spin, Tag, Card } from 'antd';
 import { FiUserPlus, FiUser } from 'react-icons/fi';
@@ -10,8 +9,9 @@ import { fetchEmployees, postEmployee } from '../../redux/slices/employeeSlice';
 const EmployeeManagement = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { employees = [], loading, loadingCreate } = useSelector((state) => state.employee || {});
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+
+  const { employees = [], loading } = useSelector((state) => state.employee || {});
 
   useEffect(() => {
     dispatch(fetchEmployees());
@@ -57,7 +57,7 @@ const EmployeeManagement = () => {
                 <>
                   {getStatusTag(employee.status)}
                   <div>Chức vụ: {employee.jobTitle}</div>
-                  <div>Email: {employee.email}</div>
+                  <div>Lương: {employee.salary.toLocaleString()} VND</div>
                 </>
               }
             />
@@ -69,7 +69,7 @@ const EmployeeManagement = () => {
         visible={isCreateModalVisible}
         onCancel={() => setIsCreateModalVisible(false)}
         onSubmit={handleCreateEmployee}
-        loading={loadingCreate}
+        loading={loading}
       />
     </div>
   );

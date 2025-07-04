@@ -18,8 +18,8 @@ const EmployeeAdminModal = ({
   visible,
   onCancel,
   onSubmit,
-  loading,
   isEdit,
+  loading,
   initialValues,
 }) => {
   const [form] = Form.useForm();
@@ -52,9 +52,14 @@ const EmployeeAdminModal = ({
       open={visible}
       onCancel={onCancel}
       footer={null}
+      className="rounded-xl"
     >
-      <Form form={form} layout="vertical" onFinish={onSubmit}>
-        <Form.Item label="Họ tên" name="fullName" rules={[{ required: true }]}>
+      <Form layout="vertical" form={form} onFinish={onSubmit}>
+        <Form.Item
+          label="Họ tên"
+          name="fullName"
+          rules={[{ required: true }]}
+        >
           <Input />
         </Form.Item>
         <Form.Item label="Email" name="email" rules={[{ type: "email" }]}>
@@ -66,12 +71,8 @@ const EmployeeAdminModal = ({
         <Form.Item label="Địa chỉ" name="address">
           <Input />
         </Form.Item>
-        <Form.Item
-          label="Ngày sinh"
-          name="dateOfBirth"
-          rules={[{ required: true }]}
-        >
-          <DatePicker format="YYYY-MM-DD" />
+        <Form.Item label="Ngày sinh" name="dateOfBirth" rules={[{ required: true }]}>
+          <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item label="Chức vụ" name="jobTitle">
           <Input />
@@ -82,12 +83,8 @@ const EmployeeAdminModal = ({
         <Form.Item label="Số giờ làm việc" name="numberOfWorkingHours">
           <InputNumber min={0} style={{ width: "100%" }} />
         </Form.Item>
-        <Form.Item
-          label="Ngày bắt đầu làm"
-          name="startDateWorking"
-          rules={[{ required: true }]}
-        >
-          <DatePicker format="YYYY-MM-DD" />
+        <Form.Item label="Ngày bắt đầu làm" name="startDateWorking" rules={[{ required: true }]}>
+          <DatePicker format="YYYY-MM-DD" style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item label="Tiền công (VND/giờ)" name="wage">
           <InputNumber min={0} style={{ width: "100%" }} />
@@ -107,21 +104,19 @@ const EmployeeAdminModal = ({
           </Select>
         </Form.Item>
 
-        <Form.Item>
-          <div className="text-right mt-4">
-            <Button onClick={onCancel} className="mr-2">
-              Hủy
-            </Button>
-            <Button
-              htmlType="submit"
-              type="primary"
-              loading={loading}
-              className="bg-amber-600 hover:bg-amber-700 font-bold rounded-full text-white"
-            >
-              {isEdit ? "Cập nhật" : "Tạo mới"}
-            </Button>
-          </div>
-        </Form.Item>
+        <div className="text-right mt-4">
+          <Button onClick={onCancel} className="mr-2">
+            Hủy
+          </Button>
+          <Button
+            htmlType="submit"
+            type="primary"
+            loading={loading}
+            className="bg-amber-600 hover:bg-amber-700 font-bold rounded-full text-white"
+          >
+            {isEdit ? "Cập nhật" : "Tạo mới"}
+          </Button>
+        </div>
       </Form>
     </Modal>
   );
