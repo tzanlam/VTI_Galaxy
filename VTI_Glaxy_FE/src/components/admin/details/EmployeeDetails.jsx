@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchEmployeeById } from '../../../redux/slices/employeeSlice';
-import { Spin, Typography, Button } from 'antd';
+import { fetchEmployeeById, putEmployee } from '../../../redux/slices/employeeSlice';
+import { Spin, Typography, Button, message } from 'antd';
 import { FiInfo, FiArrowLeft, FiEdit } from 'react-icons/fi';
 import EmployeeAdminModal from '../model/EmploeeModal';
 
@@ -14,7 +14,7 @@ const EmployeeDetails = () => {
   const navigate = useNavigate();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 
-  const { employee, loading } = useSelector((state) => state.employee || {});
+  const { employee, loading } = useSelector((state) => state.employee);
 
   useEffect(() => {
     if (employeeId) {
@@ -22,13 +22,28 @@ const EmployeeDetails = () => {
     }
   }, [dispatch, employeeId]);
 
+  const handleUpdate = async (values) => {
+    try {
+      await dispatch(
+        putEmployee({ employeeId, employeeRequest: values })
+      ).unwrap();
+      message.success('Cập nhật nhân viên thành công!');
+      setIsEditModalVisible(false);
+      dispatch(fetchEmployeeById(employeeId));
+    } catch (error) {
+      message.error('Cập nhật thất bại', error);
+    }
+  };
+
   if (loading || !employee) return <Spin />;
 
   return (
     <div className="max-w-3xl mx-auto p-6 rounded-xl bg-gradient-to-r from-yellow-100 via-yellow-200 to-yellow-300 shadow-lg">
       <div className="flex items-center space-x-3 mb-4">
         <FiInfo className="text-amber-700 text-3xl" />
-        <Title level={3} className="!text-amber-800">Thông tin Nhân viên</Title>
+        <Title level={3} className="!text-amber-800">
+          Thông tin Nhân viên
+        </Title>
       </div>
 
       <div className="text-amber-900 space-y-2">
@@ -38,12 +53,12 @@ const EmployeeDetails = () => {
         <p><Text strong>Số điện thoại:</Text> {employee.phone}</p>
         <p><Text strong>Địa chỉ:</Text> {employee.address}</p>
         <p><Text strong>Ngày sinh:</Text> {employee.dateOfBirth}</p>
-        <p><Text strong>Vị trí công việc:</Text> {employee.jobTitle}</p>
+        <p><Text strong>Chức vụ:</Text> {employee.jobTitle}</p>
         <p><Text strong>Đánh giá:</Text> {employee.evaluate}</p>
-        <p><Text strong>Số giờ làm:</Text> {employee.numberOfWorkingHours}</p>
+        <p><Text strong>Số giờ làm việc:</Text> {employee.numberOfWorkingHours}</p>
         <p><Text strong>Ngày bắt đầu làm:</Text> {employee.startDateWorking}</p>
-        <p><Text strong>Lương cơ bản:</Text> {employee.wage} VND</p>
-        <p><Text strong>Lương thực nhận:</Text> {employee.salary} VND</p>
+        <p><Text strong>Lương cơ bản:</Text> {employee.wage?.toLocaleString()} VND</p>
+        <p><Text strong>Lương thực nhận:</Text> {employee.salary?.toLocaleString()} VND</p>
         <p><Text strong>Trạng thái:</Text> {employee.status}</p>
       </div>
 
@@ -68,9 +83,9 @@ const EmployeeDetails = () => {
         visible={isEditModalVisible}
         onCancel={() => setIsEditModalVisible(false)}
         isEdit={true}
-        onSubmit={() => setIsEditModalVisible(false)} // Xử lý cập nhật thực tế ở Management
         initialValues={employee}
-        loading={false}
+        onSubmit={handleUpdate}
+        loading={loading}
       />
     </div>
   );

@@ -112,7 +112,7 @@ const router = createBrowserRouter([
       },
       {
         element: <EmployeeDetails />,
-        peth: "employee/:employeeId"
+        path: "employee/:employeeId"
       }
     ],
   },
