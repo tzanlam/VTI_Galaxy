@@ -3,8 +3,10 @@ package demo.services.impl;
 import demo.modal.constant.ActiveStatus;
 import demo.modal.dto.EmployeeDto;
 import demo.modal.entity.Employee;
+import demo.modal.entity.Galaxy;
 import demo.modal.request.EmployeeRequest;
 import demo.repository.EmployeeRepository;
+import demo.repository.GalaxyRepository;
 import demo.services.interfaceClass.EmployeeService;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +16,11 @@ import java.util.stream.Collectors;
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
+    private final GalaxyRepository galaxyRepository;
 
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
+    public EmployeeServiceImpl(EmployeeRepository employeeRepository, GalaxyRepository galaxyRepository) {
         this.employeeRepository = employeeRepository;
+        this.galaxyRepository = galaxyRepository;
     }
 
     @Override
@@ -42,8 +46,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDto createEmployee(EmployeeRequest request) {
+        Galaxy galaxy = galaxyRepository.findById(request.getGalaxyId()).orElseThrow(
+                () -> new RuntimeException("Galaxy with id " + request.getGalaxyId() + " not found")
+        );
         try{
             Employee employee = request.setEmployee();
+            employee.setGalaxy(galaxy);
             employeeRepository.save(employee);
             return new EmployeeDto(employee);
         }catch (Exception e){

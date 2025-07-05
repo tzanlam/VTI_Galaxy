@@ -40,10 +40,10 @@ public class MethodSupport {
 
     public static LocalDate convertToLocalDate(String dateString){
         try {
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             return LocalDate.parse(dateString, dateFormatter);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Định dạng ngày không hợp lệ: " + dateString + ". Định dạng yêu cầu: yyyy-MM-dd");
+            throw new IllegalArgumentException("Định dạng ngày không hợp lệ: " + dateString + ". Định dạng yêu cầu: dd/MM/yyyy");
         }
     }
 

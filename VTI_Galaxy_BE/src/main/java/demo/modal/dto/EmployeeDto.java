@@ -15,7 +15,6 @@ public class EmployeeDto {
     private String evaluate;
     private int numberOfWorkingHours;
     private String startDateWorking;
-    private int wage;
     private int salary;
     private String status;
 
@@ -30,7 +29,6 @@ public class EmployeeDto {
         this.evaluate = emp.getEvaluate();
         this.numberOfWorkingHours = emp.getNumberOfWorkingHours();
         this.startDateWorking = emp.getStartDateWorking() != null ? emp.getStartDateWorking().toString() : null;
-        this.wage = emp.getWage();
         this.salary = emp.getSalary();
         this.status = emp.getStatus() != null ? emp.getStatus().toString() : null;
     }
