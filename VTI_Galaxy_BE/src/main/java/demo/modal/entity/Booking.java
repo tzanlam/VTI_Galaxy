@@ -34,6 +34,14 @@ public class Booking extends Time{
     @JoinColumn(nullable = false)
     private Galaxy galaxy;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "account_id", nullable = false)
+    private Account account;
+
+    @ManyToOne
+    @JoinColumn(name = "show_time_id", nullable = false)
+    private ShowTime showTime;
+
     @ManyToOne
     @JoinColumn
     private Voucher voucher;
@@ -46,7 +54,7 @@ public class Booking extends Time{
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "vnpay_transaction_id")
-//    private VnpayTransaction vnpayTransaction;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "vnpay_transaction_id")
+    private VnpayTransaction vnpayTransaction;
 }

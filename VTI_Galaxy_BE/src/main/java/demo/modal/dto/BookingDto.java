@@ -13,7 +13,9 @@ import java.util.List;
 @Data
 @EqualsAndHashCode
 public class BookingDto {
-    private String id;
+    private int id;
+    private String accountId;
+    private String showtimeId;
     @JsonIgnore
     private List<String> seatRoomIds;
     @JsonIgnore
@@ -25,7 +27,9 @@ public class BookingDto {
     private BookingStatus status;
 
     public BookingDto(Booking booking) {
-        this.id = String.valueOf(booking.getId());
+        this.id =  booking.getId();
+        this.accountId = booking.getAccount() != null ? String.valueOf(booking.getAccount().getId()) : null;
+        this.showtimeId = booking.getShowTime() != null ? String.valueOf(booking.getShowTime().getId()) : null;
         this.seatRoomIds = booking.getSeatRooms() != null ?
                 booking.getSeatRooms().stream().map(sr -> String.valueOf(sr.getId())).toList() :
                 new ArrayList<>();

@@ -97,7 +97,8 @@ public class SecurityConfig {
                                 "/getOtherByGalaxyId",
                                 "/getBookings",
                                 "/postBooking",
-                                "/getSeatRoomById"
+                                "/getSeatRoomById",
+                                "/putSeatRoomStatus"
                                 ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);

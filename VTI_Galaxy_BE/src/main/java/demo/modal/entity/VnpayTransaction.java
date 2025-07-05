@@ -2,44 +2,30 @@ package demo.modal.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vnpay_transactions")
+@Table(name = "vnpay_transaction")
 @Data
 public class VnpayTransaction {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String txnRef; // Mã giao dịch VNPay (vnp_TxnRef)
+    @Column(name = "vnp_transaction_id", nullable = false)
+    private String vnpTransactionId;
 
-    @Column(nullable = false)
-    private Long amount; // Số tiền (VND * 100)
+    @Column(name = "amount", nullable = false)
+    private Long amount;
 
-    @Column
-    private String orderInfo; // Thông tin đơn hàng
+    @Column(name = "order_info")
+    private String orderInfo;
 
-    @Column
-    private String responseCode; // Mã phản hồi từ VNPay
+    @Column(name = "transaction_status")
+    private String transactionStatus;
 
-    @Column
-    private String transactionStatus; // Trạng thái giao dịch (PENDING, SUCCESS, FAILED)
+    @Column(name = "created_at")
+    private String createdAt;
 
-    @Column
-    private String bankCode; // Mã ngân hàng
-
-    @Column
-    private String bankTranNo; // Mã giao dịch ngân hàng
-
-    @Column
-    private LocalDateTime createDate; // Thời gian tạo
-
-    @Column
-    private LocalDateTime updateDate; // Thời gian cập nhật
-
-//    @OneToOne(mappedBy = "vnpayTransaction")
-//    private Booking booking;
+    @OneToOne(mappedBy = "vnpayTransaction")
+    private Booking booking;
 }

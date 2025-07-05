@@ -25,6 +25,9 @@ public class BookingServiceImpl implements BookingService {
     private BookingRepository bookingRepository;
 
     @Autowired
+    private ShowTimeRepository showTimeRepository;
+
+    @Autowired
     private GalaxyRepository galaxyRepository;
 
     @Autowired
@@ -35,6 +38,9 @@ public class BookingServiceImpl implements BookingService {
 
     @Autowired
     private OtherRepository otherRepository;
+
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Override
     public List<BookingDto> getBookings() {
@@ -52,19 +58,26 @@ public class BookingServiceImpl implements BookingService {
         return new BookingDto(booking);
     }
 
+
+
     @Override
     @Transactional
     public BookingDto createBooking(BookingRequest request) {
-        Booking booking = new Booking();
+
         try {
-            if (Objects.nonNull(request.getVoucherId())) {
-                voucherRepository.findById(request.getVoucherId()).ifPresentOrElse(
-                        booking::setVoucher,
-                        () -> booking.setVoucher(null)
-                );
-            } else {
-                booking.setVoucher(null);
-            }
+            Booking booking = new Booking();
+            booking.setPaymentMethod(request.getPaymentMethod());
+            voucherRepository.findById(request.getVoucherId()).ifPresentOrElse(
+                    booking::setVoucher,
+                    () -> booking.setVoucher(null)
+            );
+
+
+            booking.setAccount(accountRepository.findById(request.getAccountId())
+                    .orElseThrow(() -> new RuntimeException("Account not found")));
+
+            booking.setShowTime(showTimeRepository.findById(request.getShowtimeId())
+                    .orElseThrow(() -> new RuntimeException("Show time not found")));
             booking.setGalaxy(galaxyRepository.findById(request.getGalaxyId())
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy rạp")));
             for (String j : request.getOtherIds()){
@@ -113,7 +126,13 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto deleteBooking(int id) {
-        return null;
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt vé"));
+        bookingRepository.delete(booking);
+        return new BookingDto(booking);
     }
+
+
 }
