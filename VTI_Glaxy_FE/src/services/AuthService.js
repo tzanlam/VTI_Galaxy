@@ -33,7 +33,7 @@ export const login = async (email, password) => {
     throw new Error("Phản hồi không hợp lệ từ server");
   } catch (error) {
     console.error("Login error:", error);
-    throw new Error(error.response?.data?.message || "Đăng nhập thất bại");
+    throw new Error(error.message || "Đăng nhập thất bại");
   }
 };
 

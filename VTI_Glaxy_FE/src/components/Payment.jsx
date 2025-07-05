@@ -26,8 +26,18 @@ const Payment = () => {
   const [finalPrice, setFinalPrice] = useState(totalPrice);
 
   const { voucher, loading, error } = useSelector((state) => state.voucher);
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
   useEffect(() => {
+    // Kiểm tra trạng thái đăng nhập
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!isLoggedIn || !token) {
+      toast.error("Vui lòng đăng nhập để thực hiện thanh toán");
+      navigate("/");
+      return;
+    }
+
     console.log("Payment.jsx - Received state:", {
       showtimeId,
       selectedSeats,
@@ -36,6 +46,7 @@ const Payment = () => {
       comboItems,
       totalComboPrice,
     });
+
     if (
       !safeMovieInfo.galaxyId ||
       !selectedSeats ||
@@ -92,7 +103,7 @@ const Payment = () => {
       };
       rollbackSeats();
     };
-  }, [safeMovieInfo, selectedSeats, navigate]);
+  }, [safeMovieInfo, selectedSeats, navigate, isLoggedIn]);
 
   useEffect(() => {
     if (voucher) {
@@ -123,6 +134,15 @@ const Payment = () => {
   };
 
   const handleConfirmPayment = async () => {
+    // Kiểm tra trạng thái đăng nhập trước khi thanh toán
+    const token =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!isLoggedIn || !token) {
+      toast.error("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại");
+      navigate("/");
+      return;
+    }
+
     if (!paymentMethod) {
       toast.error("Vui lòng chọn phương thức thanh toán");
       return;
@@ -133,7 +153,7 @@ const Payment = () => {
       for (const seatRoom of selectedSeats) {
         console.log("Checking seatRoom status:", { seatRoomId: seatRoom.id });
         const response = await axiosClient.get(
-          `/api/seat-rooms/getSeatRoomById?seatRoomId=${seatRoom.id}`
+          `/getSeatRoomById?seatRoomId=${seatRoom.id}`
         );
         if (response.data.status === "BOOKED") {
           toast.error(`Ghế ${seatRoom.name || "N/A"} đã được đặt`);
@@ -143,56 +163,103 @@ const Payment = () => {
       }
 
       const seatRoomIds = selectedSeats.map((seat) => seat.id);
+
+      // Lấy thông tin user từ localStorage
+      const userInfo = JSON.parse(localStorage.getItem("user") || "{}");
+
+      console.log("User info from localStorage:", userInfo);
+      console.log("Raw userInfo.id:", userInfo.id, "type:", typeof userInfo.id);
+
+      // Validation dữ liệu trước khi gửi request
+      const accountId = parseInt(userInfo.id);
+      console.log("Parsed accountId:", accountId, "isNaN:", isNaN(accountId));
+
+      if (!userInfo.id || isNaN(accountId)) {
+        console.error("Missing or invalid user ID:", userInfo);
+        toast.error(
+          "Không tìm thấy thông tin tài khoản hợp lệ, vui lòng đăng nhập lại"
+        );
+        navigate("/");
+        return;
+      }
+
+      if (!showtimeId || isNaN(parseInt(showtimeId))) {
+        console.error("Missing or invalid showtime ID:", showtimeId);
+        toast.error("Thiếu thông tin suất chiếu, vui lòng chọn lại");
+        navigate("/seat-selection");
+        return;
+      }
+
+      // Chuyển đổi các ID thành string array như backend mong đợi
+      const seatRoomIdsAsString = seatRoomIds.map((id) => String(id));
+      const galaxyIdAsInt = parseInt(safeMovieInfo.galaxyId);
+      const showtimeIdAsInt = parseInt(showtimeId);
+
       const bookingRequest = {
-        showTimeId: showtimeId,
-        seatRoomIds,
-        comboItems: comboItems || [],
-        totalPrice: finalPrice,
-        galaxyId: safeMovieInfo.galaxyId,
-        voucherCode: voucherCode || null,
-        paymentMethod,
+        accountId: accountId,
+        galaxyId: galaxyIdAsInt,
+        showtimeId: showtimeIdAsInt,
+        seatRoomIds: seatRoomIdsAsString,
+        otherIds: [],
+        voucherId: voucherCode ? parseInt(voucherCode) : null,
+        paymentMethod: paymentMethod,
+        status: "PENDING",
       };
 
-      // Gửi yêu cầu thanh toán
-      const paymentResponse = await axiosClient.post("/api/payment/initiate", {
+      console.log("Final booking request:", bookingRequest);
+      console.log("AccountId type:", typeof accountId, "value:", accountId);
+      console.log(
+        "GalaxyId type:",
+        typeof galaxyIdAsInt,
+        "value:",
+        galaxyIdAsInt
+      );
+      console.log(
+        "ShowTimeId type:",
+        typeof showtimeIdAsInt,
+        "value:",
+        showtimeIdAsInt
+      );
+
+      console.log("Booking request data:", {
         bookingRequest,
-        paymentMethod,
-        amount: finalPrice,
+        selectedSeats,
+        showtimeId,
+        finalPrice,
+        galaxyId: safeMovieInfo.galaxyId,
       });
 
-      if (paymentResponse.data.redirectUrl) {
-        console.log(
-          "Redirecting to payment URL:",
-          paymentResponse.data.redirectUrl
-        );
-        window.location.href = paymentResponse.data.redirectUrl;
-      } else {
-        // Thanh toán nội bộ
-        const bookingResponse = await axiosClient.post(
-          "/api/booking/create",
-          bookingRequest
-        );
+      // Gọi API đặt vé
+      const bookingResponse = await axiosClient.post(
+        "/postBooking",
+        bookingRequest
+      );
 
-        // Cập nhật trạng thái ghế thành BOOKED sau khi thanh toán thành công
+      if (bookingResponse.data.redirectUrl) {
+        // Chuyển hướng đến trang thanh toán bên ngoài
+        window.location.href = bookingResponse.data.redirectUrl;
+      } else {
+        // Thanh toán thành công nội bộ
+        // Cập nhật trạng thái ghế và chuyển đến trang chủ
         for (const seatRoom of selectedSeats) {
           console.log("Updating seatRoom to BOOKED:", {
             seatRoomId: seatRoom.id,
           });
           await axiosClient.put(
-            `/api/seat-rooms/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
+            `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
           );
         }
 
         toast.success("Đặt vé thành công!");
-        navigate("/booking-success", {
-          state: { booking: bookingResponse.data },
-        });
+        navigate("/"); // Đưa về trang chủ sau khi đặt vé thành công
       }
     } catch (err) {
       console.error("Payment error:", {
         message: err.message,
         response: err.response?.data,
         status: err.response?.status,
+        data: err.data,
+        fullError: err,
       });
 
       // Rollback trạng thái ghế về AVAILABLE nếu thanh toán thất bại
@@ -201,9 +268,7 @@ const Payment = () => {
           seatRoomId: seatRoom.id,
         });
         await axiosClient
-          .put(
-            `/api/seat-rooms/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
-          )
+          .put(`/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`)
           .catch((rollbackErr) => {
             console.error("Rollback error:", rollbackErr);
             toast.error(
@@ -212,10 +277,36 @@ const Payment = () => {
           });
       }
 
-      toast.error(
-        "Lỗi khi xử lý thanh toán: " +
-          (err.response?.data?.message || err.message)
-      );
+      // Xử lý các loại lỗi khác nhau
+      let errorMessage = "Lỗi khi xử lý thanh toán";
+
+      const status = err.status || err.response?.status;
+
+      if (status === 401) {
+        errorMessage =
+          err.message || "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại";
+        navigate("/");
+        return;
+      } else if (status === 403) {
+        errorMessage = err.message || "Bạn không có quyền thực hiện thanh toán";
+      } else if (status === 400) {
+        // Sử dụng thông báo lỗi từ server
+        errorMessage =
+          err.message ||
+          err.data?.message ||
+          err.response?.data?.message ||
+          "Thông tin thanh toán không hợp lệ";
+      } else if (status === 500) {
+        errorMessage = err.message || "Lỗi máy chủ, vui lòng thử lại sau";
+      } else {
+        errorMessage =
+          err.message ||
+          err.data?.message ||
+          err.response?.data?.message ||
+          "Đã xảy ra lỗi không xác định";
+      }
+
+      toast.error(errorMessage);
       navigate("/seat-selection");
     }
   };
