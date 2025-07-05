@@ -1,51 +1,38 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeLoginModal, openRegisterModal } from "../redux/slices/modalSlice";
-import {
-  loginStart,
-  loginSuccess,
-  loginFailure,
-} from "../redux/slices/authSlice";
-import { validateLogin } from "../utils/Validation";
+import { loginS } from "../redux/slices/authSlice";
 import { IoIosEyeOff, IoMdEye } from "react-icons/io";
 import { toast } from "react-toastify";
-import { login } from "../services/AuthService";
 
 const LoginModal = () => {
   const { isLoginOpen } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validateLogin(formData.email, formData.password);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
 
-    dispatch(loginStart());
     setIsLoading(true);
-
     try {
-      const response = await login(formData.email, formData.password);
-      dispatch(loginSuccess(response));
+      await dispatch(loginS({
+        email: formData.email,
+        password: formData.password
+      })).unwrap();
+
       toast.success("Đăng nhập thành công!");
-      setFormData({ email: "", password: "" });
       dispatch(closeLoginModal());
-    } catch (error) {
-      const errorMessage = error.message || "Đăng nhập thất bại";
-      dispatch(loginFailure(errorMessage));
-      toast.error(errorMessage);
+      setFormData({ email: "", password: "" });
+    } catch (err) {
+      console.error("Đăng nhập lỗi:", err);
+      toast.error("Đăng nhập thất bại!");
     } finally {
       setIsLoading(false);
     }
@@ -61,51 +48,26 @@ const LoginModal = () => {
           className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
           aria-label="Đóng"
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
-          Đăng Nhập
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Đăng Nhập</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-gray-700 font-semibold mb-2"
-            >
-              Email
-            </label>
+            <label htmlFor="email" className="block text-gray-700 font-semibold mb-2">Email</label>
             <input
-              type="email"
-              id="email"
-              name="email"
+              type="email" id="email" name="email"
               value={formData.email}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-              placeholder="Nhập email của bạn"
+              placeholder="Nhập email"
             />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-            )}
           </div>
+
           <div className="mb-6 relative">
-            <label
-              htmlFor="password"
-              className="block text-gray-700 font-semibold mb-2"
-            >
-              Mật khẩu
-            </label>
+            <label htmlFor="password" className="block text-gray-700 font-semibold mb-2">Mật khẩu</label>
             <input
               type={showPassword ? "text" : "password"}
               id="password"
@@ -122,26 +84,21 @@ const LoginModal = () => {
             >
               {showPassword ? <IoMdEye size={24} /> : <IoIosEyeOff size={24} />}
             </button>
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-            )}
           </div>
+
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full ${
-              isLoading ? "bg-gray-400" : "bg-orange-500 hover:bg-orange-600"
-            } text-white py-2 rounded-md transition-colors duration-300`}
+            className={`w-full ${isLoading ? "bg-gray-400" : "bg-orange-500 hover:bg-orange-600"
+              } text-white py-2 rounded-md transition-colors duration-300`}
           >
             {isLoading ? "Đang xử lý..." : "Đăng Nhập"}
           </button>
         </form>
+
         <p className="text-center text-gray-600 mt-4">
           Chưa có tài khoản?{" "}
-          <button
-            onClick={() => dispatch(openRegisterModal())}
-            className="text-orange-500 hover:underline"
-          >
+          <button onClick={() => dispatch(openRegisterModal())} className="text-orange-500 hover:underline">
             Đăng ký
           </button>
         </p>

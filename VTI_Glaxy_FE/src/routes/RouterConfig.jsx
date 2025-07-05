@@ -1,4 +1,3 @@
-// routes/RouterConfig.js
 import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import HomePage from "../pages/HomePage";
@@ -21,6 +20,7 @@ import OtherManagement from "../components/admin/OtherManagement";
 import OtherDetails from "../components/admin/details/OtherDetails";
 import EmployeeManagement from "../components/admin/EmployeeManagement";
 import EmployeeDetails from "../components/admin/details/EmployeeDetails";
+import { PrivateRouter } from "./PrivateRouter";
 
 const router = createBrowserRouter([
   {
@@ -31,8 +31,8 @@ const router = createBrowserRouter([
         element: <HomePage />,
         children: [
           {
-            index: true, // Mặc định khi vào "/"
-            element: <Navigate to="/?tab=now-showing" replace />, // Chuyển hướng đến tab "now-showing"
+            index: true,
+            element: <Navigate to="/?tab=now-showing" replace />,
           },
         ],
       },
@@ -63,57 +63,27 @@ const router = createBrowserRouter([
     ],
   },
   {
-    element: <HomeAdmin />,
     path: "/management",
+    element: <PrivateRouter allowedRoles={["ADMIN"]} />,
     children: [
       {
-        element: <GalaxyManagement />,
-        path: "galaxy",
+        path: "",
+        element: <HomeAdmin />,
+        children: [
+          { path: "galaxy", element: <GalaxyManagement /> },
+          { path: "galaxy/:galaxyId", element: <GalaxyDetails /> },
+          { path: "room", element: <RoomManagement /> },
+          { path: "room/:roomId", element: <RoomDetails /> },
+          { path: "movie", element: <MovieManagement /> },
+          { path: "movie/:movieId", element: <MovieDetailsAdmin /> },
+          { path: "voucher", element: <VoucherManagement /> },
+          { path: "voucher/:voucherId", element: <VoucherDetails /> },
+          { path: "other", element: <OtherManagement /> },
+          { path: "other/:otherId", element: <OtherDetails /> },
+          { path: "employee", element: <EmployeeManagement /> },
+          { path: "employee/:employeeId", element: <EmployeeDetails /> },
+        ],
       },
-      {
-        element: <GalaxyDetails />,
-        path: "galaxy/:galaxyId"
-      },
-      {
-        element: <RoomManagement />,
-        path: "room",
-      },
-      {
-        element: <RoomDetails />,
-        path: "room/:roomId"
-      },
-      {
-        element: <MovieManagement />,
-        path: "movie",
-      },
-      {
-        element: <MovieDetailsAdmin />,
-        path: "movie/:movieId"
-      },
-      {
-        element: <VoucherManagement />,
-        path: "voucher"
-      },
-      {
-        element: <VoucherDetails />,
-        path: "voucher/:voucherId"
-      },
-      {
-        element: <OtherManagement />,
-        path: "other"
-      },
-      {
-        element: <OtherDetails />,
-        path: "other/:otherId"
-      },
-      {
-        element: <EmployeeManagement />,
-        path: "employee"
-      },
-      {
-        element: <EmployeeDetails />,
-        path: "employee/:employeeId"
-      }
     ],
   },
 ]);
