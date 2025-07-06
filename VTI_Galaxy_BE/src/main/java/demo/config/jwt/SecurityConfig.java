@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
                                 "getEmployees",
+                                "/getAccountById",
                                 "/getVouchers",
                                 "/getVoucherById",
                                 "/postVoucher",
