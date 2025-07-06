@@ -57,4 +57,7 @@ public class Booking extends Time{
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "vnpay_transaction_id")
     private VnpayTransaction vnpayTransaction;
+
+    @Column(name = "vnp_txn_ref")
+    private String vnpTxnRef;
 }

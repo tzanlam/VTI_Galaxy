@@ -25,6 +25,7 @@ public class BookingDto {
     private String voucherId;
     private PaymentMethod paymentMethod;
     private BookingStatus status;
+    private String redirectUrl;
 
     public BookingDto(Booking booking) {
         this.id =  booking.getId();
@@ -41,5 +42,6 @@ public class BookingDto {
         this.voucherId = booking.getVoucher() != null ? String.valueOf(booking.getVoucher().getId()) : null;
         this.paymentMethod = booking.getPaymentMethod();
         this.status = booking.getStatus();
+        this.redirectUrl = null;
     }
 }

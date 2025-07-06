@@ -1,7 +1,6 @@
 package demo.services.interfaceClass;
 
 import demo.modal.dto.BookingDto;
-import demo.modal.entity.Booking;
 import demo.modal.request.BookingRequest;
 
 import java.util.List;
