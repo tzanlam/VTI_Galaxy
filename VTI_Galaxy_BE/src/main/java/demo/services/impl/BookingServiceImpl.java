@@ -11,45 +11,50 @@ import demo.repository.*;
 import demo.services.VNPayService;
 import demo.services.interfaceClass.BookingService;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static demo.support.MethodSupport.calculatePriceBooking;
 
 @Service
 public class BookingServiceImpl implements BookingService {
-    @Autowired
-    private BookingRepository bookingRepository;
+    private final BookingRepository bookingRepository;
 
-    @Autowired
-    private ShowTimeRepository showTimeRepository;
+    private final ShowTimeRepository showTimeRepository;
 
-    @Autowired
-    private GalaxyRepository galaxyRepository;
+    private final GalaxyRepository galaxyRepository;
 
-    @Autowired
-    private VoucherRepository voucherRepository;
+    private final VoucherRepository voucherRepository;
 
-    @Autowired
-    private SeatRoomRepository seatRoomRepository;
+    private final SeatRoomRepository seatRoomRepository;
 
-    @Autowired
-    private OtherRepository otherRepository;
+    private final OtherRepository otherRepository;
 
-    @Autowired
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
-    @Autowired
-    private VNPayService vnPayService;
+    private final VNPayService vnPayService;
 
-    @Autowired
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest httpServletRequest;
+
+    private final VNPayConfig vnPayConfig;
+
+    public BookingServiceImpl(BookingRepository bookingRepository, ShowTimeRepository showTimeRepository, GalaxyRepository galaxyRepository, VoucherRepository voucherRepository, SeatRoomRepository seatRoomRepository, OtherRepository otherRepository, AccountRepository accountRepository, VNPayService vnPayService, HttpServletRequest httpServletRequest, VNPayConfig vnPayConfig) {
+        this.bookingRepository = bookingRepository;
+        this.showTimeRepository = showTimeRepository;
+        this.galaxyRepository = galaxyRepository;
+        this.voucherRepository = voucherRepository;
+        this.seatRoomRepository = seatRoomRepository;
+        this.otherRepository = otherRepository;
+        this.accountRepository = accountRepository;
+        this.vnPayService = vnPayService;
+        this.httpServletRequest = httpServletRequest;
+        this.vnPayConfig = vnPayConfig;
+    }
+
     @Override
     public List<BookingDto> getBookings() {
         return bookingRepository.findAll().stream()
@@ -164,9 +169,8 @@ public class BookingServiceImpl implements BookingService {
                     String redirectUrl = vnPayService.createOrder(
                             totalPrice,
                             orderInfo,
-                            VNPayConfig.vnp_Returnurl,
-                            ipAddress,
-                            vnpTxnRef
+                            vnPayConfig.getVnpReturnUrl(),
+                            httpServletRequest
                     );
                     if (redirectUrl == null || redirectUrl.isEmpty()) {
                         System.err.println("VNPayService.createOrder returned null or empty URL");

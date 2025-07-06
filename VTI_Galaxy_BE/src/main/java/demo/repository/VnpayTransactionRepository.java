@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VnpayTransactionRepository extends JpaRepository<VnpayTransaction, Long> {
-    VnpayTransaction findByVnpTransactionId(String vnpTransactionId);
 }

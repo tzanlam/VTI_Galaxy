@@ -3,29 +3,43 @@ package demo.modal.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "vnpay_transaction")
 @Data
 public class VnpayTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    @Column(name = "vnp_transaction_id", nullable = false)
-    private String vnpTransactionId;
+    @Column(name = "txn_ref", nullable = false)
+    private String txnRef;
 
     @Column(name = "amount", nullable = false)
-    private Long amount;
+    private long amount;
 
     @Column(name = "order_info")
     private String orderInfo;
 
+    @Column(name = "response_code")
+    private String responseCode;
+
     @Column(name = "transaction_status")
     private String transactionStatus;
 
-    @Column(name = "created_at")
-    private String createdAt;
+    @Column(name = "bank_code")
+    private String bankCode;
 
-    @OneToOne(mappedBy = "vnpayTransaction")
-    private Booking booking;
+    @Column(name = "bank_tran_no")
+    private String bankTranNo;
+
+    @Column(name = "booking_id")
+    private Integer bookingId;
+
+    @Column(name = "create_date")
+    private LocalDateTime createDate;
+
+    @Column(name = "update_date")
+    private LocalDateTime updateDate;
 }
