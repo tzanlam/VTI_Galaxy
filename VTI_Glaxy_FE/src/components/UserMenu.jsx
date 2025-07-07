@@ -1,37 +1,36 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Menu, Dropdown, Avatar } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Dropdown, Avatar } from "antd";
+import { useDispatch } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
-const UserMenu = () => {
+const UserMenu = ({ account }) => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());
+    navigate("/");
   };
 
-  const menu = (
-    <Menu
-      items={[
-        { key: "profile", label: "Trang cá nhân" },
-        { key: "logout", label: <span onClick={handleLogout}>Đăng xuất</span> },
-      ]}
-    />
-  );
+  const menuItems = [
+    {
+      key: "logout",
+      label: "Đăng xuất",
+      onClick: handleLogout,
+    },
+  ];
 
   return (
-    <Dropdown overlay={menu} placement="bottomRight">
-      <div className="flex items-center space-x-2 cursor-pointer">
+    <Dropdown menu={{ items: menuItems }} placement="bottomRight">
+      <div className="cursor-pointer flex items-center space-x-2">
         <Avatar
-          icon={<UserOutlined />}
-          src={user?.image || null}
-          className="bg-amber-400"
-        />
-        <span className="text-amber-700 font-semibold">
-          {user?.identifier || "Tài khoản"}
-        </span>
+          size="large"
+          src={account?.avatar || null}
+          style={{ backgroundColor: "#f56a00" }}
+        >
+          {account?.fullName?.charAt(0)?.toUpperCase()}
+        </Avatar>
+        <span>{account?.fullName || account?.email}</span>
       </div>
     </Dropdown>
   );
