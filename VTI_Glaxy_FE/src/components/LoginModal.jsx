@@ -1,41 +1,49 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeLoginModal, openRegisterModal } from "../redux/slices/modalSlice";
 import { loginS } from "../redux/slices/authSlice";
 import { IoIosEyeOff, IoMdEye } from "react-icons/io";
 import { toast } from "react-toastify";
+import { fetchAccountById } from "../redux/slices/accountSlice";
+import { useNavigate } from "react-router-dom";
 
 const LoginModal = () => {
   const { isLoginOpen } = useSelector((state) => state.modal);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const accountId = localStorage.getItem("accountId")
+  // const position = localStorage.getItem("position")
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
+  try {
+    const loginResult = await dispatch(loginS(formData)).unwrap();
+        const role = loginResult.authorities?.[0]?.authority;
+    const accountResult = await dispatch(fetchAccountById(accountId)).unwrap();
+    console.log(accountResult);
+    if (role === "ADMIN") {
+      navigate("/management");
+    } else {
+      navigate("/");
+    }
+
+    dispatch(closeLoginModal());
+    setFormData({ email: "", password: "" });
+  } catch (err) {
+    toast.error("Đăng nhập thất bại!");
+    console.error("Lỗi đăng nhập:", err);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    setIsLoading(true);
-    try {
-      await dispatch(loginS({
-        email: formData.email,
-        password: formData.password
-      })).unwrap();
-
-      toast.success("Đăng nhập thành công!");
-      dispatch(closeLoginModal());
-      setFormData({ email: "", password: "" });
-    } catch (err) {
-      console.error("Đăng nhập lỗi:", err);
-      toast.error("Đăng nhập thất bại!");
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   if (!isLoginOpen) return null;

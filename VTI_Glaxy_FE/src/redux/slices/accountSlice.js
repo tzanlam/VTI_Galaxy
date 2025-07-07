@@ -12,7 +12,7 @@ export const fetchAccounts = createAsyncThunk('account/getAccounts', async({reje
 
 export const fetchAccountById = createAsyncThunk('account/getAccountById', async(accountId, {rejectWithValue})=>{
    try {
-      const response = await accountService.fetchAccountById()
+      const response = await accountService.fetchAccountById(accountId)
       return response.data
    } catch (error) {
       rejectWithValue(error)

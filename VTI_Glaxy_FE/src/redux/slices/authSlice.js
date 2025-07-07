@@ -1,6 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { login } from "../../services/AuthService";
 
+const initialState = {
+  isLoggedIn: false,
+  loading: false,
+  accountId: null,
+  error: null,
+  position: null
+};
+
 export const loginS = createAsyncThunk(
   "auth/login",
   async ({ email, password }, { rejectWithValue }) => {
@@ -8,19 +16,10 @@ export const loginS = createAsyncThunk(
       const response = await login(email, password);
       return response.data;
     } catch (error) {
-      console.error("Login error:", error);
       return rejectWithValue(error?.response?.data?.message || "Lỗi hệ thống");
     }
   }
 );
-
-const initialState = {
-  isLoggedIn: false,
-  user: null,
-  loading: false,
-  error: null,
-  position: []
-};
 
 const authSlice = createSlice({
   name: "auth",
@@ -28,13 +27,12 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.isLoggedIn = false;
-      state.user = null;
-      state.position = [];
+      state.token = null;
+      state.position = null;
+      state.accountId = null;
       localStorage.removeItem("token");
+      localStorage.removeItem("accountId");
     },
-    clearAuthSlice: (state) => {
-      Object.assign(state, initialState);
-    }
   },
   extraReducers: (builder) => {
     builder
@@ -43,30 +41,20 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(loginS.fulfilled, (state, action) => {
-        const data = action.payload;
-
-        // Kiểm tra data tồn tại trước khi gán
-        if (data && typeof data === "object") {
-          state.isLoggedIn = true;
-          state.user = data;
-          state.position = Array.isArray(data.authorities) ? data.authorities : [];
-          state.loading = false;
-          localStorage.setItem("token", data.token);
-        } else {
-          // fallback trong trường hợp payload không hợp lệ
-          state.isLoggedIn = false;
-          state.user = null;
-          state.position = [];
-          state.loading = false;
-          state.error = "Dữ liệu đăng nhập không hợp lệ";
-        }
+        state.accountId = action.payload.accountId
+        state.isLoggedIn = true;
+        localStorage.setItem("token", action.payload.token);
+        localStorage.setItem("accountId", action.payload.accountId);
+        localStorage.setItem("position", action.payload.authorities?.[0]?.authority)
+        state.position = action.payload.authorities?.[0]?.authority;
+        state.loading = false;
       })
       .addCase(loginS.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
-}
+  },
 });
 
-export const { logout, clearAuthSlice } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;

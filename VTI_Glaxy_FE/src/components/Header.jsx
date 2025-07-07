@@ -1,12 +1,15 @@
 import { useDispatch, useSelector } from "react-redux";
 import { openLoginModal, openRegisterModal } from "../redux/slices/modalSlice";
 import UserMenu from "./UserMenu";
+import LoginModal from "./LoginModal";
+import RegisterModal from "./RegisterModal";
 import logo3 from "../assets/logo3.png";
 import menuItems from "../data/menuItems";
 
 const Header = () => {
   const dispatch = useDispatch();
   const { isLoggedIn } = useSelector((state) => state.auth);
+  const { account } = useSelector((state) => state.account); // 👈 lấy account đã fetch
 
   return (
     <header className="bg-white shadow-md">
@@ -29,7 +32,7 @@ const Header = () => {
 
         <div className="flex items-center space-x-4">
           {isLoggedIn ? (
-            <UserMenu />
+            <UserMenu account={account} /> // 👈 truyền props
           ) : (
             <>
               <button
@@ -48,6 +51,9 @@ const Header = () => {
           )}
         </div>
       </div>
+
+      <LoginModal />
+      <RegisterModal />
     </header>
   );
 };
