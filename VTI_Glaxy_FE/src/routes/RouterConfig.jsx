@@ -21,6 +21,7 @@ import OtherDetails from "../components/admin/details/OtherDetails";
 import EmployeeManagement from "../components/admin/EmployeeManagement";
 import EmployeeDetails from "../components/admin/details/EmployeeDetails";
 import { PrivateRouter } from "./PrivateRouter";
+import ProfilePage from "../components/admin/details/ProfileManagement";
 
 const router = createBrowserRouter([
   {
@@ -82,6 +83,7 @@ const router = createBrowserRouter([
           { path: "other/:otherId", element: <OtherDetails /> },
           { path: "employee", element: <EmployeeManagement /> },
           { path: "employee/:employeeId", element: <EmployeeDetails /> },
+          { path: "profile", element: <ProfilePage />}
         ],
       },
     ],

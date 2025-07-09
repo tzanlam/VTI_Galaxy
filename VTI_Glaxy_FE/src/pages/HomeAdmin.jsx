@@ -1,19 +1,15 @@
-import { Layout, Menu, Input, Avatar, Dropdown } from "antd";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Link, Outlet } from "react-router-dom";
+import { Layout, Menu, Input, Avatar } from "antd";
 import { SearchOutlined, UserOutlined } from "@ant-design/icons";
-import { useDispatch } from "react-redux";
-import {
-  clearAccountSlice,
-} from "../redux/slices/accountSlice";
 
 const { Header, Sider, Content } = Layout;
 
 const HomeAdmin = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  // const accountId = localStorage.getItem("accountId");
-  // const account = useSelector((state) => state.account);
+  const account = useSelector((state) => state.account.account);
+
   const menuItems = [
+    { key: "9", label: <Link to="/management/profile">Thông tin cá nhân</Link> },
     { key: "1", label: <Link to="/management/galaxy">Galaxy</Link> },
     { key: "2", label: <Link to="/management/room">Phòng chiếu</Link> },
     { key: "3", label: <Link to="/management/movie">Phim</Link> },
@@ -23,30 +19,6 @@ const HomeAdmin = () => {
     { key: "7", label: <Link to="/management/invoice">Hóa đơn điện tử</Link> },
     { key: "8", label: <Link to="/management/report">Báo cáo</Link> },
   ];
-
-  const handleLogout = () => {
-    dispatch(clearAccountSlice());
-    navigate("/");
-  };
-
-  // useEffect(
-    // () => (dispatch(fetchAccountById(accountId)), [dispatch, accountId])
-  // );
-
-  const userMenu = (
-    <Menu
-      items={[
-        {
-          key: "profile",
-          label: <Link to="/management/profile">Hồ sơ cá nhân</Link>,
-        },
-        {
-          key: "logout",
-          label: <span onClick={handleLogout}>Đăng xuất</span>,
-        },
-      ]}
-    />
-  );
 
   return (
     <Layout className="min-h-screen">
@@ -64,9 +36,6 @@ const HomeAdmin = () => {
           defaultSelectedKeys={["1"]}
           className="mt-2 bg-transparent text-amber-900 font-medium"
           items={menuItems}
-          style={{
-            backgroundColor: "transparent",
-          }}
         />
       </Sider>
 
@@ -83,16 +52,13 @@ const HomeAdmin = () => {
             />
           </div>
 
-          {/* User info dropdown */}
-          <Dropdown menu={{items: userMenu}} placement="bottomRight" arrow>
-            <div className="flex items-center space-x-3 cursor-pointer">
-              <Avatar icon={<UserOutlined />} className="bg-amber-400" />
-              <span className="font-semibold text-amber-700">
-                {/* ${account.fullName} */}
-                thông tin tài khoản
-              </span>
-            </div>
-          </Dropdown>
+          {/* Fullname (hiển thị) */}
+          <div className="flex items-center space-x-2">
+            <Avatar icon={<UserOutlined />} className="bg-amber-400" />
+            <span className="font-semibold text-amber-700">
+              {account?.fullName || account?.email || "Admin"}
+            </span>
+          </div>
         </Header>
 
         {/* Content */}

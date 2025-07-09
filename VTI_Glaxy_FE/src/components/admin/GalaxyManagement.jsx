@@ -7,8 +7,6 @@ import {
   createNewGalaxy,
   updateGalaxy,
   deleteGalaxy,
-  fetchGalaxyById,
-  clearGalaxySlice,
 } from '../../redux/slices/galaxySlice';
 import { useNavigate } from 'react-router-dom';
 import CreateGalaxyModal from './model/GalaxyAdminModal';
@@ -16,55 +14,52 @@ import CreateGalaxyModal from './model/GalaxyAdminModal';
 const GalaxyManagement = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { galaxies = [], loading, loadingCreate } = useSelector((state) => state.galaxy || {});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
-  const [currentId, setCurrentId] = useState(null);
+  const [editingGalaxy, setEditingGalaxy] = useState(null); // ✅ Dùng local state thay Redux
 
   useEffect(() => {
     dispatch(fetchGalaxies());
   }, [dispatch]);
 
   const getStatusTag = (status) => {
-    if (status === 'ACTIVE') {
-      return <Tag color="green">Active</Tag>;
-    } else {
-      return <Tag color="red">Inactive</Tag>;
-    }
+    if (status === 'ACTIVE') return <Tag color="green">Active</Tag>;
+    return <Tag color="red">Inactive</Tag>;
   };
-  
+
   const handleCreate = () => {
     setIsEdit(false);
-    setCurrentId(null);
+    setEditingGalaxy(null); // 👈 reset
     setIsModalVisible(true);
   };
-  
-  const handleEdit = async (id) => {
+
+  const handleEdit = (galaxy) => {
     setIsEdit(true);
-    setCurrentId(id);
-    await dispatch(fetchGalaxyById(id));
+    setEditingGalaxy(galaxy); // 👈 truyền toàn bộ object vào modal
     setIsModalVisible(true);
   };
-  
+
   const handleDelete = async (id) => {
     await dispatch(deleteGalaxy(id));
     message.success('Xóa thành công!');
     dispatch(fetchGalaxies());
   };
-  
+
   const handleSubmit = async (values) => {
-    if (isEdit && currentId) {
-      await dispatch(updateGalaxy({ galaxyId: currentId, galaxyRequest: values }));
+    if (isEdit && editingGalaxy?.id) {
+      await dispatch(updateGalaxy({ galaxyId: editingGalaxy.id, galaxyRequest: values }));
       message.success('Cập nhật thành công!');
     } else {
       await dispatch(createNewGalaxy(values));
       message.success('Tạo thành công!');
     }
-    dispatch(clearGalaxySlice());
     setIsModalVisible(false);
+    setEditingGalaxy(null);
     dispatch(fetchGalaxies());
   };
-  
+
   if (loading) return <Spin />;
 
   return (
@@ -75,7 +70,7 @@ const GalaxyManagement = () => {
           icon={<FiPlusCircle />}
           type="primary"
           onClick={handleCreate}
-          className="bg-amber-600 hover:bg-amber-700 rounded-full font-bold text-white flex items-center justify-center space-x-2"
+          className="bg-amber-600 hover:bg-amber-700 rounded-full font-bold text-white"
         >
           Tạo Galaxy mới
         </Button>
@@ -106,7 +101,7 @@ const GalaxyManagement = () => {
               }
             />
             <div className="flex justify-end space-x-2 mt-3" onClick={(e) => e.stopPropagation()}>
-              <Button icon={<FiEdit />} onClick={() => handleEdit(galaxy.id)} type="link" />
+              <Button icon={<FiEdit />} onClick={() => handleEdit(galaxy)} type="link" />
               <Popconfirm
                 title="Bạn có chắc chắn muốn xóa?"
                 onConfirm={() => handleDelete(galaxy.id)}
@@ -123,7 +118,11 @@ const GalaxyManagement = () => {
       <CreateGalaxyModal
         visible={isModalVisible}
         isEdit={isEdit}
-        onCancel={() => setIsModalVisible(false)}
+        data={editingGalaxy} // ✅ truyền trực tiếp object
+        onCancel={() => {
+          setIsModalVisible(false);
+          setEditingGalaxy(null);
+        }}
         onSubmit={handleSubmit}
         loading={loadingCreate}
       />
