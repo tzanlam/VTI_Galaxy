@@ -32,10 +32,10 @@ public class ShowTimeController {
         }
     }
 
-    @GetMapping("/getShowTimeByMovieDateAndGalaxy")
-    public ResponseEntity<?> getByMovieDateAndGalaxy(@RequestParam("movieId") int movie,@RequestParam("date") String date, @RequestParam("galaxyId") int galaxyId) {
+    @GetMapping("/getShowTimeByMovieDateAndRoom ")
+    public ResponseEntity<?> getByMovieDateAndGalaxy(@RequestParam("movieId") int movie,@RequestParam("date") String date, @RequestParam("roomId") int roomId) {
         try{
-            return ResponseEntity.ok(showTimeService.findByDateAndMovie(galaxyId, movie, date));
+            return ResponseEntity.ok(showTimeService.findByDateAndMovie(roomId, movie, date));
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -44,7 +44,17 @@ public class ShowTimeController {
     @GetMapping("/getShowTimeByRoom")
     public ResponseEntity<?> getByRoom(@RequestParam("roomId") int roomId) {
         try{
-            return ResponseEntity.ok(showTimeService.findShowTimeByRoom(roomId));
+            return ResponseEntity.ok(showTimeService.
+                    findShowTimeByRoom(roomId));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getShowTimeByRoomAndDate")
+    public ResponseEntity<?> getByRoomAndDate(@RequestParam("roomId") int roomId, @RequestParam("date") String date) {
+        try{
+            return ResponseEntity.ok(showTimeService.findByDateAndRoom(roomId, date));
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -70,11 +80,7 @@ public class ShowTimeController {
     @PostMapping("/postShowTime")
     public ResponseEntity<?> createShowTime(@RequestBody ShowTimeRequest request) {
         try {
-            return ResponseEntity.ok(showTimeService.create(
-                    Integer.parseInt(request.getGalaxyId()),
-                    Integer.parseInt(request.getMovieId()),
-                    request.getDate(), request.getStartTimes()
-            ));
+            return ResponseEntity.ok(showTimeService.create(request));
         } catch (NumberFormatException e) {
             return ResponseEntity.badRequest().body("galaxyId, movieId hoặc startTimes không hợp lệ");
         } catch (Exception e) {
@@ -90,8 +96,9 @@ public class ShowTimeController {
         try {
             return ResponseEntity.ok(showTimeService.updateShowTime(
                     showTimeId,
-                    Integer.parseInt(request.getGalaxyId()),
-                    Integer.parseInt(request.getMovieId()),
+                    request.getGalaxyId(),
+                    request.getRoomId(),
+                    request.getMovieId(),
                     request.getDate(), request.getStartTimes()
             ));
         } catch (NumberFormatException e) {

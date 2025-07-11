@@ -3,9 +3,12 @@ package demo.services.impl;
 import demo.modal.dto.ShowTimeDto;
 import demo.modal.entity.Galaxy;
 import demo.modal.entity.Movie;
+import demo.modal.entity.Room;
 import demo.modal.entity.ShowTime;
+import demo.modal.request.ShowTimeRequest;
 import demo.repository.GalaxyRepository;
 import demo.repository.MovieRepository;
+import demo.repository.RoomRepository;
 import demo.repository.ShowTimeRepository;
 import demo.services.interfaceClass.ShowTimeService;
 import org.springframework.stereotype.Service;
@@ -23,12 +26,14 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     private final ShowTimeRepository showTimeRepository;
     private final GalaxyRepository galaxyRepository;
     private final MovieRepository movieRepository;
+    private final RoomRepository roomRepository;
 
     public ShowTimeServiceImpl(ShowTimeRepository showTimeRepository, GalaxyRepository galaxyRepository,
-                               MovieRepository movieRepository) {
+                               MovieRepository movieRepository, RoomRepository roomRepository) {
         this.showTimeRepository = showTimeRepository;
         this.galaxyRepository = galaxyRepository;
         this.movieRepository = movieRepository;
+        this.roomRepository = roomRepository;
     }
 
     @Override
@@ -44,10 +49,18 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public ShowTimeDto findByDateAndMovie(int galaxyId, int movieId, String date) {
-        ShowTime showTime = showTimeRepository.findByDateAndMovie(galaxyId, movieId, convertToLocalDate(date))
+    public ShowTimeDto findByDateAndMovie(int roomId, int movieId, String date) {
+        ShowTime showTime = showTimeRepository.findByDateAndMovieAndRoom(roomId, movieId, convertToLocalDate(date))
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch chiếu"));
         return new ShowTimeDto(showTime);
+    }
+
+    @Override
+    public List<ShowTimeDto> findByDateAndRoom(int roomId, String date) {
+        List<ShowTime> showTimes = showTimeRepository.findByRoomAndDate(roomId, convertToLocalDate(date)).orElseGet(
+                ArrayList::new
+        );
+        return showTimes.stream().map(ShowTimeDto::new).collect(Collectors.toList());
     }
 
     @Override
@@ -66,17 +79,17 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public ShowTimeDto create(int galaxyId, int movieId, String date, List<String> startTimeIds) {
-        ShowTime showTime = populate(galaxyId, movieId, date, startTimeIds);
+    public ShowTimeDto create(ShowTimeRequest request) {
+        ShowTime showTime = populate(request.getGalaxyId(), request.getRoomId(), request.getMovieId(), request.getDate(), request.getStartTimes());
         showTimeRepository.save(showTime);
         return new ShowTimeDto(showTime);
     }
 
     @Override
-    public ShowTimeDto updateShowTime(int id, int galaxyId, int movieId, String date, List<String> startTimes) {
+    public ShowTimeDto updateShowTime(int id, int galaxyId, int roomId, int movieId, String date, List<String> startTimes) {
         ShowTime showTime = showTimeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch chiếu với id " + id));
-        ShowTime updated = populate(galaxyId, movieId, date, startTimes);
+        ShowTime updated = populate(galaxyId,roomId, movieId, date, startTimes);
         showTime.setGalaxy(updated.getGalaxy());
         showTime.setMovie(updated.getMovie());
         showTime.setDate(convertToLocalDate(date));
@@ -92,20 +105,23 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         showTimeRepository.delete(showTime);
     }
 
-    private ShowTime populate(int galaxyId, int movieId, String date, List<String> startTimes) {
+    private ShowTime populate(int galaxyId, int roomId,  int movieId, String date, List<String> startTimes) {
         ShowTime showTime = new ShowTime();
         Galaxy galaxy = galaxyRepository.findById(galaxyId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy rạp với id " + galaxyId));
         Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy phim với id " + movieId));
+        Room room = roomRepository.findById(roomId).orElseThrow(
+                () -> new RuntimeException("room not found with id " + roomId)
+        );
         if (showTime.getStartTimes() == null) startTimes = new ArrayList<>();
         for (String st : startTimes){
             showTime.getStartTimes().add(convertToLocalTime(st));
         }
+        showTime.setRoom(room);
         showTime.setGalaxy(galaxy);
         showTime.setMovie(movie);
         showTime.setDate(convertToLocalDate(date));
-        ShowTime savedShowTime = showTimeRepository.save(showTime);
-        return showTimeRepository.save(savedShowTime);
+        return showTime;
     }
 }
