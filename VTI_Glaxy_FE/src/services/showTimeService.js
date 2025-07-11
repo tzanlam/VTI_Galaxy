@@ -7,13 +7,13 @@ const showTimeService = {
   fetchShowTimeById(showTimeId) {
     return axiosClient.get(`/getShowTime/${showTimeId}`);
   },
-  fetchShowTimeByMovieDateAndGalaxy(galaxyId, movieId, date) {
-    return axiosClient.get("/getShowTimeByMovieDateAndGalaxy", {
-      params: { galaxyId, movieId, date },
-    });
+  fetchShowTimeByMovieDateAndRoom(roomId, movieId, date) {
+    return axiosClient.get(`/getShowTimeByMovieDateAndRoom?movieId=${movieId}&date=${date}&roomId=${roomId}`);
   },
   fetchShowTimeByRoom(roomId){
     return axiosClient.get(`getShowTimeByRoom?roomId=${roomId}`)
+  },fetchShowTimeByRoomAndDate(roomId, date){
+    return axiosClient.get(`getShowTimeByRoomAndDate?roomId=${roomId}&date=${date}`)
   },
   createShowTime(showTimeRequest) {
     return axiosClient.post("/postShowTime", showTimeRequest);

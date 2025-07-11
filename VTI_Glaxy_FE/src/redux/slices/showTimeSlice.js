@@ -39,26 +39,34 @@ export const fetchShowTimeById = createAsyncThunk(
   }
 );
 
-export const fetchShowTimeByMovieDateAndGalaxy = createAsyncThunk(
-  "showtime/fetchShowTimeByMovieDateAndGalaxy",
-  async ({ galaxyId, movieId, date }, { rejectWithValue }) => {
+export const fetchShowTimeByRoomAndDate = createAsyncThunk(
+  "showtime/fetchByRoomAndDate",
+  async ({ roomId, date }, { rejectWithValue }) => {
     try {
-      console.log("fetchShowTimeByMovieDateAndGalaxy params:", {
-        galaxyId,
+      const res = await showTimeService.fetchShowTimeByRoomAndDate(roomId, date);
+      const data = res?.data;
+      const realData = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : [data]);
+      return realData;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Lỗi lấy lịch chiếu theo ngày và phòng");
+    }
+  }
+);
+
+export const fetchShowTimeByMovieDateAndRoom = createAsyncThunk(
+  "showtime/fetchShowTimeByMovieDateAndRoom",
+  async ({ roomId, movieId, date }, { rejectWithValue }) => {
+    try {
+      const response = await showTimeService.fetchShowTimeByMovieDateAndRoom(
         movieId,
         date,
-      });
-      const response = await showTimeService.fetchShowTimeByMovieDateAndGalaxy(
-        galaxyId,
-        movieId,
-        date
+        roomId
       );
       console.log("fetchShowTimeByMovieDateAndGalaxy response:", response.data);
-      // Chuẩn hóa dữ liệu: bọc object trong mảng
       return Array.isArray(response.data) ? response.data : [response.data];
     } catch (err) {
       console.error(
-        "fetchShowTimeByMovieDateAndGalaxy error:",
+        "fetchShowTimeByMovieDateAndRoom error:",
         err.response?.data
       );
       return rejectWithValue(
@@ -86,7 +94,6 @@ export const postShowTime = createAsyncThunk(
             .filter((id) => id !== null)
             .join(",")
         : showTimeRequest.startTimes;
-      console.log("Mapped startTimeIds:", startTimeIds);
       const response = await showTimeService.createShowTime({
         ...showTimeRequest,
         startTimes: startTimeIds,
@@ -173,6 +180,18 @@ const showTimeSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+    .addCase(fetchShowTimeByRoomAndDate.pending, (state)=>{
+      state.loading = true
+      state.error = null
+    })
+    .addCase(fetchShowTimeByRoomAndDate.fulfilled, (state, action)=>{
+      state.showTimes = action.payload
+      state.loading = false
+    })
+    .addCase(fetchShowTimeByRoomAndDate.rejected, (state, action)=>{
+      state.loading =false
+      state.error = action.payload
+    })
       // fetch ShowTime By Room
       .addCase(fetchShowTimeByRoom.pending, (state)=>{
         state.loading = true,
@@ -190,39 +209,32 @@ const showTimeSlice = createSlice({
       .addCase(fetchShowTimes.pending, (state) => {
         state.loading = true;
         state.error = null;
-        console.log("fetchShowTimes pending");
       })
       .addCase(fetchShowTimes.fulfilled, (state, action) => {
         state.showTimes = action.payload;
         state.loading = false;
-        console.log("fetchShowTimes fulfilled, showTimes:", action.payload);
       })
       .addCase(fetchShowTimes.rejected, (state, action) => {
         state.error = action.payload;
         state.loading = false;
-        console.log("fetchShowTimes rejected, error:", action.payload);
       })
       .addCase(fetchShowTimeById.pending, (state) => {
         state.loading = true;
         state.error = null;
-        console.log("fetchShowTimeById pending");
       })
       .addCase(fetchShowTimeById.fulfilled, (state, action) => {
         state.showTime = action.payload;
         state.loading = false;
-        console.log("fetchShowTimeById fulfilled, showTime:", action.payload);
       })
       .addCase(fetchShowTimeById.rejected, (state, action) => {
         state.error = action.payload;
         state.loading = false;
-        console.log("fetchShowTimeById rejected, error:", action.payload);
       })
-      .addCase(fetchShowTimeByMovieDateAndGalaxy.pending, (state) => {
+      .addCase(fetchShowTimeByMovieDateAndRoom.pending, (state) => {
         state.loading = true;
         state.error = null;
-        console.log("fetchShowTimeByMovieDateAndGalaxy pending");
       })
-      .addCase(fetchShowTimeByMovieDateAndGalaxy.fulfilled, (state, action) => {
+      .addCase(fetchShowTimeByMovieDateAndRoom.fulfilled, (state, action) => {
         state.showTimes = Array.isArray(action.payload)
           ? action.payload
           : [action.payload];
@@ -232,7 +244,7 @@ const showTimeSlice = createSlice({
           action.payload
         );
       })
-      .addCase(fetchShowTimeByMovieDateAndGalaxy.rejected, (state, action) => {
+      .addCase(fetchShowTimeByMovieDateAndRoom.rejected, (state, action) => {
         state.error = action.payload;
         state.loading = false;
         console.log(

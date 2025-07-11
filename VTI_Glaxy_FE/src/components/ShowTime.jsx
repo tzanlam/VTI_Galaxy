@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchShowTimeByMovieDateAndGalaxy } from "../redux/slices/showTimeSlice";
 import { fetchStartTimes } from "../redux/slices/startTimeSlice";
 import { fetchGalaxies } from "../redux/slices/galaxySlice";
 import { useNavigate } from "react-router-dom";
+import { fetchShowTimeByMovieDateAndRoom } from './../redux/slices/showTimeSlice';
 
 const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
   const dispatch = useDispatch();
@@ -128,7 +128,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
         date: selectedDay.dateForApi,
       });
       dispatch(
-        fetchShowTimeByMovieDateAndGalaxy({
+        fetchShowTimeByMovieDateAndRoom({
           galaxyId: String(selectedGalaxyId),
           movieId: String(movieId),
           date: selectedDay.dateForApi,
