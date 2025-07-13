@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Avatar, Button, Input, Select, DatePicker } from "antd";
-import { updateAccount, fetchAccountById } from "../redux/slices/accountSlice";
 import { toast } from "react-toastify";
 import moment from "moment";
+import { fetchAccountById, updateAccount } from "../redux/slices/accountSlice";
 
 const { Option } = Select;
 const { Password } = Input;
