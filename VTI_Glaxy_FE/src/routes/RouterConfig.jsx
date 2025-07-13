@@ -22,6 +22,7 @@ import EmployeeManagement from "../components/admin/EmployeeManagement";
 import EmployeeDetails from "../components/admin/details/EmployeeDetails";
 import { PrivateRouter } from "./PrivateRouter";
 import ProfilePage from "../components/admin/details/ProfileManagement";
+import UserProfile from "../components/UserProfile";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: "/movie/:id",
         element: <MovieDetails />,
+      },
+      {
+        path: "/profile",
+        element: <UserProfile />,
       },
       {
         path: "/error",
@@ -83,7 +88,7 @@ const router = createBrowserRouter([
           { path: "other/:otherId", element: <OtherDetails /> },
           { path: "employee", element: <EmployeeManagement /> },
           { path: "employee/:employeeId", element: <EmployeeDetails /> },
-          { path: "profile", element: <ProfilePage />}
+          { path: "profile", element: <ProfilePage /> },
         ],
       },
     ],
