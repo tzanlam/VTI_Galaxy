@@ -18,6 +18,11 @@ const UserMenu = ({ account }) => {
       label: "Đăng xuất",
       onClick: handleLogout,
     },
+    {
+      key: "profile",
+      label: "Thông tin cá nhân",
+      onClick: () => navigate("/profile"),
+    },
   ];
 
   return (
