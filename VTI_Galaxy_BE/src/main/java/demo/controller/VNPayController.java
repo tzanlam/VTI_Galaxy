@@ -36,7 +36,7 @@ public class VNPayController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<?> createVnPay(@RequestBody VnPayRequest request, HttpServletRequest http){
         String paymentUrl = vnpayService.createOrder(Math.toIntExact(request.getTotal()), request.getOrderId(), request.getReturnUrl(), http);
         Map<String, String> response = new HashMap<>();

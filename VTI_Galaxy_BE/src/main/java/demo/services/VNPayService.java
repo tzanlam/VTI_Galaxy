@@ -136,14 +136,11 @@ public class VNPayService {
             while (itr.hasNext()) {
                 String fieldName = itr.next();
                 String fieldValue = params.get(fieldName);
+                String encodedFieldName = URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString());
+                String encodedFieldValue = URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString());
 
-                // hashData không encode giá trị
-                hashData.append(fieldName).append('=').append(fieldValue);
-
-                // query encode cho URL
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII.toString()))
-                        .append('=')
-                        .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII.toString()));
+                hashData.append(encodedFieldName).append('=').append(encodedFieldValue);
+                query.append(encodedFieldName).append('=').append(encodedFieldValue);
 
                 if (itr.hasNext()) {
                     hashData.append('&');

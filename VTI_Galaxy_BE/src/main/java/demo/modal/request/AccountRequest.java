@@ -48,7 +48,7 @@ public class AccountRequest {
         return userAccount;
     }
 
-    public void updateAccount(Account account) throws Exception {
+    public void updateAccount(Account account) {
         account.setFullName(fullName);
         account.setPhoneNumber(phoneNumber);
         account.setDateOfBirth(convertToLocalDate(dateOfBirth));
