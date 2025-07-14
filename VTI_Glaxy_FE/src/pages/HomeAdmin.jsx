@@ -9,15 +9,15 @@ const HomeAdmin = () => {
   const account = useSelector((state) => state.account.account);
 
   const menuItems = [
-    { key: "9", label: <Link to="/management/profile">Thông tin cá nhân</Link> },
-    { key: "1", label: <Link to="/management/galaxy">Galaxy</Link> },
-    { key: "2", label: <Link to="/management/room">Phòng chiếu</Link> },
-    { key: "3", label: <Link to="/management/movie">Phim</Link> },
-    { key: "4", label: <Link to="/management/voucher">Voucher</Link> },
-    { key: "5", label: <Link to="/management/employee">Nhân viên</Link> },
-    { key: "6", label: <Link to="/management/other">Dịch vụ khác</Link> },
-    { key: "7", label: <Link to="/management/invoice">Hóa đơn điện tử</Link> },
-    { key: "8", label: <Link to="/management/report">Báo cáo</Link> },
+    { key: "1", label: <Link to="/management/profile">Thông tin cá nhân</Link> },
+    { key: "2", label: <Link to="/management/galaxy">Galaxy</Link> },
+    { key: "3", label: <Link to="/management/room">Phòng chiếu</Link> },
+    { key: "4", label: <Link to="/management/movie">Phim</Link> },
+    { key: "5", label: <Link to="/management/voucher">Voucher</Link> },
+    { key: "6", label: <Link to="/management/employee">Nhân viên</Link> },
+    { key: "7", label: <Link to="/management/other">Dịch vụ khác</Link> },
+    { key: "8", label: <Link to="/management/invoice">Hóa đơn điện tử</Link> },
+    { key: "9", label: <Link to="/management/report">Báo cáo</Link> },
   ];
 
   return (

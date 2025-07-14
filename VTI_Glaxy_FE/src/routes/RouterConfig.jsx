@@ -76,6 +76,8 @@ const router = createBrowserRouter([
         path: "",
         element: <HomeAdmin />,
         children: [
+          { index: true, element: <Navigate to="profile" replace /> },
+
           { path: "galaxy", element: <GalaxyManagement /> },
           { path: "galaxy/:galaxyId", element: <GalaxyDetails /> },
           { path: "room", element: <RoomManagement /> },
