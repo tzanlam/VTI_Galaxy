@@ -1,15 +1,8 @@
 {
   "projects": {
-    "y": "galaxy-6ab6e"
+    "y": "galaxy-6ab6e",
+    "default": "galaxy-6ab6e"
   },
   "targets": {},
-  "etags": {},
-  "hosting": {
-    "public": "dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
-  }
+  "etags": {}
 }
