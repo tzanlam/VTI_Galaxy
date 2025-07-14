@@ -2,10 +2,19 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAccountById } from "../../../redux/slices/accountSlice";
 import { Avatar, Descriptions, Card, Badge, Spin } from "antd";
-import { UserOutlined, MailOutlined, PhoneOutlined, CalendarOutlined, IdcardOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  CalendarOutlined,
+  IdcardOutlined,
+} from "@ant-design/icons";
+import { logout } from "../../../redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const accountId = localStorage.getItem("accountId");
   const { account, loading } = useSelector((state) => state.account);
 
@@ -14,6 +23,12 @@ const ProfilePage = () => {
       dispatch(fetchAccountById(accountId));
     }
   }, [dispatch, accountId]);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem("accountId");
+    navigate("/");
+  };
 
   if (loading || !account) {
     return (
@@ -26,9 +41,20 @@ const ProfilePage = () => {
   return (
     <div className="flex justify-center mt-10 px-4">
       <Card
-        className="shadow-xl w-full max-w-4xl rounded-lg border border-amber-200"
-        title={<h2 className="text-xl font-bold text-amber-700">Thông tin cá nhân</h2>}
-        bordered={false}
+        className="shadow-xl w-full max-w-4xl rounded-lg"
+        title={
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-amber-700">
+              Thông tin cá nhân
+            </h2>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-md shadow"
+            >
+              Đăng xuất
+            </button>
+          </div>
+        }
       >
         <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-6 sm:space-y-0 sm:space-x-6 mb-8">
           <Avatar
@@ -41,7 +67,9 @@ const ProfilePage = () => {
           </Avatar>
 
           <div className="text-center sm:text-left">
-            <h3 className="text-2xl font-bold text-gray-800">{account.fullName || "Chưa có tên"}</h3>
+            <h3 className="text-2xl font-bold text-gray-800">
+              {account.fullName || "Chưa có tên"}
+            </h3>
             <p className="text-gray-500">
               <MailOutlined className="mr-2" />
               {account.email}
@@ -64,15 +92,36 @@ const ProfilePage = () => {
           column={1}
           labelStyle={{ fontWeight: "bold", color: "#92400e" }}
         >
-          <Descriptions.Item label={<><IdcardOutlined className="mr-2" />Mã tài khoản</>}>
+          <Descriptions.Item
+            label={
+              <>
+                <IdcardOutlined className="mr-2" />
+                Mã tài khoản
+              </>
+            }
+          >
             {account.accountId}
           </Descriptions.Item>
 
-          <Descriptions.Item label={<><PhoneOutlined className="mr-2" />Số điện thoại</>}>
+          <Descriptions.Item
+            label={
+              <>
+                <PhoneOutlined className="mr-2" />
+                Số điện thoại
+              </>
+            }
+          >
             {account.phone || "Chưa cập nhật"}
           </Descriptions.Item>
 
-          <Descriptions.Item label={<><CalendarOutlined className="mr-2" />Ngày sinh</>}>
+          <Descriptions.Item
+            label={
+              <>
+                <CalendarOutlined className="mr-2" />
+                Ngày sinh
+              </>
+            }
+          >
             {account.dob || "Chưa cập nhật"}
           </Descriptions.Item>
 
