@@ -5,6 +5,7 @@ import autoprefixer from 'autoprefixer';
 import history from 'connect-history-api-fallback';
 
 export default defineConfig({
+  base: "./",
   plugins: [react()],
   css: {
     postcss: {
