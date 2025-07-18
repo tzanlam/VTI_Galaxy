@@ -56,6 +56,15 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
+    public List<ShowTimeDto> findByDateAndMovieAndGalaxy(int movieId, String date, int galaxyId) {
+        LocalDate localDate = LocalDate.parse(date);
+        return showTimeRepository.findByMovieIdAndDateAndGalaxyId(movieId, localDate, galaxyId)
+                .stream()
+                .map(ShowTimeDto::new)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<ShowTimeDto> findByDateAndRoom(int roomId, String date) {
         List<ShowTime> showTimes = showTimeRepository.findByRoomAndDate(roomId, convertToLocalDate(date)).orElseGet(
                 ArrayList::new

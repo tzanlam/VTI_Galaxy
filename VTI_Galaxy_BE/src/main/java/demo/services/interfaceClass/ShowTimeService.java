@@ -9,6 +9,9 @@ public interface ShowTimeService {
     List<ShowTimeDto> findAll();
     ShowTimeDto findById(int id);
     ShowTimeDto findByDateAndMovie(int galaxyId, int movieId, String date);
+
+    List<ShowTimeDto> findByDateAndMovieAndGalaxy(int movieId, String date, int galaxyId);
+
     List<ShowTimeDto> findByDateAndRoom(int roomId, String date);
     List<ShowTimeDto> findShowTimeByRoom(int roomId);
     List<ShowTimeDto> findByFilter(Integer galaxyId, Integer movieId, String date);
