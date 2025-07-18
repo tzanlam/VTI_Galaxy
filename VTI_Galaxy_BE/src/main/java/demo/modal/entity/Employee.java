@@ -35,6 +35,10 @@ public class Employee {
     @Column
     private String evaluate;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn
+    private Galaxy galaxy;
+
     @Column
     private int numberOfWorkingHours;
 
@@ -43,10 +47,6 @@ public class Employee {
 
     @Column
     private int salary;
-
-    @ManyToOne
-    @JoinColumn
-    private Galaxy galaxy;
 
     @Column
     @Enumerated(EnumType.STRING)

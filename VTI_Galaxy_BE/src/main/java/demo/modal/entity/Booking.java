@@ -4,10 +4,12 @@ import demo.modal.constant.BookingStatus;
 import demo.modal.constant.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table
 @Data
@@ -35,11 +37,11 @@ public class Booking extends Time{
     private Galaxy galaxy;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false)
+    @JoinColumn( nullable = false)
     private Account account;
 
     @ManyToOne
-    @JoinColumn(name = "show_time_id", nullable = false)
+    @JoinColumn(nullable = false)
     private ShowTime showTime;
 
     @ManyToOne
@@ -55,9 +57,9 @@ public class Booking extends Time{
     private BookingStatus status;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "vnpay_transaction_id")
+    @JoinColumn
     private VnpayTransaction vnpayTransaction;
 
-    @Column(name = "vnp_txn_ref")
+    @Column
     private String vnpTxnRef;
 }

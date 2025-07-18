@@ -17,10 +17,12 @@ public class EmployeeDto {
     private String startDateWorking;
     private int salary;
     private String status;
+    private int galaxyId;
 
     public EmployeeDto(Employee emp) {
         this.id = emp.getId();
         this.fullName = emp.getFullName();
+        this.galaxyId = emp.getGalaxy().getId();
         this.email = emp.getEmail();
         this.phone = emp.getPhoneNumber();
         this.address = emp.getAddress();
