@@ -1,9 +1,14 @@
-// pages/HomePage.jsx (đã sửa)
 import React from "react";
+import Banner from "../components/Banner";
 import HomeContent from "../components/HomeContent";
 
 const HomePage = () => {
-  return <HomeContent />; // Chỉ render HomeContent
+  return (
+    <div>
+      <Banner />
+      <HomeContent />
+    </div>
+  );
 };
 
 export default HomePage;

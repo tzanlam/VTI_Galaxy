@@ -8,12 +8,17 @@ const showTimeService = {
     return axiosClient.get(`/getShowTime/${showTimeId}`);
   },
   fetchShowTimeByMovieDateAndRoom(roomId, movieId, date) {
-    return axiosClient.get(`/getShowTimeByMovieDateAndRoom?movieId=${movieId}&date=${date}&roomId=${roomId}`);
+    return axiosClient.get(
+      `/getShowTimeByMovieDateAndRoom?movieId=${movieId}&date=${date}&roomId=${roomId}`
+    );
   },
-  fetchShowTimeByRoom(roomId){
-    return axiosClient.get(`getShowTimeByRoom?roomId=${roomId}`)
-  },fetchShowTimeByRoomAndDate(roomId, date){
-    return axiosClient.get(`getShowTimeByRoomAndDate?roomId=${roomId}&date=${date}`)
+  fetchShowTimeByRoom(roomId) {
+    return axiosClient.get(`getShowTimeByRoom?roomId=${roomId}`);
+  },
+  fetchShowTimeByMovieDateAndGalaxy(movieId, date, galaxyId) {
+    return axiosClient.get(
+      `/getShowTimeByMovieDateAndGalaxy?movieId=${movieId}&date=${date}&galaxyId=${galaxyId}`
+    );
   },
   createShowTime(showTimeRequest) {
     return axiosClient.post("/postShowTime", showTimeRequest);
