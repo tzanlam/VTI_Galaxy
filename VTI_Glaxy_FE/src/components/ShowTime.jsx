@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchStartTimes } from "../redux/slices/startTimeSlice";
 import { fetchGalaxies } from "../redux/slices/galaxySlice";
 import { useNavigate } from "react-router-dom";
-import { fetchShowTimeByMovieDateAndRoom } from './../redux/slices/showTimeSlice';
+import { fetchShowTimeByMovieDateAndGalaxy } from "./../redux/slices/showTimeSlice";
 
 const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
   const dispatch = useDispatch();
@@ -29,7 +29,6 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
     dispatch(fetchStartTimes());
   }, [dispatch]);
 
-  // Kiểm tra showTimes
   useEffect(() => {
     console.log("Current showTimes:", showTimes);
   }, [showTimes]);
@@ -56,12 +55,12 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
       console.log("Auto-selecting first cinema:", getCinemas[0].name);
       setSelectedCinema(getCinemas[0].name);
       setSelectedGalaxyId(getCinemas[0].id);
-      localStorage.setItem("selectedGalaxyId", getCinemas[0].id); // Store galaxyId
+      localStorage.setItem("selectedGalaxyId", getCinemas[0].id);
     } else {
       console.log("No cinemas available for city:", selectedCity);
       setSelectedCinema("Chọn rạp");
       setSelectedGalaxyId(null);
-      localStorage.removeItem("selectedGalaxyId"); // Clear localStorage when no cinema selected
+      localStorage.removeItem("selectedGalaxyId");
     }
   }, [selectedCity, getCinemas]);
 
@@ -75,7 +74,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
       setIsCityOpen(false);
       setSelectedCinema("Chọn rạp");
       setSelectedGalaxyId(null);
-      localStorage.removeItem("selectedGalaxyId"); // Clear galaxyId when city changes
+      localStorage.removeItem("selectedGalaxyId");
     },
     [onCityChange]
   );
@@ -84,7 +83,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
     console.log("Selected cinema:", cinema);
     setSelectedCinema(cinema.name);
     setSelectedGalaxyId(cinema.id);
-    localStorage.setItem("selectedGalaxyId", cinema.id); // Store selected galaxyId
+    localStorage.setItem("selectedGalaxyId", cinema.id);
     setIsCinemaOpen(false);
   }, []);
 
@@ -128,7 +127,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
         date: selectedDay.dateForApi,
       });
       dispatch(
-        fetchShowTimeByMovieDateAndRoom({
+        fetchShowTimeByMovieDateAndGalaxy({
           galaxyId: String(selectedGalaxyId),
           movieId: String(movieId),
           date: selectedDay.dateForApi,
@@ -201,7 +200,6 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
 
   const selectedShowtimes = useMemo(() => {
     if (!selectedDay) return [];
-    // Kiểm tra showTimes là mảng
     if (!Array.isArray(showTimes)) {
       console.warn("showTimes is not an array:", showTimes);
       return [];
@@ -221,7 +219,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
         galaxyName: showtime.galaxyName,
         date: selectedDay?.date,
         time: time,
-        galaxyId: selectedGalaxyId, // Pass galaxyId to state
+        galaxyId: selectedGalaxyId,
       },
     });
   };
@@ -285,7 +283,10 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
       {loading && <p className="text-gray-500">Đang tải lịch chiếu...</p>}
       {error && (
         <p className="text-red-500">
-          Lỗi: {error.message || error || "Không thể tải lịch chiếu"}
+          Lỗi:{" "}
+          {error.message ||
+            error ||
+            "Không thể tải lịch chiếu. Vui lòng đăng nhập lại hoặc thử lại sau."}
         </p>
       )}
       {startTimeLoading && (
