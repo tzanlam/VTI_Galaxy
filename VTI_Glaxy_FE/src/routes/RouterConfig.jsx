@@ -1,6 +1,6 @@
 import React from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import HomePage from "../pages/HomePage";
+import HomePage from "../pages/Homepage";
 import MovieDetails from "../components/MovieDetails";
 import Layout from "../components/Layout";
 import ErrorPage from "../components/ErrorPage";
