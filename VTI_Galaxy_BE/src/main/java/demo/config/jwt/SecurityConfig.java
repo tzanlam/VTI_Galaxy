@@ -102,7 +102,8 @@ public class SecurityConfig {
                                 "/getBookings",
                                 "/postBooking",
                                 "/getSeatRoomById",
-                                "/putSeatRoomStatus"
+                                "/putSeatRoomStatus",
+                                "/get"
                                 ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);
