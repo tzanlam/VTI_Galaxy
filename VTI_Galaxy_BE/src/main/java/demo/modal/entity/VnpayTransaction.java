@@ -13,6 +13,9 @@ public class VnpayTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "vnp_transaction_id", nullable = false) // Ánh xạ cột vnp_transaction_id
+    private String vnpTransactionId; // Thêm trường này
+
     @Column(name = "txn_ref", nullable = false)
     private String txnRef;
 

@@ -61,6 +61,7 @@ public class SecurityConfig {
                 .sessionManagement(i->i.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
+                                "/vnpay-payment",
                                 "/vnpay-payment/get",
                                 "/vnpay-payment/create",
                                 "getEmployees",
@@ -102,8 +103,7 @@ public class SecurityConfig {
                                 "/getBookings",
                                 "/postBooking",
                                 "/getSeatRoomById",
-                                "/putSeatRoomStatus",
-                                "/get"
+                                "/putSeatRoomStatus"
                                 ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);

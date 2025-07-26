@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -56,15 +58,17 @@ public class VNPayConfig {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder sb = new StringBuilder();
-        Iterator<String> itr = fieldNames.iterator();
-        while (itr.hasNext()) {
-            String fieldName = itr.next();
+        for (String fieldName : fieldNames) {
             String fieldValue = fields.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                sb.append(fieldName).append("=").append(fieldValue);
-                if (itr.hasNext()) {
-                    sb.append("&");
+                try {
+                    // Mã hóa giá trị tham số để đảm bảo khớp với VNPay
+                    String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString());
+                    sb.append(fieldName).append("=").append(encodedValue);
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException("Encoding error", e);
                 }
+                sb.append("&");
             }
         }
         return hmacSHA512(hashSecret, sb.toString());

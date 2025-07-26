@@ -75,9 +75,12 @@ public class VNPayService {
         fields.remove("vnp_SecureHash");
 
         String signValue = VNPayConfig.hashAllFields(fields, vnpayConfig.getVnpHashSecret());
+        log.info("Generated signValue: {}", signValue);
+        log.info("Received vnp_SecureHash: {}", vnp_SecureHash);
 
         Map<String, String> response = new HashMap<>();
         response.put("txnRef", request.getParameter("vnp_TxnRef"));
+
         response.put("amount", request.getParameter("vnp_Amount"));
         String orderInfo = request.getParameter("vnp_OrderInfo");
         response.put("orderInfo", orderInfo);
@@ -101,6 +104,7 @@ public class VNPayService {
     private void saveTransaction(HttpServletRequest request, String status) {
         VnpayTransaction transaction = new VnpayTransaction();
         transaction.setTxnRef(request.getParameter("vnp_TxnRef"));
+        transaction.setVnpTransactionId(request.getParameter("vnp_TxnRef"));
         String amountStr = request.getParameter("vnp_Amount");
         if (amountStr != null && !amountStr.isEmpty()) {
             transaction.setAmount(Long.parseLong(amountStr));
