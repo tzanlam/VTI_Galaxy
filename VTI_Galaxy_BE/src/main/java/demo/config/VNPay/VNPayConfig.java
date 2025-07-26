@@ -65,6 +65,7 @@ public class VNPayConfig {
                     // Mã hóa giá trị tham số để đảm bảo khớp với VNPay
                     String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString());
                     sb.append(fieldName).append("=").append(encodedValue);
+                    // TUI NGHI LA DONG NAY
                 } catch (UnsupportedEncodingException e) {
                     throw new RuntimeException("Encoding error", e);
                 }
