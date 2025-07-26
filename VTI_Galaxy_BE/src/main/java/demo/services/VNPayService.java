@@ -65,12 +65,18 @@ public class VNPayService {
         for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
             String fieldName = params.nextElement();
             String fieldValue = request.getParameter(fieldName);
-            if (fieldValue != null && !fieldValue.isEmpty()) {
-                fields.put(fieldName, fieldValue);
-            }
+            fields.put(fieldName, fieldValue != null ? fieldValue : "");
+            log.info("Parameter {}: {}", fieldName, fieldValue); // Log từng tham số
         }
 
         String vnp_SecureHash = request.getParameter("vnp_SecureHash");
+        if (vnp_SecureHash == null) {
+            log.error("vnp_SecureHash is missing in the request");
+            Map<String, String> response = new HashMap<>();
+            response.put("status", "missing_secure_hash");
+            return response;
+        }
+
         fields.remove("vnp_SecureHashType");
         fields.remove("vnp_SecureHash");
 
@@ -80,7 +86,6 @@ public class VNPayService {
 
         Map<String, String> response = new HashMap<>();
         response.put("txnRef", request.getParameter("vnp_TxnRef"));
-
         response.put("amount", request.getParameter("vnp_Amount"));
         String orderInfo = request.getParameter("vnp_OrderInfo");
         response.put("orderInfo", orderInfo);

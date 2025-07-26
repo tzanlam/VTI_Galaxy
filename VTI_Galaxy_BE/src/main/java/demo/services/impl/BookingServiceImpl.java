@@ -118,7 +118,6 @@ public class BookingServiceImpl implements BookingService {
                             return new RuntimeException("Ghế không tồn tại");
                         }
                 );
-                // Validate seat status
                 if (seatRoom.getStatus() == SeatRoom.BookedStatus.BOOKED) {
                     System.err.println("SeatRoom already booked: " + i);
                     throw new IllegalStateException("Seat " + seatRoom.getName() + " is already booked");
@@ -154,7 +153,6 @@ public class BookingServiceImpl implements BookingService {
                 System.out.println("Generated VNPay vnpTxnRef: " + vnpTxnRef);
             }
 
-            // Save booking after setting all fields but before VNPay to allow rollback
             Booking savedBooking = bookingRepository.save(booking);
             System.out.println("Saved booking with id: " + savedBooking.getId());
 
@@ -162,7 +160,7 @@ public class BookingServiceImpl implements BookingService {
             if ("VNPAY".equalsIgnoreCase(String.valueOf(request.getPaymentMethod()))) {
                 try {
                     String ipAddress = VNPayConfig.getIpAddress(httpServletRequest);
-                    String orderInfo = "Thanh toan don hang " + savedBooking.getId();
+                    String orderInfo = "Thanh toan don hang #" + savedBooking.getId(); // Thêm ký tự #
                     System.out.println("Calling VNPayService.createOrder with totalPrice=" + totalPrice +
                             ", orderInfo=" + orderInfo + ", ipAddress=" + ipAddress +
                             ", vnpTxnRef=" + vnpTxnRef);
@@ -180,7 +178,6 @@ public class BookingServiceImpl implements BookingService {
                     bookingDto.setRedirectUrl(redirectUrl);
                 } catch (Exception e) {
                     System.err.println("Error generating VNPay redirectUrl: " + e.getMessage());
-                    // Rollback booking
                     bookingRepository.delete(savedBooking);
                     System.out.println("Rolled back booking with id: " + savedBooking.getId());
                     throw new RuntimeException("Failed to generate VNPay payment URL: " + e.getMessage(), e);

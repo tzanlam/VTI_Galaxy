@@ -58,21 +58,23 @@ public class VNPayConfig {
         List<String> fieldNames = new ArrayList<>(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder sb = new StringBuilder();
-        for (String fieldName : fieldNames) {
+        for (int i = 0; i < fieldNames.size(); i++) {
+            String fieldName = fieldNames.get(i);
             String fieldValue = fields.get(fieldName);
-            if (fieldValue != null && !fieldValue.isEmpty()) {
-                try {
-                    // Mã hóa giá trị tham số để đảm bảo khớp với VNPay
-                    String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString());
-                    sb.append(fieldName).append("=").append(encodedValue);
-                    // TUI NGHI LA DONG NAY
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException("Encoding error", e);
+            // Bao gồm cả tham số rỗng để khớp với VNPay
+            try {
+                String encodedValue = fieldValue != null ? URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()) : "";
+                sb.append(fieldName).append("=").append(encodedValue);
+                if (i < fieldNames.size() - 1) {
+                    sb.append("&");
                 }
-                sb.append("&");
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException("Encoding error", e);
             }
         }
-        return hmacSHA512(hashSecret, sb.toString());
+        String hashData = sb.toString();
+
+        return hmacSHA512(hashSecret, hashData);
     }
 
     public static String getIpAddress(HttpServletRequest request) {
