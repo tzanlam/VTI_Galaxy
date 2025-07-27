@@ -17,7 +17,7 @@ export const fetchBookingById = createAsyncThunk(
   "booking/fetchBookingById",
   async (bookingId, { rejectWithValue }) => {
     try {
-      const response = await bookingService.fetchById(bookingId);
+      const response = await bookingService.fetchBookingById(bookingId);
       return response.data;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -105,7 +105,6 @@ const bookingSlice = createSlice({
       .addCase(fetchBookingById.fulfilled, (state, action) => {
         state.booking = action.payload;
         state.loading = false;
-        console.log("fetchBookingById fulfilled, booking:", action.payload);
         console.log("fetchBookingById fulfilled, booking:", action.payload);
       })
       .addCase(fetchBookingById.rejected, (state, action) => {
