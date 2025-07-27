@@ -5,6 +5,18 @@ import { toast } from "react-toastify";
 import axiosClient from "../services/axiosClient";
 import { fetchVoucher, resetVoucher } from "../redux/slices/voucherSlice";
 
+// Thêm: Retry logic để xử lý lỗi mạng
+const retry = async (fn, retries = 3, delay = 1000) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+};
+
 const Payment = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -23,41 +35,66 @@ const Payment = () => {
   const totalPrice = (totalSeatPrice || 0) + (totalComboPrice || 0);
 
   const [voucherCode, setVoucherCode] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("VNPAY");
+  const [paymentMethod, setPaymentMethod] = useState("");
   const [finalPrice, setFinalPrice] = useState(totalPrice);
+  // Thêm: Trạng thái để hiển thị loading khi xử lý VNPay return
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const { voucher, loading, error } = useSelector((state) => state.voucher);
   const { isLoggedIn } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // Handle VNPay return
+    // Sửa: Xử lý VNPay return để hiển thị toast thay vì JSON
     const vnpResponseCode = searchParams.get("vnp_TransactionStatus");
     if (vnpResponseCode) {
+      setIsProcessing(true); // Thêm: Bật loading
       (async () => {
         try {
           console.log(
             "Processing VNPay return, transaction status:",
             vnpResponseCode
           );
-          const response = await axiosClient.get(
-            "/vnpay-payment?" + searchParams.toString()
+          const response = await retry(() =>
+            axiosClient.get("/vnpay-payment?" + searchParams.toString())
           );
           console.log("VNPay response:", response.data);
           if (response.data.status === "success") {
-            for (const seatRoom of selectedSeats) {
-              await axiosClient.put(
-                `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
-              );
+            // Sửa: Chỉ cập nhật ghế nếu BE chưa làm
+            if (!response.data.seatStatusUpdated) {
+              for (const seatRoom of selectedSeats) {
+                await retry(() =>
+                  axiosClient.put(
+                    `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
+                  )
+                );
+              }
             }
+            // Sửa: Hiển thị toast thành công và chuyển hướng
             toast.success("Thanh toán VNPay thành công!");
             navigate("/");
           } else {
+            // Sửa: Hiển thị lỗi chi tiết từ BE qua toast
+            const errorMessage =
+              response.data.error ||
+              response.data.message ||
+              "Thanh toán VNPay thất bại";
+            let rollbackErrors = [];
             for (const seatRoom of selectedSeats) {
-              await axiosClient.put(
-                `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
-              );
+              try {
+                await retry(() =>
+                  axiosClient.put(
+                    `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
+                  )
+                );
+              } catch (rollbackErr) {
+                rollbackErrors.push(seatRoom.name || "N/A");
+                console.error("Rollback error:", rollbackErr);
+              }
             }
-            toast.error(response.data.message || "Thanh toán VNPay thất bại");
+            if (rollbackErrors.length) {
+              toast.error(`Lỗi khi đặt lại ghế: ${rollbackErrors.join(", ")}`);
+            }
+            toast.error(errorMessage);
             navigate("/seat-selection");
           }
         } catch (err) {
@@ -66,25 +103,37 @@ const Payment = () => {
             response: err.response?.data,
             status: err.response?.status,
           });
+          let rollbackErrors = [];
           for (const seatRoom of selectedSeats) {
-            await axiosClient
-              .put(
-                `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
-              )
-              .catch((rollbackErr) => {
-                console.error("Rollback error:", rollbackErr);
-                toast.error(
-                  `Lỗi khi đặt lại trạng thái ghế ${seatRoom.name || "N/A"}`
-                );
-              });
+            try {
+              await retry(() =>
+                axiosClient.put(
+                  `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
+                )
+              );
+            } catch (rollbackErr) {
+              rollbackErrors.push(seatRoom.name || "N/A");
+              console.error("Rollback error:", rollbackErr);
+            }
           }
-          toast.error("Lỗi khi xử lý phản hồi từ VNPay");
+          if (rollbackErrors.length) {
+            toast.error(`Lỗi khi đặt lại ghế: ${rollbackErrors.join(", ")}`);
+          }
+          // Sửa: Hiển thị lỗi qua toast thay vì JSON
+          toast.error(
+            err.response?.data?.error ||
+              err.response?.data?.message ||
+              "Lỗi khi xử lý phản hồi từ VNPay"
+          );
           navigate("/seat-selection");
+        } finally {
+          setIsProcessing(false); // Thêm: Tắt loading
         }
       })();
       return;
     }
 
+    // Kiểm tra token và isLoggedIn
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!isLoggedIn || !token) {
@@ -93,6 +142,7 @@ const Payment = () => {
       return;
     }
 
+    // Validate dữ liệu đầu vào
     if (
       !safeMovieInfo.galaxyId ||
       !selectedSeats ||
@@ -118,8 +168,19 @@ const Payment = () => {
             navigate("/seat-selection");
             return;
           }
-          await axiosClient.put(
-            `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=SELECTED`
+          // Kiểm tra trạng thái ghế trước khi đặt SELECTED
+          const response = await retry(() =>
+            axiosClient.get(`/getSeatRoomById?seatRoomId=${seatRoom.id}`)
+          );
+          if (!["AVAILABLE", "SELECTED"].includes(response.data.status)) {
+            toast.error(`Ghế ${seatRoom.name || "N/A"} không khả dụng`);
+            navigate("/seat-selection");
+            return;
+          }
+          await retry(() =>
+            axiosClient.put(
+              `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=SELECTED`
+            )
           );
         }
       } catch (err) {
@@ -128,7 +189,9 @@ const Payment = () => {
           response: err.response?.data,
           status: err.response?.status,
         });
-        toast.error("Lỗi khi tạm giữ ghế, vui lòng thử lại");
+        toast.error(
+          err.response?.data?.error || "Lỗi khi tạm giữ ghế, vui lòng thử lại"
+        );
         navigate("/seat-selection");
       }
     };
@@ -140,8 +203,10 @@ const Payment = () => {
         try {
           for (const seatRoom of selectedSeats) {
             if (seatRoom.id) {
-              await axiosClient.put(
-                `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
+              await retry(() =>
+                axiosClient.put(
+                  `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
+                )
               );
             }
           }
@@ -188,7 +253,7 @@ const Payment = () => {
         response: err.response?.data,
         status: err.response?.status,
       });
-      toast.error("Mã khuyến mãi không hợp lệ");
+      toast.error(err.response?.data?.error || "Mã khuyến mãi không hợp lệ");
     }
   };
 
@@ -206,6 +271,7 @@ const Payment = () => {
       finalPrice,
     });
 
+    // Kiểm tra token
     const token =
       localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!isLoggedIn || !token) {
@@ -219,6 +285,16 @@ const Payment = () => {
       return;
     }
 
+    // Validate dữ liệu đầu vào
+    if (!selectedSeats?.length) {
+      toast.error("Vui lòng chọn ít nhất một ghế");
+      return;
+    }
+    if (comboItems?.some((item) => !item.comboId || item.quantity <= 0)) {
+      toast.error("Combo không hợp lệ");
+      return;
+    }
+
     try {
       toast.info("Đang xử lý thanh toán, vui lòng đợi...");
       for (const seatRoom of selectedSeats) {
@@ -228,11 +304,11 @@ const Payment = () => {
           navigate("/seat-selection");
           return;
         }
-        const response = await axiosClient.get(
-          `/getSeatRoomById?seatRoomId=${seatRoom.id}`
+        const response = await retry(() =>
+          axiosClient.get(`/getSeatRoomById?seatRoomId=${seatRoom.id}`)
         );
-        if (response.data.status === "BOOKED") {
-          toast.error(`Ghế ${seatRoom.name || "N/A"} đã được đặt`);
+        if (!["AVAILABLE", "SELECTED"].includes(response.data.status)) {
+          toast.error(`Ghế ${seatRoom.name || "N/A"} không khả dụng`);
           navigate("/seat-selection");
           return;
         }
@@ -269,6 +345,12 @@ const Payment = () => {
       const galaxyIdAsInt = parseInt(safeMovieInfo.galaxyId);
       const showtimeIdAsInt = parseInt(showtimeId);
 
+      const vnpayRequest = {
+        total: finalPrice,
+        orderId: `ORDER_${Date.now()}_${accountId}`,
+        returnUrl: `${window.location.origin}/payment`,
+      };
+
       const bookingRequest = {
         accountId: accountId,
         galaxyId: galaxyIdAsInt,
@@ -280,13 +362,13 @@ const Payment = () => {
         voucherId: voucher ? parseInt(voucher.id) : null,
         paymentMethod: paymentMethod,
         status: "PENDING",
+        vnpayRequest: paymentMethod === "VNPAY" ? vnpayRequest : null,
       };
 
       console.log("Sending booking request to /postBooking:", bookingRequest);
 
-      const bookingResponse = await axiosClient.post(
-        "/postBooking",
-        bookingRequest
+      const bookingResponse = await retry(() =>
+        axiosClient.post("/postBooking", bookingRequest)
       );
 
       console.log("Booking response:", bookingResponse.data);
@@ -300,15 +382,13 @@ const Payment = () => {
             "VNPay redirectUrl missing in response:",
             bookingResponse.data
           );
-          throw new Error(
-            `Không nhận được URL thanh toán VNPay từ server. Response: ${JSON.stringify(
-              bookingResponse.data
-            )}`
-          );
+          throw new Error(`Không nhận được URL thanh toán VNPay từ server`);
         }
         for (const seatRoom of selectedSeats) {
-          await axiosClient.put(
-            `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
+          await retry(() =>
+            axiosClient.put(
+              `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=BOOKED`
+            )
           );
         }
         toast.success("Đặt vé thành công!");
@@ -319,20 +399,23 @@ const Payment = () => {
         message: err.message,
         response: err.response?.data,
         status: err.response?.status,
-        bookingResponse: err.message.includes("Không nhận được URL thanh toán")
-          ? bookingResponse?.data
-          : undefined,
       });
 
+      let rollbackErrors = [];
       for (const seatRoom of selectedSeats) {
-        await axiosClient
-          .put(`/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`)
-          .catch((rollbackErr) => {
-            console.error("Rollback error:", rollbackErr);
-            toast.error(
-              `Lỗi khi đặt lại trạng thái ghế ${seatRoom.name || "N/A"}`
-            );
-          });
+        try {
+          await retry(() =>
+            axiosClient.put(
+              `/putSeatRoomStatus?seatRoomId=${seatRoom.id}&status=AVAILABLE`
+            )
+          );
+        } catch (rollbackErr) {
+          rollbackErrors.push(seatRoom.name || "N/A");
+          console.error("Rollback error:", rollbackErr);
+        }
+      }
+      if (rollbackErrors.length) {
+        toast.error(`Lỗi khi đặt lại ghế: ${rollbackErrors.join(", ")}`);
       }
 
       let errorMessage = "Lỗi khi xử lý thanh toán";
@@ -340,22 +423,26 @@ const Payment = () => {
 
       if (status === 401) {
         errorMessage =
-          err.message || "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại";
+          err.response?.data?.error ||
+          "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại";
         navigate("/");
       } else if (status === 403) {
-        errorMessage = err.message || "Bạn không có quyền thực hiện thanh toán";
+        errorMessage =
+          err.response?.data?.error ||
+          "Bạn không có quyền thực hiện thanh toán";
       } else if (status === 400) {
         errorMessage =
-          err.message ||
+          err.response?.data?.error ||
           err.response?.data?.message ||
           "Thông tin thanh toán không hợp lệ";
       } else if (status === 500) {
-        errorMessage = err.message || "Lỗi máy chủ, vui lòng thử lại sau";
+        errorMessage =
+          err.response?.data?.error || "Lỗi máy chủ, vui lòng thử lại sau";
       } else {
         errorMessage =
-          err.message ||
+          err.response?.data?.error ||
           err.response?.data?.message ||
-          `Lỗi thanh toán VNPay: ${err.message}`;
+          "Lỗi thanh toán VNPay";
       }
 
       toast.error(errorMessage);
@@ -369,6 +456,15 @@ const Payment = () => {
       currency: "VND",
     }).format(amount);
   };
+
+  // Thêm: Hiển thị loading khi xử lý VNPay return
+  if (isProcessing) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h2 className="text-xl font-bold">Đang xử lý thanh toán...</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
