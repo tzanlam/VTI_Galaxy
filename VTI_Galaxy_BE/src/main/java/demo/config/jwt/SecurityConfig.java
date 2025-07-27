@@ -61,6 +61,9 @@ public class SecurityConfig {
                 .sessionManagement(i->i.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/static/**",
                                 "/vnpay-payment/**", // Bao gồm tất cả endpoint con của /vnpay-payment
                                 "/error",
                                 "getEmployees",
