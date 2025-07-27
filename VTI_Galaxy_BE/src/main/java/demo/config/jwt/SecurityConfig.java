@@ -25,10 +25,12 @@ import java.util.List;
 public class SecurityConfig {
     private final JwtAuthenticationPoint jwtAuthenticationPoint;
     private final JwtFilterRequest jwtFilterRequest;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
-    public SecurityConfig(JwtAuthenticationPoint jwtAuthenticationPoint, JwtFilterRequest jwtFilterRequest) {
+    public SecurityConfig(JwtAuthenticationPoint jwtAuthenticationPoint, JwtFilterRequest jwtFilterRequest, CustomAccessDeniedHandler customAccessDeniedHandler) {
         this.jwtAuthenticationPoint = jwtAuthenticationPoint;
         this.jwtFilterRequest = jwtFilterRequest;
+        this.customAccessDeniedHandler = customAccessDeniedHandler;
     }
 
     @Bean
@@ -57,7 +59,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(jwtAuthenticationPoint))
+                .exceptionHandling(
+                        exceptionHandling ->
+                                exceptionHandling
+                                        .authenticationEntryPoint(jwtAuthenticationPoint)
+                                        .accessDeniedHandler(customAccessDeniedHandler))
                 .sessionManagement(i->i.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
