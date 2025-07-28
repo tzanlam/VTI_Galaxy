@@ -25,6 +25,7 @@ public class AccountRequest {
         adminAccount.setPhoneNumber(phoneNumber);
         adminAccount.setEmail(email);
         adminAccount.setPassword(passwordEncoder.encode(password));
+        adminAccount.setPoint(0);
         adminAccount.setAvatar(null);
         adminAccount.setPosition(Account.Position.ADMIN);
         adminAccount.setConfirmCode(randomConfirmationCode());
@@ -40,6 +41,7 @@ public class AccountRequest {
         userAccount.setAvatar(null);
         userAccount.setPhoneNumber(phoneNumber);
         userAccount.setEmail(email);
+        userAccount.setPoint(0);
         userAccount.setPassword(passwordEncoder.encode(password));
         userAccount.setPosition(Account.Position.USER);
         userAccount.setConfirmCode(randomConfirmationCode());

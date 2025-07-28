@@ -76,16 +76,13 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto createBooking(BookingRequest request) {
-        System.out.println("Creating booking with request: " + request);
         try {
-            // Validate request
             if (request.getAccountId() <= 0 || request.getGalaxyId() <= 0 ||
                     request.getShowtimeId() <= 0 || request.getSeatRoomIds() == null ||
                     request.getSeatRoomIds().isEmpty()) {
                 System.err.println("Invalid booking request: " + request);
                 throw new IllegalArgumentException("Missing required fields in booking request");
             }
-
             Booking booking = new Booking();
             booking.setPaymentMethod(request.getPaymentMethod());
             voucherRepository.findById(request.getVoucherId()).ifPresentOrElse(

@@ -15,6 +15,7 @@ public class AccountDto {
     private String position;
     private String status;
     private String phone;
+    private int point;
     private String createdAt;
     private String updatedAt;
 
@@ -25,6 +26,7 @@ public class AccountDto {
         this.phone = account.getPhoneNumber() != null ? account.getPhoneNumber() : null;
         this.dob = account.getDateOfBirth() != null ? String.valueOf(account.getDateOfBirth()) : null;
         this.avatar = account.getAvatar() != null ? account.getAvatar() : null;
+        this.point = account.getPoint();
         this.gender = account.getGender() != null ? account.getGender().toString() : null;
         this.status = account.getStatus() != null ? account.getStatus().toString() : null;
         this.position = account.getPosition() != null ? account.getPosition().toString() : null;

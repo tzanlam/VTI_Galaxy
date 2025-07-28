@@ -4,6 +4,7 @@ import demo.config.VNPay.VNPayConfig;
 import demo.modal.entity.VnpayTransaction;
 
 import demo.repository.VnpayTransactionRepository;
+import demo.support.MethodSchedule;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ public class VNPayService {
     private static final Logger log = LoggerFactory.getLogger(VNPayService.class);
     private final VnpayTransactionRepository vnpayTransactionRepository;
     private final VNPayConfig vnpayConfig;
+    private final MethodSchedule  methodSchedule;
 
     public String createOrder(int total, String orderInfo, String urlReturn, HttpServletRequest request) {
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
@@ -66,7 +68,7 @@ public class VNPayService {
             String fieldName = params.nextElement();
             String fieldValue = request.getParameter(fieldName);
             fields.put(fieldName, fieldValue != null ? fieldValue : "");
-            log.info("Parameter {}: {}", fieldName, fieldValue); // Log từng tham số
+            log.info("Parameter {}: {}", fieldName, fieldValue);
         }
 
         String vnp_SecureHash = request.getParameter("vnp_SecureHash");
@@ -93,18 +95,37 @@ public class VNPayService {
         response.put("bankCode", request.getParameter("vnp_BankCode"));
         response.put("bankTranNo", request.getParameter("vnp_BankTranNo"));
 
-        String bookingId = orderInfo != null && orderInfo.contains("#") ? orderInfo.replaceAll("[^0-9]", "") : "";
-        response.put("bookingId", bookingId);
+        // Lấy bookingId từ orderInfo
+        String bookingIdStr = orderInfo != null && orderInfo.contains("#") ? orderInfo.replaceAll("[^0-9]", "") : "";
+        response.put("bookingId", bookingIdStr);
 
+        // Xác định trạng thái
+        String status;
         if (signValue.equals(vnp_SecureHash)) {
-            response.put("status", "00".equals(request.getParameter("vnp_TransactionStatus")) ? "success" : "failed");
+            status = "00".equals(request.getParameter("vnp_TransactionStatus")) ? "success" : "failed";
         } else {
-            response.put("status", "invalid_signature");
+            status = "invalid_signature";
+        }
+        response.put("status", status);
+
+        // Lưu transaction
+        saveTransaction(request, status);
+
+        // === CỘNG ĐIỂM NẾU SUCCESS ===
+        if ("success".equals(status) && !bookingIdStr.isEmpty()) {
+            try {
+                long bookingId = Long.parseLong(bookingIdStr);
+                double paidAmount = Double.parseDouble(response.get("amount")) / 100; // VNPay trả *100
+                methodSchedule.addPointAfterPayment((int) bookingId);
+                log.info("Cộng điểm thành công cho bookingId {} với số tiền {}", bookingId, paidAmount);
+            } catch (Exception e) {
+                log.error("Lỗi khi cộng điểm cho booking {}: {}", bookingIdStr, e.getMessage());
+            }
         }
 
-        saveTransaction(request, response.get("status"));
         return response;
     }
+
 
     private void saveTransaction(HttpServletRequest request, String status) {
         VnpayTransaction transaction = new VnpayTransaction();

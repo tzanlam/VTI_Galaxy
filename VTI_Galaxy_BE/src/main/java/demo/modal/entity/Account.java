@@ -47,6 +47,9 @@ public class Account extends Time{
     private ActiveStatus status;
 
     @Column
+    private int point;
+
+    @Column
     private String confirmCode;
 
     public enum Gender {
