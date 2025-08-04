@@ -62,10 +62,9 @@ public class VNPayController {
                 }
             }
 
-            // Định dạng số tiền
+
             String totalPrice = response.get("amount") != null ? String.format("%,d VND", Long.parseLong(response.get("amount")) / 100) : "0 VND";
 
-            // Trả về HTML với giao diện giống VNPay, bao gồm bookingId
             String htmlResponse = String.format(
                     "<!DOCTYPE html>" +
                             "<html>" +
