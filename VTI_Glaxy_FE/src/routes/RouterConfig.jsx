@@ -23,6 +23,7 @@ import EmployeeDetails from "../components/admin/details/EmployeeDetails";
 import { PrivateRouter } from "./PrivateRouter";
 import ProfilePage from "../components/admin/details/ProfileManagement";
 import UserProfile from "../components/UserProfile";
+import PaymentHistory from "../components/PaymentHistory";
 
 const router = createBrowserRouter([
   {
@@ -46,6 +47,7 @@ const router = createBrowserRouter([
         path: "/profile",
         element: <UserProfile />,
       },
+      { path: "/payment-history", element: <PaymentHistory /> },
       {
         path: "/error",
         element: <ErrorPage />,

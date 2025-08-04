@@ -13,6 +13,7 @@ import otherReducer from "./slices/otherSlice";
 import voucherReducer from "./slices/voucherSlice";
 import employeeReducer from "./slices/employeeSlice";
 import bookingReducer from "./slices/bookingSlice";
+import paymentHistoryReducer from "./slices/paymentHistorySlice";
 
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
@@ -42,6 +43,7 @@ const store = configureStore({
     voucher: voucherReducer,
     employee: employeeReducer,
     booking: bookingReducer,
+    paymentHistory: paymentHistoryReducer,
   },
   preloadedState,
   // eslint-disable-next-line no-undef

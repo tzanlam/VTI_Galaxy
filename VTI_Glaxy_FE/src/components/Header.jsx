@@ -5,11 +5,20 @@ import LoginModal from "./LoginModal";
 import RegisterModal from "./RegisterModal";
 import logo3 from "../assets/logo3.png";
 import menuItems from "../data/menuItems";
+import { useEffect } from "react";
+import { fetchAccountById } from "../redux/slices/accountSlice";
 
 const Header = () => {
   const dispatch = useDispatch();
   const { isLoggedIn } = useSelector((state) => state.auth);
-  const { account } = useSelector((state) => state.account); // 👈 lấy account đã fetch
+  const { account } = useSelector((state) => state.account);
+
+  useEffect(() => {
+    const accountId = localStorage.getItem("accountId");
+    if (isLoggedIn && accountId && !account) {
+      dispatch(fetchAccountById(accountId));
+    }
+  }, [isLoggedIn, dispatch, account]);
 
   return (
     <header className="bg-white shadow-md">
