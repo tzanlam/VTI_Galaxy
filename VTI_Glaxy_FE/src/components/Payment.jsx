@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import axiosClient from "../services/axiosClient";
 import { fetchVoucher, resetVoucher } from "../redux/slices/voucherSlice";
+import { fetchAccountById } from "../redux/slices/accountSlice";
 
 // Thêm: Retry logic để xử lý lỗi mạng
 const retry = async (fn, retries = 3, delay = 1000) => {
@@ -68,6 +69,11 @@ const Payment = () => {
                   )
                 );
               }
+            }
+            // Cập nhật lại thông tin account để hiển thị điểm mới
+            const accountId = localStorage.getItem("accountId");
+            if (accountId) {
+              dispatch(fetchAccountById(accountId));
             }
             // Sửa: Hiển thị toast thành công và chuyển hướng
             toast.success("Thanh toán VNPay thành công!");

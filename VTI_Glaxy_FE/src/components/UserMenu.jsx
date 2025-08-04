@@ -14,14 +14,19 @@ const UserMenu = ({ account }) => {
 
   const menuItems = [
     {
-      key: "logout",
-      label: "Đăng xuất",
-      onClick: handleLogout,
-    },
-    {
       key: "profile",
       label: "Thông tin cá nhân",
       onClick: () => navigate("/profile"),
+    },
+    {
+      key: "payment-history",
+      label: "Lịch sử thanh toán",
+      onClick: () => navigate("/payment-history"),
+    },
+    {
+      key: "logout",
+      label: "Đăng xuất",
+      onClick: handleLogout,
     },
   ];
 
@@ -35,7 +40,14 @@ const UserMenu = ({ account }) => {
         >
           {account?.fullName?.charAt(0)?.toUpperCase()}
         </Avatar>
-        <span>{account?.fullName || account?.email}</span>
+        <div className="flex flex-col">
+          <span className="font-medium">
+            {account?.fullName || account?.email}
+          </span>
+          <span className="text-sm text-gray-500">
+            {account?.point || 0} điểm
+          </span>
+        </div>
       </div>
     </Dropdown>
   );
