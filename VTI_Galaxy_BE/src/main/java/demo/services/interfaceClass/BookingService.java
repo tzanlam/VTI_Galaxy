@@ -15,4 +15,6 @@ public interface BookingService {
     BookingDto updateBooking(int id, BookingRequest request);
 
     BookingDto deleteBooking(int id);
+
+    List<BookingDto> getBookingsByAccountId(int accountId);
 }

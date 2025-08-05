@@ -3,6 +3,8 @@ package demo.repository;
 import demo.modal.constant.BookingStatus;
 import demo.modal.entity.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +24,7 @@ public interface BookingRepository  extends JpaRepository<Booking, Integer> {
     List<Booking> findByGalaxyIdAndStatus(int galaxyId, BookingStatus status);
 
     Optional<Booking> findByVnpTxnRef(String vnpTxnRef);
+
+    @Query("SELECT b FROM Booking b WHERE b.account.id = :accountId")
+    List<Booking> findBookingsByAccountId(@Param("accountId") int accountId);
 }

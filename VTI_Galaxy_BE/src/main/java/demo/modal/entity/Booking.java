@@ -36,7 +36,7 @@ public class Booking extends Time{
     @JoinColumn(nullable = false)
     private Galaxy galaxy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn( nullable = false)
     private Account account;
 

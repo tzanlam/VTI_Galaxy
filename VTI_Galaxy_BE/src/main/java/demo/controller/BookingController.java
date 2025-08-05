@@ -31,6 +31,15 @@ public class BookingController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    @GetMapping("/getBookingsByAccountId")
+    public  ResponseEntity<?> getBookingsByAccountId(@RequestParam("accountId") int accountId) {
+        try{
+            return ResponseEntity.ok(bookingService.getBookingsByAccountId(accountId));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 
     @PostMapping("/postBooking")
     public ResponseEntity<?> postBooking(@RequestBody BookingRequest request){

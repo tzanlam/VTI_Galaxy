@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,6 +70,27 @@ public class BookingServiceImpl implements BookingService {
                 () -> new NullPointerException("Booking not found with id: " + id)
         );
         return new BookingDto(booking);
+    }
+
+    @Override
+    @Transactional
+    public List<BookingDto> getBookingsByAccountId(int accountId) {
+        List<Booking> bookings = bookingRepository.findBookingsByAccountId(accountId);
+        if (accountId <= 0) {
+            System.err.println("Invalid accountId: " + accountId);
+            throw new IllegalArgumentException("ID tài khoản không hợp lệ");
+        }
+        if (!accountRepository.existsById(accountId)) {
+            System.err.println("Account not found with id: " + accountId);
+            throw new IllegalArgumentException("Tài khoản không tồn tại");
+        }
+        if (bookings.isEmpty()) {
+            System.out.println("No bookings found for accountId: " + accountId);
+            return Collections.emptyList();
+        }
+        return bookings.stream()
+                .map(BookingDto::new)
+                .collect(Collectors.toList());
     }
 
 
@@ -214,6 +236,8 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.delete(booking);
         return new BookingDto(booking);
     }
+
+
 
 
 }
