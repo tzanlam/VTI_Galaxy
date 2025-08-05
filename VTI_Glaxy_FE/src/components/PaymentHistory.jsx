@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Table, Tag, Card, Spin } from "antd";
+import { Table, Tag, Card, Spin, Empty } from "antd";
 import { toast } from "react-toastify";
-import bookingService from "../services/bookingService";
 import moment from "moment";
 import { fetchPaymentHistory } from "../redux/slices/paymentHistorySlice";
 
@@ -14,41 +13,37 @@ const PaymentHistory = () => {
   const { isLoggedIn } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    const fetchPaymentHistory = async () => {
-      try {
-        const accountId = localStorage.getItem("accountId");
-        if (!accountId || !isLoggedIn) {
-          toast.error("Vui lòng đăng nhập");
-          return;
-        }
+    const accountId = localStorage.getItem("accountId");
+    if (accountId && isLoggedIn) {
+      dispatch(fetchPaymentHistory(accountId));
+    } else {
+      toast.error("Vui lòng đăng nhập để xem lịch sử thanh toán");
+    }
+  }, [dispatch, isLoggedIn]);
 
-        // Test các endpoint có thể có
-        console.log("Testing endpoints for accountId:", accountId);
-
-        // Thử endpoint từ bookingService
-        const response = await bookingService.fetchBookingsByAccountId(
-          accountId
-        );
-        setPayments(response.data);
-      } catch (error) {
-        console.error("Error fetching payment history:", error);
-
-        // Tạm thời hiển thị empty state
-        setPayments([]);
-        toast.info("Chưa có lịch sử thanh toán");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPaymentHistory();
-  }, [isLoggedIn]);
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
 
   const columns = [
     {
       title: "Mã đơn hàng",
       dataIndex: "orderId",
       key: "orderId",
+    },
+    {
+      title: "Tên tài khoản",
+      dataIndex: "accountName",
+      key: "accountName",
+      render: (text, record) => record.account?.username || "Không xác định",
+    },
+    {
+      title: "Email",
+      dataIndex: "accountEmail",
+      key: "accountEmail",
+      render: (text, record) => record.account?.email || "Không xác định",
     },
     {
       title: "Phim",
@@ -64,30 +59,35 @@ const PaymentHistory = () => {
       title: "Ngày chiếu",
       dataIndex: "showDate",
       key: "showDate",
-      render: (date) => moment(date).format("DD/MM/YYYY HH:mm"),
+      render: (date) =>
+        date ? moment(date).format("DD/MM/YYYY HH:mm") : "Không xác định",
     },
     {
       title: "Ghế",
       dataIndex: "seats",
       key: "seats",
-      render: (seats) => seats?.join(", "),
+      render: (seats) => (seats?.length ? seats.join(", ") : "Không xác định"),
     },
     {
       title: "Tổng tiền",
       dataIndex: "totalPrice",
       key: "totalPrice",
       render: (price) =>
-        new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }).format(price),
+        price
+          ? new Intl.NumberFormat("vi-VN", {
+              style: "currency",
+              currency: "VND",
+            }).format(price)
+          : "0 ₫",
     },
     {
       title: "Phương thức",
       dataIndex: "paymentMethod",
       key: "paymentMethod",
       render: (method) => (
-        <Tag color={method === "VNPAY" ? "blue" : "green"}>{method}</Tag>
+        <Tag color={method === "VNPAY" ? "blue" : "green"}>
+          {method || "Không xác định"}
+        </Tag>
       ),
     },
     {
@@ -116,7 +116,8 @@ const PaymentHistory = () => {
       title: "Ngày thanh toán",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (date) => moment(date).format("DD/MM/YYYY HH:mm"),
+      render: (date) =>
+        date ? moment(date).format("DD/MM/YYYY HH:mm") : "Không xác định",
     },
   ];
 
@@ -124,6 +125,24 @@ const PaymentHistory = () => {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Empty description="Vui lòng đăng nhập để xem lịch sử thanh toán" />
+      </div>
+    );
+  }
+
+  if (payments.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Card title="Lịch sử thanh toán" className="shadow-md">
+          <Empty description="Không có lịch sử thanh toán" />
+        </Card>
       </div>
     );
   }

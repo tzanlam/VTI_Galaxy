@@ -5,7 +5,7 @@ const bookingService = {
     return axiosClient.get("/getBookings");
   },
   fetchBookingsByAccountId(accountId) {
-    return axiosClient.get(`/getBookingsByAccount?accountId=${accountId}`);
+    return axiosClient.get(`/getBookingsByAccountId?accountId=${accountId}`);
   },
   fetchBookingById(bookingId) {
     return axiosClient.get(`/getBookingById?bookingId=${bookingId}`);
