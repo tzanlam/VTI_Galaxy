@@ -1,18 +1,47 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import bookingService from "../../services/bookingService";
-import axiosClient from "../../services/axiosClient";
 
 export const fetchPaymentHistory = createAsyncThunk(
   "paymentHistory/fetchPaymentHistory",
   async (accountId, { rejectWithValue }) => {
     try {
-      // Sử dụng endpoint có sẵn từ bookingService
+      console.log("Đang lấy lịch sử thanh toán cho accountId:", accountId);
+      if (!accountId || isNaN(accountId)) {
+        throw new Error("ID tài khoản không hợp lệ");
+      }
       const response = await bookingService.fetchBookingsByAccountId(accountId);
-      return response.data;
+      console.log("Phản hồi API:", response.data);
+      if (!Array.isArray(response.data)) {
+        console.warn("Dữ liệu không phải mảng:", response.data);
+        return [];
+      }
+      const transformedData = response.data.map((booking) => ({
+        id: booking.id,
+        orderId: booking.id,
+        account: {
+          username: booking.account?.username || "Không xác định",
+          email: booking.account?.email || "Không xác định",
+        },
+        movieName: booking.showTime?.movie?.name || "Không xác định",
+        galaxyName: booking.galaxy?.name || "Không xác định",
+        showDate: booking.showTime?.startTime || null,
+        seats: booking.seatRooms?.map((seat) => seat.name) || [],
+        totalPrice: booking.totalPrice || 0,
+        paymentMethod: booking.paymentMethod || "Không xác định",
+        status: booking.status || "Không xác định",
+        createdAt: booking.createdAt || null,
+      }));
+      return transformedData;
     } catch (err) {
-      return rejectWithValue(
-        err.response?.data?.message || "Lỗi khi lấy lịch sử thanh toán"
-      );
+      console.error("Lỗi API:", err);
+      const errorMessage =
+        err.response?.status === 404
+          ? "Không tìm thấy endpoint lịch sử thanh toán"
+          : err.response?.data?.error ||
+            err.response?.data?.message ||
+            err.message ||
+            "Lỗi khi lấy lịch sử thanh toán";
+      return rejectWithValue(errorMessage);
     }
   }
 );
