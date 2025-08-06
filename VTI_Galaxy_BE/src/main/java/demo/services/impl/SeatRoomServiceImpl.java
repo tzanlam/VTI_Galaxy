@@ -93,14 +93,9 @@ public class SeatRoomServiceImpl implements SeatRoomService {
                 "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
                 "U", "V", "W", "X", "Y", "Z"};
 
-        int totalSeats = request.getQuantityColumn() * request.getSeatPerRow();
         if (request.getQuantityColumn() > rowLabels.length) {
             throw new RuntimeException("Số lượng cột vượt quá giới hạn hàng tối đa: " + rowLabels.length);
         }
-        if (totalSeats > room.getCapacity()) {
-            throw new RuntimeException("Số ghế yêu cầu vượt quá sức chứa phòng: " + room.getCapacity());
-        }
-
         List<SeatRoom> seatRoomList = new ArrayList<>();
 
         for (int i = 0; i < request.getQuantityColumn(); i++) {
