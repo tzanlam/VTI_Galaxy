@@ -6,43 +6,44 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "vnpay_transaction")
+@Table
 @Data
 public class VnpayTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "vnp_transaction_id", nullable = false) // Ánh xạ cột vnp_transaction_id
-    private String vnpTransactionId; // Thêm trường này
+    @Column(nullable = false)
+    private String vnpTransactionId;
 
-    @Column(name = "txn_ref", nullable = false)
+    @Column(nullable = false)
     private String txnRef;
 
-    @Column(name = "amount", nullable = false)
+    @Column(nullable = false)
     private long amount;
 
-    @Column(name = "order_info")
+    @Column
     private String orderInfo;
 
-    @Column(name = "response_code")
+    @Column
     private String responseCode;
 
-    @Column(name = "transaction_status")
+    @Column
     private String transactionStatus;
 
-    @Column(name = "bank_code")
+    @Column
     private String bankCode;
 
-    @Column(name = "bank_tran_no")
+    @Column
     private String bankTranNo;
 
-    @Column(name = "booking_id")
-    private Integer bookingId;
+    @OneToOne
+    @JoinColumn(nullable = false)
+    private Booking booking;
 
-    @Column(name = "create_date")
+    @Column
     private LocalDateTime createDate;
 
-    @Column(name = "update_date")
+    @Column
     private LocalDateTime updateDate;
 }

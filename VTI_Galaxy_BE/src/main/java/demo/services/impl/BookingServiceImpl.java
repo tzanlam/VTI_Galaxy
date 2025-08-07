@@ -155,9 +155,9 @@ public class BookingServiceImpl implements BookingService {
                 );
                 others.add(other);
             }
-            booking.setOther(others);
+            booking.setOthers(others);
 
-            int totalPrice = calculatePriceBooking(booking.getSeatRooms(), booking.getOther(), booking.getVoucher());
+            int totalPrice = calculatePriceBooking(booking.getSeatRooms(), booking.getOthers(), booking.getVoucher());
             if (totalPrice <= 0) {
                 System.err.println("Invalid totalPrice: " + totalPrice);
                 throw new IllegalArgumentException("Total price must be greater than 0");

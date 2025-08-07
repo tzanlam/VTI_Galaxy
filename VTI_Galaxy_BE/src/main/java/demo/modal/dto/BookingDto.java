@@ -34,8 +34,8 @@ public class BookingDto {
         this.seatRoomIds = booking.getSeatRooms() != null ?
                 booking.getSeatRooms().stream().map(sr -> String.valueOf(sr.getId())).toList() :
                 new ArrayList<>();
-        this.otherIds = booking.getOther() != null ?
-                booking.getOther().stream().map(o -> String.valueOf(o.getId())).toList() :
+        this.otherIds = booking.getOthers() != null ?
+                booking.getOthers().stream().map(o -> String.valueOf(o.getId())).toList() :
                 new ArrayList<>();
         this.totalPrice = booking.getTotalPrice();
         this.galaxyId = booking.getGalaxy() != null ? String.valueOf(booking.getGalaxy().getId()) : null;

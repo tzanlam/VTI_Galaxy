@@ -33,11 +33,11 @@ public class Galaxy extends Time{
     @Enumerated(EnumType.STRING)
     private OpenStatus status;
 
-    @OneToMany(mappedBy = "galaxy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "galaxy")
     @JsonIgnore
     private List<Room> rooms;
 
-    @OneToMany(mappedBy = "galaxy", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "galaxy")
     @JsonIgnore
     private List<Other> others;
 }

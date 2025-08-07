@@ -9,11 +9,11 @@ import lombok.EqualsAndHashCode;
 import java.util.ArrayList;
 import java.util.List;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table
 @Data
-public class Booking extends Time{
+@EqualsAndHashCode(callSuper = true)
+public class Booking extends Time {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -27,37 +27,31 @@ public class Booking extends Time{
     private List<SeatRoom> seatRooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Other> Other;
+    private List<Other> others = new ArrayList<>();
 
     @Column(nullable = false)
     private int totalPrice;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
+    @ManyToOne(optional = false)
     private Galaxy galaxy;
 
-    @ManyToOne
-    @JoinColumn( nullable = false)
+    @ManyToOne(optional = false)
     private Account account;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
+    @ManyToOne(optional = false)
     private ShowTime showTime;
 
     @ManyToOne
-    @JoinColumn
     private Voucher voucher;
 
-    @Column
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private BookingStatus status;
+    @Column(nullable = false)
+    private BookingStatus status = BookingStatus.PENDING;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn
+    @OneToOne(mappedBy = "booking")
     private VnpayTransaction vnpayTransaction;
 
     @Column

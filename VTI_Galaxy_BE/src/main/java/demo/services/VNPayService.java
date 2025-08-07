@@ -1,8 +1,10 @@
 package demo.services;
 
 import demo.config.VNPay.VNPayConfig;
+import demo.modal.entity.Booking;
 import demo.modal.entity.VnpayTransaction;
 
+import demo.repository.BookingRepository;
 import demo.repository.VnpayTransactionRepository;
 import demo.support.MethodSchedule;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,7 @@ public class VNPayService {
     private final VnpayTransactionRepository vnpayTransactionRepository;
     private final VNPayConfig vnpayConfig;
     private final MethodSchedule  methodSchedule;
+    private final BookingRepository bookingRepository;
 
     public String createOrder(int total, String orderInfo, String urlReturn, HttpServletRequest request) {
         String vnp_TxnRef = VNPayConfig.getRandomNumber(8);
@@ -145,9 +148,11 @@ public class VNPayService {
         transaction.setUpdateDate(LocalDateTime.now());
 
         if (orderInfo != null && orderInfo.contains("#")) {
-            String bookingId = orderInfo.replaceAll("[^0-9]", "");
-            if (!bookingId.isEmpty()) {
-                transaction.setBookingId(Integer.parseInt(bookingId));
+            int bookingId = Integer.parseInt(orderInfo.replaceAll("[^0-9]", ""));
+            if (bookingId != 0) {
+                Booking booking = bookingRepository.findById(bookingId).orElseGet(
+                        Booking::new);
+                transaction.setBooking(booking);
             }
         }
 

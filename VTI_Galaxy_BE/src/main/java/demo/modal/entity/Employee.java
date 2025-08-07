@@ -35,7 +35,7 @@ public class Employee {
     @Column
     private String evaluate;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn
     private Galaxy galaxy;
 
