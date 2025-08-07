@@ -20,7 +20,7 @@ public class SeatRoom {
 
     @ManyToOne
     @JoinColumn
-    private ShowTime showTime;
+    private StartTime startTime;
 
     @ManyToOne
     @JoinColumn

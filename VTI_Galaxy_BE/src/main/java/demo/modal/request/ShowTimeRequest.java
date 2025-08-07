@@ -10,5 +10,5 @@ public class ShowTimeRequest {
     private int roomId;
     private int movieId;
     private String date;
-    private List<String> startTimes;
+    private List<Integer> startTimes;
 }

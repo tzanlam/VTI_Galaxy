@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface SeatRoomRepository extends JpaRepository<SeatRoom, Integer> {
-    @Query("SELECT sr FROM SeatRoom sr JOIN FETCH sr.seat WHERE sr.showTime.id = :showtimeId")
+    @Query("SELECT sr FROM SeatRoom sr JOIN FETCH sr.seat s JOIN sr.startTime st JOIN st.showTime sh WHERE sh.id = :showtimeId")
     List<SeatRoom> findByShowTimeId(@Param("showtimeId") int showtimeId);
 
     List<SeatRoom> findByRoomId(int roomId);

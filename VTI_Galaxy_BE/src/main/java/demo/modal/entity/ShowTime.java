@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +30,6 @@ public class ShowTime {
     @Column
     private LocalDate date;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "showtime_start_times", joinColumns = @JoinColumn(name = "showtime_id"))
-    @Column(name = "start_time")
-    private List<LocalTime> startTimes = new ArrayList<>();
+    @OneToMany(mappedBy = "showTime")
+    private List<StartTime> startTimes = new ArrayList<>();
 }

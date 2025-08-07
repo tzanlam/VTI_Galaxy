@@ -16,6 +16,6 @@ public interface ShowTimeService {
     List<ShowTimeDto> findShowTimeByRoom(int roomId);
     List<ShowTimeDto> findByFilter(Integer galaxyId, Integer movieId, String date);
     ShowTimeDto create(ShowTimeRequest request);
-    ShowTimeDto updateShowTime(int id, int galaxyId,int roomId,  int movieId, String date, List<String> startTimes);
+    ShowTimeDto updateShowTime(int id, int galaxyId,int roomId,  int movieId, String date, List<Integer> startTimeIds);
     void delete(int id);
 }
