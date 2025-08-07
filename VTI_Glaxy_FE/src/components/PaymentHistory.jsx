@@ -97,14 +97,14 @@ const PaymentHistory = () => {
       render: (status) => (
         <Tag
           color={
-            status === "COMPLETED"
+            status === "CONFIRMED"
               ? "green"
               : status === "PENDING"
               ? "orange"
               : "red"
           }
         >
-          {status === "COMPLETED"
+          {status === "CONFIRMED"
             ? "Thành công"
             : status === "PENDING"
             ? "Đang xử lý"
