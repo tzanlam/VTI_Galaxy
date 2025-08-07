@@ -6,7 +6,7 @@ import lombok.Data;
 @Entity
 @Table
 @Data
-public class SeatRoom {
+public class SeatRoom extends Time {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

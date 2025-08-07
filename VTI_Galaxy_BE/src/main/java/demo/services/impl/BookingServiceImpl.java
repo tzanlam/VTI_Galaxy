@@ -5,6 +5,7 @@ import demo.modal.constant.BookingStatus;
 import demo.modal.dto.BookingDto;
 import demo.modal.entity.Booking;
 import demo.modal.entity.Other;
+import demo.modal.entity.Seat;
 import demo.modal.entity.SeatRoom;
 import demo.modal.request.BookingRequest;
 import demo.repository.*;
@@ -105,6 +106,7 @@ public class BookingServiceImpl implements BookingService {
                 System.err.println("Invalid booking request: " + request);
                 throw new IllegalArgumentException("Missing required fields in booking request");
             }
+
             Booking booking = new Booking();
             booking.setPaymentMethod(request.getPaymentMethod());
             voucherRepository.findById(request.getVoucherId()).ifPresentOrElse(
@@ -215,6 +217,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto updateBooking(int id, BookingRequest request) {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đặt vé"));
+
         request.updateBooking(booking);
         if (request.getGalaxyId() != 0) {
             booking.setGalaxy(galaxyRepository.findById(request.getGalaxyId())
@@ -225,6 +228,7 @@ public class BookingServiceImpl implements BookingService {
                     .orElseThrow(() -> new RuntimeException("Không tìm thấy voucher")));
         }
         booking = bookingRepository.save(booking);
+
         return new BookingDto(booking);
     }
 
