@@ -1,15 +1,12 @@
 package demo.services.impl;
 
 import demo.modal.dto.SeatRoomDto;
-import demo.modal.entity.Room;
-import demo.modal.entity.Seat;
-import demo.modal.entity.SeatRoom;
-import demo.modal.entity.ShowTime;
+import demo.modal.entity.*;
 import demo.modal.request.SeatRoomRequest;
 import demo.repository.RoomRepository;
 import demo.repository.SeatRepository;
 import demo.repository.SeatRoomRepository;
-import demo.repository.ShowTimeRepository;
+import demo.repository.StartTimeRepository;
 import demo.services.interfaceClass.SeatRoomService;
 import org.springframework.stereotype.Service;
 
@@ -22,14 +19,14 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     private final SeatRoomRepository seatRoomRepository;
     private final SeatRepository seatRepository;
     private final RoomRepository roomRepository;
-    private final ShowTimeRepository showTimeRepository; // Thêm
+    private final StartTimeRepository startTimeRepository;
 
     public SeatRoomServiceImpl(SeatRoomRepository seatRoomRepository, SeatRepository seatRepository,
-                               RoomRepository roomRepository, ShowTimeRepository showTimeRepository) {
+                               RoomRepository roomRepository, demo.repository.StartTimeRepository startTimeRepository) {
         this.seatRoomRepository = seatRoomRepository;
         this.seatRepository = seatRepository;
         this.roomRepository = roomRepository;
-        this.showTimeRepository = showTimeRepository;
+        this.startTimeRepository = startTimeRepository;
     }
 
     @Override
@@ -85,22 +82,17 @@ public class SeatRoomServiceImpl implements SeatRoomService {
         Seat seat = seatRepository.findById(request.getSeatId()).orElseThrow(
                 () -> new RuntimeException("Không tìm thấy ghế với id: " + request.getSeatId())
         );
-        ShowTime showTime = showTimeRepository.findById(request.getShowtimeId()).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy suất chiếu với id: " + request.getShowtimeId())
+        StartTime startTime = startTimeRepository.findById(request.getStartTimeId()).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy suất chiếu với id: " + request.getStartTimeId())
         );
 
         String[] rowLabels = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
                 "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
                 "U", "V", "W", "X", "Y", "Z"};
 
-        int totalSeats = request.getQuantityColumn() * request.getSeatPerRow();
         if (request.getQuantityColumn() > rowLabels.length) {
             throw new RuntimeException("Số lượng cột vượt quá giới hạn hàng tối đa: " + rowLabels.length);
         }
-        if (totalSeats > room.getCapacity()) {
-            throw new RuntimeException("Số ghế yêu cầu vượt quá sức chứa phòng: " + room.getCapacity());
-        }
-
         List<SeatRoom> seatRoomList = new ArrayList<>();
 
         for (int i = 0; i < request.getQuantityColumn(); i++) {
@@ -110,7 +102,7 @@ public class SeatRoomServiceImpl implements SeatRoomService {
                 seatRoom.setName(row + j); // Ví dụ: A1, A2, ...
                 seatRoom.setRoom(room);
                 seatRoom.setSeat(seat);
-                seatRoom.setShowTime(showTime); // Đặt suất chiếu
+                seatRoom.setStartTime(startTime); // Đặt suất chiếu
                 seatRoom.setStatus(SeatRoom.BookedStatus.AVAILABLE);
                 seatRoomList.add(seatRoom);
             }

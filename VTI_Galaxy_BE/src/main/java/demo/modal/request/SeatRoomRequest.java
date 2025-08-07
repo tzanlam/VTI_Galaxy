@@ -7,7 +7,7 @@ public class SeatRoomRequest {
     private int id;
     private int seatId;
     private int roomId;
-    private int showtimeId; // Ensure this field is present
+    private int startTimeId;
     private int seatPerRow;
     private int quantityColumn;
 }

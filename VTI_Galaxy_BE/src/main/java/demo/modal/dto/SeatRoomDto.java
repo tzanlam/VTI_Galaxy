@@ -11,7 +11,7 @@ public class SeatRoomDto {
     private int price;
     private String roomId;
     private String status;
-    private String showtimeId;
+    private String startTimeId;
 
     public SeatRoomDto(SeatRoom seatRoom) {
         this.id = seatRoom.getId() != 0 ? String.valueOf(seatRoom.getId()) : null;
@@ -20,6 +20,6 @@ public class SeatRoomDto {
         this.price = seatRoom.getSeat() != null ? seatRoom.getSeat().getPrice() : 0;
         this.roomId = seatRoom.getRoom() != null ? String.valueOf(seatRoom.getRoom().getId()) : null;
         this.status = seatRoom.getStatus() != null ? seatRoom.getStatus().toString() : null;
-        this.showtimeId = seatRoom.getShowTime() != null ? String.valueOf(seatRoom.getShowTime().getId()) : null;
+        this.startTimeId = seatRoom.getStartTime() != null ? String.valueOf(seatRoom.getStartTime().getId()) : null;
     }
 }

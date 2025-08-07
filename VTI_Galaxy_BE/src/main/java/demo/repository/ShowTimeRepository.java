@@ -43,4 +43,6 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer> {
             @Param("date") LocalDate date,
             @Param("galaxyId") int galaxyId
     );
+
+    boolean existsByRoomIdAndDate(Integer roomId, LocalDate date);
 }

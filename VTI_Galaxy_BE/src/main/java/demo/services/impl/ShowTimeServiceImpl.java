@@ -1,15 +1,9 @@
 package demo.services.impl;
 
 import demo.modal.dto.ShowTimeDto;
-import demo.modal.entity.Galaxy;
-import demo.modal.entity.Movie;
-import demo.modal.entity.Room;
-import demo.modal.entity.ShowTime;
+import demo.modal.entity.*;
 import demo.modal.request.ShowTimeRequest;
-import demo.repository.GalaxyRepository;
-import demo.repository.MovieRepository;
-import demo.repository.RoomRepository;
-import demo.repository.ShowTimeRepository;
+import demo.repository.*;
 import demo.services.interfaceClass.ShowTimeService;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static demo.support.MethodSupport.convertToLocalDate;
-import static demo.support.MethodSupport.convertToLocalTime;
 
 @Service
 public class ShowTimeServiceImpl implements ShowTimeService {
@@ -27,13 +20,15 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     private final GalaxyRepository galaxyRepository;
     private final MovieRepository movieRepository;
     private final RoomRepository roomRepository;
+    private final StartTimeRepository startTimeRepository;
 
     public ShowTimeServiceImpl(ShowTimeRepository showTimeRepository, GalaxyRepository galaxyRepository,
-                               MovieRepository movieRepository, RoomRepository roomRepository) {
+                               MovieRepository movieRepository, RoomRepository roomRepository, StartTimeRepository startTimeRepository) {
         this.showTimeRepository = showTimeRepository;
         this.galaxyRepository = galaxyRepository;
         this.movieRepository = movieRepository;
         this.roomRepository = roomRepository;
+        this.startTimeRepository = startTimeRepository;
     }
 
     @Override
@@ -95,10 +90,10 @@ public class ShowTimeServiceImpl implements ShowTimeService {
     }
 
     @Override
-    public ShowTimeDto updateShowTime(int id, int galaxyId, int roomId, int movieId, String date, List<String> startTimes) {
+    public ShowTimeDto updateShowTime(int id, int galaxyId, int roomId, int movieId, String date, List<Integer> startTimeIds) {
         ShowTime showTime = showTimeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy lịch chiếu với id " + id));
-        ShowTime updated = populate(galaxyId,roomId, movieId, date, startTimes);
+        ShowTime updated = populate(galaxyId,roomId, movieId, date, startTimeIds);
         showTime.setGalaxy(updated.getGalaxy());
         showTime.setMovie(updated.getMovie());
         showTime.setDate(convertToLocalDate(date));
@@ -114,7 +109,7 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         showTimeRepository.delete(showTime);
     }
 
-    private ShowTime populate(int galaxyId, int roomId,  int movieId, String date, List<String> startTimes) {
+    private ShowTime populate(int galaxyId, int roomId,  int movieId, String date, List<Integer> startTimeIds) {
         ShowTime showTime = new ShowTime();
         Galaxy galaxy = galaxyRepository.findById(galaxyId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy rạp với id " + galaxyId));
@@ -123,9 +118,11 @@ public class ShowTimeServiceImpl implements ShowTimeService {
         Room room = roomRepository.findById(roomId).orElseThrow(
                 () -> new RuntimeException("room not found with id " + roomId)
         );
-        if (showTime.getStartTimes() == null) startTimes = new ArrayList<>();
-        for (String st : startTimes){
-            showTime.getStartTimes().add(convertToLocalTime(st));
+        for (int startTime : startTimeIds) {
+            StartTime st = startTimeRepository.findById(startTime).orElseThrow(
+                    () -> new RuntimeException("start time not found with id " + startTime)
+            );
+            showTime.getStartTimes().add(st);
         }
         showTime.setRoom(room);
         showTime.setGalaxy(galaxy);

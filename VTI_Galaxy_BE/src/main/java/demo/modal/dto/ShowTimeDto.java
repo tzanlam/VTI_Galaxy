@@ -2,9 +2,9 @@ package demo.modal.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import demo.modal.entity.ShowTime;
+import demo.modal.entity.StartTime;
 import lombok.Data;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +31,8 @@ public class ShowTimeDto {
 
     private List<String> mapTime(ShowTime showTime){
         List<String> st = new ArrayList<>();
-        for (LocalTime std : showTime.getStartTimes()){
-            st.add(std.toString());
+        for (StartTime std : showTime.getStartTimes()){
+            st.add(std.getTime().toString());
         }
         return st;
     }

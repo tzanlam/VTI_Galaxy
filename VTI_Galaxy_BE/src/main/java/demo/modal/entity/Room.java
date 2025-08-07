@@ -24,9 +24,6 @@ public class Room extends Time{
     @Enumerated(EnumType.STRING)
     private OpenStatus status;
 
-    @Column
-    private int capacity;
-
     @ManyToOne
     @JoinColumn
     private Galaxy galaxy;

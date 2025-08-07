@@ -17,7 +17,6 @@ public class RoomRequest {
         room.setName(name);
         room.setTypeScreen(typeScreen);
         room.setStatus(status != null ? status : OpenStatus.CLOSED);
-        room.setCapacity(capacity);
         return room;
     }
 
@@ -25,6 +24,5 @@ public class RoomRequest {
         room.setName(name);
         room.setTypeScreen(typeScreen);
         room.setStatus(status != null ? status : room.getStatus());
-        room.setCapacity(capacity);
     }
 }

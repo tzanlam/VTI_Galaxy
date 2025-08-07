@@ -18,6 +18,5 @@ public class RoomDto {
         this.typeScreen = room.getTypeScreen();
         this.galaxyName = room.getGalaxy().getName();
         this.status = room.getStatus() != null ? room.getStatus().toString() : null;
-        this.capacity = room.getCapacity() != 0 ? room.getCapacity() : 0;
     }
 }
