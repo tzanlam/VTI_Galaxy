@@ -1,4 +1,4 @@
-package demo.config.data;
+package demo.examData;
 
 import demo.modal.constant.ActiveStatus;
 import demo.modal.constant.AgeLimit;
@@ -7,12 +7,14 @@ import demo.repository.MovieRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 @Configuration
+@Order(4)
 public class MovieSeeder {
     @Bean
     CommandLineRunner seedMovies(MovieRepository movieRepo) {

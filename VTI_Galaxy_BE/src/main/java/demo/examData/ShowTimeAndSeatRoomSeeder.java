@@ -1,16 +1,18 @@
-package demo.config.data;
+package demo.examData;
 
 import demo.modal.entity.*;
 import demo.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
 @Configuration
+@Order(5)
 public class ShowTimeAndSeatRoomSeeder {
 
     @Bean
@@ -78,9 +80,7 @@ public class ShowTimeAndSeatRoomSeeder {
                                 }
                             }
                         }
-
-                        System.out.printf("✅ Created ShowTime: [%s - %s - %s - %s]%n",
-                                galaxy.getName(), room.getName(), movie.getName(), start);
+                        System.out.println("Seeded showtime, startTime and seatRoom");
                     }
                 }
             }

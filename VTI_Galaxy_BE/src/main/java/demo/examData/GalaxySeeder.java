@@ -1,4 +1,4 @@
-package demo.config.data;
+package demo.examData;
 
 import demo.modal.constant.OpenStatus;
 import demo.modal.entity.Galaxy;
@@ -6,10 +6,12 @@ import demo.repository.GalaxyRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
 @Configuration
+@Order(1)
 public class GalaxySeeder {
     @Bean
     CommandLineRunner seedGalaxies(GalaxyRepository galaxyRepo) {

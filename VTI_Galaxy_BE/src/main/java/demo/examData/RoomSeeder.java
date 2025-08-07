@@ -1,4 +1,4 @@
-package demo.config.data;
+package demo.examData;
 
 import demo.modal.constant.OpenStatus;
 import demo.modal.entity.Galaxy;
@@ -8,11 +8,13 @@ import demo.repository.RoomRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
+@Order(2)
 public class RoomSeeder {
     @Bean
     CommandLineRunner seedRooms(RoomRepository roomRepo, GalaxyRepository galaxyRepo) {
@@ -26,7 +28,7 @@ public class RoomSeeder {
                 }
 
                 roomRepo.saveAll(rooms);
-                System.out.println("Seeded " + rooms.size() + " Rooms (3 per Galaxy)");
+                System.out.println("Seeded Rooms (3 per Galaxy)");
             }
         };
     }

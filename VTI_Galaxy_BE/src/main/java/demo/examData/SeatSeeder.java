@@ -1,14 +1,16 @@
-package demo.config.data;
+package demo.examData;
 
 import demo.modal.entity.Seat;
 import demo.repository.SeatRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
 @Configuration
+@Order(3)
 public class SeatSeeder {
     @Bean
     CommandLineRunner seedSeats(SeatRepository seatRepo) {

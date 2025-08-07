@@ -1,15 +1,17 @@
-package demo.config.data;
+package demo.examData;
 
 import demo.modal.entity.Voucher;
 import demo.repository.VoucherRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Configuration
+@Order(8)
 public class VoucherSeeder {
 
     @Bean

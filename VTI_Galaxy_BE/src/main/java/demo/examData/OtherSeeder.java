@@ -1,4 +1,4 @@
-package demo.config.data;
+package demo.examData;
 
 import demo.modal.constant.ActiveStatus;
 import demo.modal.entity.Galaxy;
@@ -8,10 +8,12 @@ import demo.repository.OtherRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.util.List;
 
 @Configuration
+@Order(9)
 public class OtherSeeder {
 
     @Bean
@@ -45,7 +47,7 @@ public class OtherSeeder {
                     combo.setStatus(ActiveStatus.ACTIVE);
 
                     otherRepo.saveAll(List.of(popcorn, combo));
-                    System.out.println("✅ Seeded bắp và combo cho galaxy: " + galaxy.getName());
+                    System.out.println("✅ Seeded bắp và combo cho galaxy");
                 }
             }
         };
