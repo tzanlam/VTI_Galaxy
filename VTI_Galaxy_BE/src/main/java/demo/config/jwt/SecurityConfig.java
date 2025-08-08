@@ -68,7 +68,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
                                 "/",
-                                "/movieId/{movieId}",
+                                "/movieId/{movieId}/andDate/{date}",
                                 "/index.html",
                                 "/static/**",
                                 "/vnpay-payment/**", // Bao gồm tất cả endpoint con của /vnpay-payment

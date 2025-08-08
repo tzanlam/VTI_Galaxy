@@ -15,10 +15,10 @@ public class StartTimeController {
         this.startTimeService = startTimeService;
     }
 
-    @GetMapping("/movieId/{movieId}")
-    public ResponseEntity<?> getByMovie(@PathVariable int movieId) {
+    @GetMapping("/movieId/{movieId}/andDate/{date}")
+    public ResponseEntity<?> getByMovie(@PathVariable int movieId, @PathVariable String date) {
         try{
-            return ResponseEntity.ok(startTimeService.getStartTimeByMovie(movieId));
+            return ResponseEntity.ok(startTimeService.getStartTimeByMovieAndDate(movieId, date));
         }catch(Exception e){
             return ResponseEntity.badRequest().build();
         }
