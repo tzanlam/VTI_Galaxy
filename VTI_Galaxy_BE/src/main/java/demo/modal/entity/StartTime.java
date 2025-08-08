@@ -14,7 +14,7 @@ public class StartTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
+    
     @ManyToOne
     @JoinColumn
     private ShowTime showTime;
