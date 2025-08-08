@@ -3,13 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchStartTimes } from "../redux/slices/startTimeSlice";
 import { fetchGalaxies } from "../redux/slices/galaxySlice";
 import { useNavigate } from "react-router-dom";
-import { fetchShowTimeByMovieDateAndGalaxy } from "./../redux/slices/showTimeSlice";
 
 const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { showTimes, loading, error } = useSelector((state) => state.showTime);
-  const { loading: startTimeLoading, error: startTimeError } = useSelector(
+  const { startTimes, loading: startTimeLoading, error: startTimeError } = useSelector(
     (state) => state.startTime
   );
   const {
@@ -24,14 +22,20 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
   const [selectedDay, setSelectedDay] = useState(null);
 
   useEffect(() => {
-    console.log("Dispatching fetchGalaxies and fetchStartTimes");
+    console.log("Dispatching fetchGalaxies");
     dispatch(fetchGalaxies());
-    dispatch(fetchStartTimes());
   }, [dispatch]);
 
   useEffect(() => {
-    console.log("Current showTimes:", showTimes);
-  }, [showTimes]);
+    if (movieId && selectedDay) {
+      console.log("Dispatching fetchStartTimes with movieId:", movieId, "and date:", selectedDay.dateForApi);
+      dispatch(fetchStartTimes({ movieId, date: selectedDay.dateForApi }));
+    }
+  }, [dispatch, movieId, selectedDay]);
+
+  useEffect(() => {
+    console.log("Current startTimes:", startTimes);
+  }, [startTimes]);
 
   const cities = useMemo(() => {
     const cityList = [
@@ -89,7 +93,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
 
   const getWeekDays = useMemo(() => {
     const weekDays = [];
-    const today = new Date();
+    const today = new Date("2025-08-09"); // Đặt ngày cố định là 9/8/2025 để kiểm tra
     for (let i = 0; i < 7; i++) {
       const day = new Date(today);
       day.setDate(today.getDate() + i);
@@ -112,36 +116,6 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
     console.log("Computed weekDays:", weekDays);
     return weekDays;
   }, []);
-
-  useEffect(() => {
-    if (
-      selectedCity &&
-      selectedCinema !== "Chọn rạp" &&
-      selectedDay &&
-      selectedGalaxyId &&
-      movieId
-    ) {
-      console.log("Dispatching fetchShowTimeByMovieDateAndGalaxy with:", {
-        galaxyId: selectedGalaxyId,
-        movieId,
-        date: selectedDay.dateForApi,
-      });
-      dispatch(
-        fetchShowTimeByMovieDateAndGalaxy({
-          galaxyId: String(selectedGalaxyId),
-          movieId: String(movieId),
-          date: selectedDay.dateForApi,
-        })
-      );
-    }
-  }, [
-    selectedCity,
-    selectedCinema,
-    selectedDay,
-    selectedGalaxyId,
-    movieId,
-    dispatch,
-  ]);
 
   const DropdownButton = ({ label, isOpen, onClick }) => (
     <button
@@ -200,16 +174,19 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
 
   const selectedShowtimes = useMemo(() => {
     if (!selectedDay) return [];
-    if (!Array.isArray(showTimes)) {
-      console.warn("showTimes is not an array:", showTimes);
+    if (!Array.isArray(startTimes)) {
+      console.warn("startTimes is not an array:", startTimes);
       return [];
     }
-    const filtered = showTimes.filter(
-      (st) => st.date === selectedDay.dateForApi
-    );
-    console.log("Computed selectedShowtimes:", filtered);
-    return filtered;
-  }, [showTimes, selectedDay]);
+    // Giả sử startTimes là mảng thời gian, thêm date và các trường khác
+    return startTimes.map(time => ({
+      startTime: time,
+      date: selectedDay.dateForApi,
+      galaxyName: selectedCinema,
+      movieName: "Phim", // Có thể lấy từ movieId nếu cần
+      id: `${selectedDay.dateForApi}_${time}` // Tạo id tạm thời
+    }));
+  }, [startTimes, selectedDay, selectedCinema]);
 
   const handleTimeClick = (showtime, time) => {
     navigate(`/seat-selection/${showtime.id}`, {
@@ -280,15 +257,6 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
           </button>
         ))}
       </div>
-      {loading && <p className="text-gray-500">Đang tải lịch chiếu...</p>}
-      {error && (
-        <p className="text-red-500">
-          Lỗi:{" "}
-          {error.message ||
-            error ||
-            "Không thể tải lịch chiếu. Vui lòng đăng nhập lại hoặc thử lại sau."}
-        </p>
-      )}
       {startTimeLoading && (
         <p className="text-gray-500">Đang tải thời gian bắt đầu...</p>
       )}
@@ -297,31 +265,25 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
           Lỗi: {startTimeError.message || "Không thể tải thời gian bắt đầu"}
         </p>
       )}
-      {!loading && !error && selectedShowtimes.length > 0
+      {!startTimeLoading && !startTimeError && selectedShowtimes.length > 0
         ? selectedShowtimes.map((showtime, idx) => (
             <div key={idx} className="mb-4 p-4 bg-white rounded-lg shadow">
               <h3 className="text-lg font-bold mb-2">
                 {showtime.galaxyName} - {showtime.movieName}
               </h3>
               <div className="flex flex-wrap gap-2">
-                {showtime.startTimes.length > 0 ? (
-                  showtime.startTimes.map((time, timeIdx) => (
-                    <button
-                      key={timeIdx}
-                      className="bg-orange-500 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition-colors"
-                      onClick={() => handleTimeClick(showtime, time)}
-                    >
-                      {time}
-                    </button>
-                  ))
-                ) : (
-                  <p className="text-gray-500">Chưa có thời gian chiếu.</p>
-                )}
+                <button
+                  key={idx}
+                  className="bg-orange-500 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition-colors"
+                  onClick={() => handleTimeClick(showtime, showtime.startTime)}
+                >
+                  {showtime.startTime}
+                </button>
               </div>
             </div>
           ))
-        : !loading &&
-          !error && (
+        : !startTimeLoading &&
+          !startTimeError && (
             <p className="text-gray-500">
               Không có lịch chiếu cho lựa chọn này.
             </p>
