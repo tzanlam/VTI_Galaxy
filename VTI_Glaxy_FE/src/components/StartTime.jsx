@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchStartTimes, createStartTime } from "./slices/startTimeSlice";
+import { fetchStartTimeByMovieId, createStartTime } from "./slices/startTimeSlice";
 
 const StartTime = () => {
   const dispatch = useDispatch();
@@ -11,7 +11,7 @@ const StartTime = () => {
   const [endTime, setEndTime] = useState("");
 
   useEffect(() => {
-    dispatch(fetchStartTimes());
+    dispatch(fetchStartTimeByMovieId());
   }, [dispatch]);
 
   const handleSubmit = (e) => {

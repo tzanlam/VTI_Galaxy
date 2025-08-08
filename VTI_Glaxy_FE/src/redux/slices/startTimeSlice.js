@@ -2,11 +2,11 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import startTimeService from "../../services/startTimeService";
 
 export const fetchStartTimes = createAsyncThunk(
-  "startTime/fetchStartTimes",
-  async (_, { rejectWithValue }) => {
+  "startTime/fetchStartTimeByMovieIdAndDate",
+  async ({ movieId, date }, { rejectWithValue }) => {
     try {
-      const response = await startTimeService.fetchStartTimes();
-      console.log("fetchStartTimes response:", response.data);
+      const response = await startTimeService.fetchStartTimeByMovieIdAndDate(movieId, date);
+      console.log("fetchStartTimes response:", response);
       return response.data;
     } catch (err) {
       console.error("fetchStartTimes error:", err.response?.data);
@@ -19,9 +19,9 @@ export const fetchStartTimes = createAsyncThunk(
 
 export const createStartTime = createAsyncThunk(
   "startTime/createStartTime",
-  async ({ startTime, endTime }, { rejectWithValue }) => {
+  async ({ times, showTimeId }, { rejectWithValue }) => {
     try {
-      console.log("createStartTime request:", { startTime, endTime });
+      console.log("createStartTime request:", { times, showTimeId });
       const response = await startTimeService.createStartTime(
         startTime,
         endTime

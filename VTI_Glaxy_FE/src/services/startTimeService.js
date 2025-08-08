@@ -1,12 +1,15 @@
 import axiosClient from "./axiosClient";
 
 const startTimeService = {
-  fetchStartTimes() {
-    return axiosClient.get("/getStartTimes");
+  fetchStartTimeByMovieIdAndDate(movieId, date) {
+    return axiosClient.get(`movieId/${movieId}/andDate/${date}`);
   },
-  createStartTime(startTime, endTime) {
-    return axiosClient.post("/postStartTime", { startTime, endTime });
-  },
+createStartTime(times, showTimeId) {
+  const params = new URLSearchParams()
+  times.forEach(time => params.append('times', time))
+  params.append('showTimeId', showTimeId)
+  return axiosClient.post('/start-times', params)
+},
 };
 
 export default startTimeService;
