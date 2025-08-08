@@ -14,6 +14,8 @@ public interface SeatRoomService {
 
     List<SeatRoomDto> getSeatRoomsByRoomId(int roomId);
 
+    List<SeatRoomDto> getSeatRoomByStartTime(String time);
+
     // post
     List<SeatRoomDto> createSeatRoom(SeatRoomRequest request);
 

@@ -9,7 +9,7 @@ public interface StartTimeService {
     List<StartTimeDTO> getAllStartTime();
     StartTimeDTO getStartTimeById(int id);
 
-    List<String> getStartTimeByMovie(int movieId);
+    List<String> getStartTimeByMovieAndDate(int movieId, String date);
     // create
     List<StartTimeDTO> createListStartTime(List<String> times, int showTimeIds);
 }

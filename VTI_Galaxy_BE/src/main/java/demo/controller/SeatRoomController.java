@@ -1,6 +1,5 @@
 package demo.controller;
 
-import demo.modal.dto.SeatRoomDto;
 import demo.modal.entity.SeatRoom;
 import demo.modal.request.SeatRoomRequest;
 import demo.services.interfaceClass.SeatRoomService;
@@ -30,6 +29,15 @@ public class SeatRoomController {
         try {
             return ResponseEntity.ok(seatRoomService.getSeatRoomById(id));
         } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getSeatRoomByTime/time/{time}")
+    public ResponseEntity<?> getSeatRoomByTime(@PathVariable("time") String time) {
+        try{
+            return ResponseEntity.ok(seatRoomService.getSeatRoomByStartTime(time));
+        }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

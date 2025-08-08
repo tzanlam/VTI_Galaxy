@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static demo.support.MethodSupport.convertToLocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class StartTimeServiceImpl implements StartTimeService {
@@ -34,8 +36,8 @@ public class StartTimeServiceImpl implements StartTimeService {
     }
 
     @Override
-    public List<String> getStartTimeByMovie(int movieId) {
-        List<StartTime> startTimes = startTimeRepository.findByMovieId(movieId).orElseThrow(
+    public List<String> getStartTimeByMovieAndDate(int movieId, String date) {
+        List<StartTime> startTimes = startTimeRepository.findByMovieIdAndDate(movieId, convertToLocalDate(date)).orElseThrow(
                 () -> new RuntimeException("null")
         );
         List<String> listTime = new ArrayList<>();

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static demo.support.MethodSupport.convertToLocalTime;
+
 @Service
 public class SeatRoomServiceImpl implements SeatRoomService {
     private final SeatRoomRepository seatRoomRepository;
@@ -72,6 +74,14 @@ public class SeatRoomServiceImpl implements SeatRoomService {
         } catch (Exception e) {
             throw new RuntimeException("Không thể lấy danh sách ghế phòng: " + e.getMessage());
         }
+    }
+
+    @Override
+    public List<SeatRoomDto> getSeatRoomByStartTime(String time) {
+        List<SeatRoom> seatRooms = seatRoomRepository.findByTime(convertToLocalTime(time)).orElseThrow(
+                () -> new RuntimeException("Not seat room by time you choose")
+        );
+        return seatRooms.stream().map(SeatRoomDto::new).collect(Collectors.toList());
     }
 
     @Override
