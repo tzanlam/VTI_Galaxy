@@ -77,8 +77,8 @@ public class SeatRoomServiceImpl implements SeatRoomService {
     }
 
     @Override
-    public List<SeatRoomDto> getSeatRoomByStartTime(String time) {
-        List<SeatRoom> seatRooms = seatRoomRepository.findByTime(convertToLocalTime(time)).orElseThrow(
+    public List<SeatRoomDto> getSeatRoomByStartTime(String time, int galaxyId, int movieId) {
+        List<SeatRoom> seatRooms = seatRoomRepository.findByTime(convertToLocalTime(time), galaxyId, movieId).orElseThrow(
                 () -> new RuntimeException("Not seat room by time you choose")
         );
         return seatRooms.stream().map(SeatRoomDto::new).collect(Collectors.toList());

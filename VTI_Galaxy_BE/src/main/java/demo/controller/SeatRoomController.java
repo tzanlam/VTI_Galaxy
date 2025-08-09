@@ -33,10 +33,10 @@ public class SeatRoomController {
         }
     }
 
-    @GetMapping("/getSeatRoomByTime/time/{time}")
-    public ResponseEntity<?> getSeatRoomByTime(@PathVariable("time") String time) {
+    @GetMapping("/getSeatRoomByTime/time/{time}/galaxyId/{galaxyId}/movieId/{movieId}")
+    public ResponseEntity<?> getSeatRoomByTime(@PathVariable("time") String time, @PathVariable("galaxyId") int galaxyId, @PathVariable("movieId")int movieId) {
         try{
-            return ResponseEntity.ok(seatRoomService.getSeatRoomByStartTime(time));
+            return ResponseEntity.ok(seatRoomService.getSeatRoomByStartTime(time, galaxyId, movieId));
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }

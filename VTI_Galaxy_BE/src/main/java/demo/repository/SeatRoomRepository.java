@@ -18,6 +18,6 @@ public interface SeatRoomRepository extends JpaRepository<SeatRoom, Integer> {
 
     List<SeatRoom> findByStatusAndModifiedBefore(SeatRoom.BookedStatus status, LocalDateTime modified);
 
-    @Query("select sr from SeatRoom sr where sr.startTime.time = :time")
-    Optional<List<SeatRoom>> findByTime(@Param("time")LocalTime time);
+    @Query("select sr from SeatRoom sr where sr.startTime.time = :time and sr.room.galaxy.id = :galaxyId and sr.startTime.showTime.movie.id = :movieId")
+    Optional<List<SeatRoom>> findByTime(@Param("time")LocalTime time, @Param("galaxyId") int galaxyId,  @Param("movieId") int movieId);
 }

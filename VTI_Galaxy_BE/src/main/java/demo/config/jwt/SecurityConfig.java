@@ -68,6 +68,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
                                 "/",
+                                "/getSeatRoomByTime/time/{time}/galaxyId/{galaxyId}/movieId/{movieId}",
                                 "/movieId/{movieId}/andDate/{date}",
                                 "/index.html",
                                 "/static/**",
