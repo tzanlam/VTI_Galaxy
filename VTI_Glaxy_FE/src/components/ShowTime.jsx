@@ -178,66 +178,33 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
       console.warn("startTimes is not an array:", startTimes);
       return [];
     }
-    // Giả sử startTimes là mảng thời gian, thêm date và các trường khác
-    return startTimes.map(time => ({
+    return startTimes.map((time, idx) => ({
       startTime: time,
       date: selectedDay.dateForApi,
       galaxyName: selectedCinema,
-      movieName: "Phim", // Có thể lấy từ movieId nếu cần
-      id: `${selectedDay.dateForApi}_${time}` // Tạo id tạm thời
+      movieName: "Phim",
+      id: `${selectedDay.dateForApi}_${time}_${idx}`,
     }));
   }, [startTimes, selectedDay, selectedCinema]);
 
-  const handleTimeClick = (showtime, time) => {
-    navigate(`/seat-selection/${showtime.id}`, {
-      state: {
-        showtimeId: showtime.id,
-        movieName: showtime.movieName,
-        galaxyName: showtime.galaxyName,
-        date: selectedDay?.date,
-        time: time,
-        galaxyId: selectedGalaxyId,
-      },
-    });
+  const handleTimeClick = (showtime) => {
+    const { id, date, startTime, galaxyName, movieName } = showtime;
+    navigate(`/seat-selection/${selectedGalaxyId}/${movieId}/${startTime}`);
   };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h2 className="text-2xl font-bold mb-4">Lịch Chiếu Phim</h2>
-      {galaxyLoading && (
-        <p className="text-gray-500">Đang tải danh sách rạp...</p>
-      )}
-      {galaxyError && (
-        <p className="text-red-500">
-          Lỗi: {galaxyError.message || "Không thể tải danh sách rạp"}
-        </p>
-      )}
+      {galaxyLoading && <p className="text-gray-500">Đang tải danh sách rạp...</p>}
+      {galaxyError && <p className="text-red-500">Lỗi: {galaxyError.message || "Không thể tải danh sách rạp"}</p>}
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="relative inline-block text-left">
-          <DropdownButton
-            label={selectedCity || "Chọn thành phố"}
-            isOpen={isCityOpen}
-            onClick={toggleCityDropdown}
-          />
-          <DropdownMenu
-            isOpen={isCityOpen}
-            items={cities}
-            onSelect={handleCitySelect}
-            selectedItem={selectedCity}
-          />
+          <DropdownButton label={selectedCity || "Chọn thành phố"} isOpen={isCityOpen} onClick={toggleCityDropdown} />
+          <DropdownMenu isOpen={isCityOpen} items={cities} onSelect={handleCitySelect} selectedItem={selectedCity} />
         </div>
         <div className="relative inline-block text-left">
-          <DropdownButton
-            label={selectedCinema}
-            isOpen={isCinemaOpen}
-            onClick={toggleCinemaDropdown}
-          />
-          <DropdownMenu
-            isOpen={isCinemaOpen}
-            items={getCinemas}
-            onSelect={handleCinemaSelect}
-            selectedItem={selectedCinema}
-          />
+          <DropdownButton label={selectedCinema} isOpen={isCinemaOpen} onClick={toggleCinemaDropdown} />
+          <DropdownMenu isOpen={isCinemaOpen} items={getCinemas} onSelect={handleCinemaSelect} selectedItem={selectedCinema} />
         </div>
       </div>
       <div className="flex flex-wrap gap-2 mb-6">
@@ -245,9 +212,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
           <button
             key={idx}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              selectedDay?.date === day.date
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              selectedDay?.date === day.date ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
             onClick={() => handleDaySelect(day)}
           >
@@ -257,37 +222,26 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
           </button>
         ))}
       </div>
-      {startTimeLoading && (
-        <p className="text-gray-500">Đang tải thời gian bắt đầu...</p>
-      )}
-      {startTimeError && (
-        <p className="text-red-500">
-          Lỗi: {startTimeError.message || "Không thể tải thời gian bắt đầu"}
-        </p>
-      )}
-      {!startTimeLoading && !startTimeError && selectedShowtimes.length > 0
-        ? selectedShowtimes.map((showtime, idx) => (
-            <div key={idx} className="mb-4 p-4 bg-white rounded-lg shadow">
-              <h3 className="text-lg font-bold mb-2">
-                {showtime.galaxyName} - {showtime.movieName}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  key={idx}
-                  className="bg-orange-500 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition-colors"
-                  onClick={() => handleTimeClick(showtime, showtime.startTime)}
-                >
-                  {showtime.startTime}
-                </button>
-              </div>
+      {startTimeLoading && <p className="text-gray-500">Đang tải thời gian bắt đầu...</p>}
+      {startTimeError && <p className="text-red-500">Lỗi: {startTimeError.message || "Không thể tải thời gian bắt đầu"}</p>}
+      {!startTimeLoading && !startTimeError && selectedShowtimes.length > 0 ? (
+        selectedShowtimes.map((showtime, idx) => (
+          <div key={idx} className="mb-4 p-4 bg-white rounded-lg shadow">
+            <h3 className="text-lg font-bold mb-2">{showtime.galaxyName} - {showtime.movieName}</h3>
+            <div className="flex flex-wrap gap-2">
+              <button
+                key={idx}
+                className="bg-orange-500 text-white px-4 py-1 rounded-md hover:bg-orange-600 transition-colors"
+                onClick={() => handleTimeClick(showtime)}
+              >
+                {showtime.startTime}
+              </button>
             </div>
-          ))
-        : !startTimeLoading &&
-          !startTimeError && (
-            <p className="text-gray-500">
-              Không có lịch chiếu cho lựa chọn này.
-            </p>
-          )}
+          </div>
+        ))
+      ) : !startTimeLoading && !startTimeError ? (
+        <p className="text-gray-500">Không có lịch chiếu cho lựa chọn này.</p>
+      ) : null}
     </div>
   );
 };

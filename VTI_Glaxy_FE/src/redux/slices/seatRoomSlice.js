@@ -17,6 +17,14 @@ export const fetchSeatRooms = createAsyncThunk(
   }
 );
 
+export const fetchSeatRoomByTime = createAsyncThunk("seatRoom/fetchByTime", async ({ time, galaxyId, movieId }, { rejectWithValue }) => {
+  try {
+    return (await (seatRoomService.fetchSeatRoomByTime(time, galaxyId, movieId))).data
+  } catch (error) {
+    return rejectWithValue(err.response?.data)
+  }
+});
+
 export const fetchSeatRoomsByShowtimeId = createAsyncThunk(
   "seatRoom/fetchSeatRoomsByShowtimeId",
   async (showtimeId, { rejectWithValue }) => {
@@ -35,7 +43,7 @@ export const fetchSeatRoomsByShowtimeId = createAsyncThunk(
       console.error("fetchSeatRoomsByShowtimeId error:", error);
       return rejectWithValue(
         error.response?.data?.message ||
-          "Lỗi khi lấy danh sách ghế phòng theo suất chiếu"
+        "Lỗi khi lấy danh sách ghế phòng theo suất chiếu"
       );
     }
   }
@@ -130,6 +138,18 @@ const seatRoomSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchSeatRoomByTime.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(fetchSeatRoomByTime.fulfilled, (state, action) => {
+        state.loading = false
+        state.seatRooms = action.payload
+      })
+      .addCase(fetchSeatRoomByTime.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload
+      })
       .addCase(fetchSeatRooms.pending, (state) => {
         state.loading = true;
         state.error = null;

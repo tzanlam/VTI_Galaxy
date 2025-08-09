@@ -10,6 +10,9 @@ const seatRoomService = {
   fetchSeatRoomsByShowtimeId(showtimeId) {
     return axiosClient.get(`/getSeatRoomsByShowtime?showtimeId=${showtimeId}`);
   },
+  fetchSeatRoomByTime(time, galaxyId, movieId){
+    return axiosClient.get(`/getSeatRoomByTime/time/${time}/galaxyId/${galaxyId}/movieId/${movieId}`)
+  },
   createSeatRoom(seatRoomRequest) {
     return axiosClient.post("/postSeatRoom", seatRoomRequest);
   },
