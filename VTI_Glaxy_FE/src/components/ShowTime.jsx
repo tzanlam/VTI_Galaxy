@@ -189,6 +189,8 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
 
   const handleTimeClick = (showtime) => {
     const { id, date, startTime, galaxyName, movieName } = showtime;
+    console.log("truyền dữ liệu để show ra ghế galaxy, movie, time", selectedGalaxyId, movieId, startTime);
+    
     navigate(`/seat-selection/${selectedGalaxyId}/${movieId}/${startTime}`);
   };
 

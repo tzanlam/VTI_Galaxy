@@ -7,13 +7,13 @@ import movieReducer from "./slices/movieSlice";
 import showTimeReducer from "./slices/showTimeSlice";
 import startTimeReducer from "./slices/startTimeSlice";
 import roomReducer from "./slices/roomSlice";
-import seatReducer from "./slices/seatSlice";
 import seatRoomReducer from "./slices/seatRoomSlice";
 import otherReducer from "./slices/otherSlice";
 import voucherReducer from "./slices/voucherSlice";
 import employeeReducer from "./slices/employeeSlice";
 import bookingReducer from "./slices/bookingSlice";
 import paymentHistoryReducer from "./slices/paymentHistorySlice";
+import seatBookedReducer from "./slices/seatRoomSlice"
 
 const persistedUser = localStorage.getItem("user");
 const persistedToken = localStorage.getItem("token");
@@ -37,13 +37,13 @@ const store = configureStore({
     movie: movieReducer,
     showTime: showTimeReducer,
     startTime: startTimeReducer,
-    seat: seatReducer,
     seatRoom: seatRoomReducer,
     other: otherReducer,
     voucher: voucherReducer,
     employee: employeeReducer,
     booking: bookingReducer,
     paymentHistory: paymentHistoryReducer,
+    seatBooked: seatBookedReducer
   },
   preloadedState,
   // eslint-disable-next-line no-undef
