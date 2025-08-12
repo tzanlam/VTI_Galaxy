@@ -3,20 +3,27 @@ package demo.modal.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalTime;
-
 @Data
 @Entity
 @Table
-public class StartTime {
+public class SeatBooked {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    
+
+    @ManyToOne
+    @JoinColumn
+    private SeatRoom seatRoom;
+
     @ManyToOne
     @JoinColumn
     private ShowTime showTime;
 
     @Column
-    private LocalTime time;
+    @Enumerated(EnumType.STRING)
+    private SeatRoomStatus status;
+
+    public enum SeatRoomStatus {
+        AVAILABLE, BOOKED
+    }
 }

@@ -41,6 +41,15 @@ public class RoomController {
         }
     }
 
+    @GetMapping("/getRoomByShowTime")
+    public ResponseEntity<?> getRoomByShowTime(@RequestParam("movieId") int movieId, @RequestParam("galaxyId") int galaxyId, @RequestParam("time") String time) {
+        try{
+            return ResponseEntity.ok(roomService.getRoomByShowTime(movieId, galaxyId, time));
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping("/postRoom")
     public ResponseEntity<?> postRoom(@RequestBody RoomRequest request) {
         try{

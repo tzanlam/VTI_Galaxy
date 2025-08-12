@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Configuration
-@Order(7)
+@Order(5)
 public class EmployeeSeeder {
 
     @Bean

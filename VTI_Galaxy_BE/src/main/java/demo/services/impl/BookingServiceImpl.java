@@ -3,10 +3,7 @@ package demo.services.impl;
 import demo.config.VNPay.VNPayConfig;
 import demo.modal.constant.BookingStatus;
 import demo.modal.dto.BookingDto;
-import demo.modal.entity.Booking;
-import demo.modal.entity.Other;
-import demo.modal.entity.Seat;
-import demo.modal.entity.SeatRoom;
+import demo.modal.entity.*;
 import demo.modal.request.BookingRequest;
 import demo.repository.*;
 import demo.services.VNPayService;
@@ -18,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static demo.support.MethodSupport.calculatePriceBooking;
@@ -44,7 +42,9 @@ public class BookingServiceImpl implements BookingService {
 
     private final VNPayConfig vnPayConfig;
 
-    public BookingServiceImpl(BookingRepository bookingRepository, ShowTimeRepository showTimeRepository, GalaxyRepository galaxyRepository, VoucherRepository voucherRepository, SeatRoomRepository seatRoomRepository, OtherRepository otherRepository, AccountRepository accountRepository, VNPayService vnPayService, HttpServletRequest httpServletRequest, VNPayConfig vnPayConfig) {
+    private final SeatBookedRepository seatBookedRepository;
+
+    public BookingServiceImpl(BookingRepository bookingRepository, ShowTimeRepository showTimeRepository, GalaxyRepository galaxyRepository, VoucherRepository voucherRepository, SeatRoomRepository seatRoomRepository, OtherRepository otherRepository, AccountRepository accountRepository, VNPayService vnPayService, HttpServletRequest httpServletRequest, VNPayConfig vnPayConfig, SeatBookedRepository sSeatBookedRepository) {
         this.bookingRepository = bookingRepository;
         this.showTimeRepository = showTimeRepository;
         this.galaxyRepository = galaxyRepository;
@@ -55,6 +55,7 @@ public class BookingServiceImpl implements BookingService {
         this.vnPayService = vnPayService;
         this.httpServletRequest = httpServletRequest;
         this.vnPayConfig = vnPayConfig;
+        this.seatBookedRepository = sSeatBookedRepository;
     }
 
     @Override
@@ -99,117 +100,110 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingDto createBooking(BookingRequest request) {
-        try {
-            if (request.getAccountId() <= 0 || request.getGalaxyId() <= 0 ||
-                    request.getShowtimeId() <= 0 || request.getSeatRoomIds() == null ||
-                    request.getSeatRoomIds().isEmpty()) {
-                System.err.println("Invalid booking request: " + request);
-                throw new IllegalArgumentException("Missing required fields in booking request");
+        if (request.getAccountId() <= 0 || request.getGalaxyId() <= 0 ||
+                request.getShowtimeId() <= 0 || request.getSeatRoomIds() == null ||
+                request.getSeatRoomIds().isEmpty()) {
+            throw new IllegalArgumentException("Missing required fields in booking request");
+        }
+
+        Booking booking = new Booking();
+        booking.setPaymentMethod(request.getPaymentMethod());
+
+        voucherRepository.findById(request.getVoucherId())
+                .ifPresentOrElse(booking::setVoucher, () -> booking.setVoucher(null));
+
+        booking.setAccount(accountRepository.findById(request.getAccountId())
+                .orElseThrow(() -> new RuntimeException("Account not found")));
+
+        ShowTime showTime = showTimeRepository.findById(request.getShowtimeId())
+                .orElseThrow(() -> new RuntimeException("Show time not found"));
+        booking.setShowTime(showTime);
+
+        booking.setGalaxy(galaxyRepository.findById(request.getGalaxyId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy rạp")));
+
+        // ==== Check & add seats ====
+        List<SeatRoom> seatRooms = new ArrayList<>();
+        for (String seatRoomIdStr : request.getSeatRoomIds()) {
+            int seatRoomId = Integer.parseInt(seatRoomIdStr);
+            SeatRoom seatRoom = seatRoomRepository.findById(seatRoomId)
+                    .orElseThrow(() -> new RuntimeException("Ghế không tồn tại"));
+
+            // Check trạng thái trong SeatBooked cho suất chiếu này
+            Optional<SeatBooked> existingBooking = seatBookedRepository
+                    .findByShowTimeIdAndSeatRoomId(showTime.getId(), seatRoom.getId());
+
+            if (existingBooking.isPresent() && existingBooking.get().getStatus() == SeatBooked.SeatRoomStatus.BOOKED) {
+                throw new IllegalStateException("Seat " + seatRoom.getName() + " is already booked");
             }
 
-            Booking booking = new Booking();
-            booking.setPaymentMethod(request.getPaymentMethod());
-            voucherRepository.findById(request.getVoucherId()).ifPresentOrElse(
-                    booking::setVoucher,
-                    () -> booking.setVoucher(null)
-            );
+            seatRooms.add(seatRoom);
+        }
+        booking.setSeatRooms(seatRooms);
 
-            booking.setAccount(accountRepository.findById(request.getAccountId())
-                    .orElseThrow(() -> {
-                        System.err.println("Account not found with id: " + request.getAccountId());
-                        return new RuntimeException("Account not found");
-                    }));
-
-            booking.setShowTime(showTimeRepository.findById(request.getShowtimeId())
-                    .orElseThrow(() -> {
-                        System.err.println("Show time not found with id: " + request.getShowtimeId());
-                        return new RuntimeException("Show time not found");
-                    }));
-            booking.setGalaxy(galaxyRepository.findById(request.getGalaxyId())
-                    .orElseThrow(() -> {
-                        System.err.println("Galaxy not found with id: " + request.getGalaxyId());
-                        return new RuntimeException("Không tìm thấy rạp");
-                    }));
-
-            List<SeatRoom> seatRooms = new ArrayList<>();
-            for (String i : request.getSeatRoomIds()) {
-                SeatRoom seatRoom = seatRoomRepository.findById(Integer.parseInt(i)).orElseThrow(
-                        () -> {
-                            System.err.println("SeatRoom not found with id: " + i);
-                            return new RuntimeException("Ghế không tồn tại");
-                        }
-                );
-                if (seatRoom.getStatus() == SeatRoom.BookedStatus.BOOKED) {
-                    System.err.println("SeatRoom already booked: " + i);
-                    throw new IllegalStateException("Seat " + seatRoom.getName() + " is already booked");
-                }
-                seatRooms.add(seatRoom);
-            }
-            booking.setSeatRooms(seatRooms);
-
-            List<Other> others = new ArrayList<>();
-            for (String j : request.getOtherIds()) {
-                Other other = otherRepository.findById(Integer.parseInt(j)).orElseThrow(
-                        () -> {
-                            System.err.println("Other not found with id: " + j);
-                            return new RuntimeException("Combo không tồn tại");
-                        }
-                );
+        // ==== Combo/Other ====
+        List<Other> others = new ArrayList<>();
+        if (request.getOtherIds() != null) {
+            for (String otherIdStr : request.getOtherIds()) {
+                int otherId = Integer.parseInt(otherIdStr);
+                Other other = otherRepository.findById(otherId)
+                        .orElseThrow(() -> new RuntimeException("Combo không tồn tại"));
                 others.add(other);
             }
-            booking.setOthers(others);
-
-            int totalPrice = calculatePriceBooking(booking.getSeatRooms(), booking.getOthers(), booking.getVoucher());
-            if (totalPrice <= 0) {
-                System.err.println("Invalid totalPrice: " + totalPrice);
-                throw new IllegalArgumentException("Total price must be greater than 0");
-            }
-            booking.setTotalPrice(totalPrice);
-            booking.setStatus(BookingStatus.PENDING);
-
-            String vnpTxnRef = null;
-            if ("VNPAY".equalsIgnoreCase(String.valueOf(request.getPaymentMethod()))) {
-                vnpTxnRef = VNPayConfig.getRandomNumber(8);
-                booking.setVnpTxnRef(vnpTxnRef);
-                System.out.println("Generated VNPay vnpTxnRef: " + vnpTxnRef);
-            }
-
-            Booking savedBooking = bookingRepository.save(booking);
-            System.out.println("Saved booking with id: " + savedBooking.getId());
-
-            BookingDto bookingDto = new BookingDto(savedBooking);
-            if ("VNPAY".equalsIgnoreCase(String.valueOf(request.getPaymentMethod()))) {
-                try {
-                    String ipAddress = VNPayConfig.getIpAddress(httpServletRequest);
-                    String orderInfo = "Thanh toan don hang #" + savedBooking.getId(); // Thêm ký tự #
-                    System.out.println("Calling VNPayService.createOrder with totalPrice=" + totalPrice +
-                            ", orderInfo=" + orderInfo + ", ipAddress=" + ipAddress +
-                            ", vnpTxnRef=" + vnpTxnRef);
-                    String redirectUrl = vnPayService.createOrder(
-                            totalPrice,
-                            orderInfo,
-                            vnPayConfig.getVnpReturnUrl(),
-                            httpServletRequest
-                    );
-                    if (redirectUrl == null || redirectUrl.isEmpty()) {
-                        System.err.println("VNPayService.createOrder returned null or empty URL");
-                        throw new RuntimeException("Failed to generate VNPay payment URL");
-                    }
-                    System.out.println("Generated VNPay redirectUrl: " + redirectUrl);
-                    bookingDto.setRedirectUrl(redirectUrl);
-                } catch (Exception e) {
-                    System.err.println("Error generating VNPay redirectUrl: " + e.getMessage());
-                    bookingRepository.delete(savedBooking);
-                    System.out.println("Rolled back booking with id: " + savedBooking.getId());
-                    throw new RuntimeException("Failed to generate VNPay payment URL: " + e.getMessage(), e);
-                }
-            }
-
-            return bookingDto;
-        } catch (Exception e) {
-            System.err.println("Booking creation failed: " + e.getMessage());
-            throw new RuntimeException("Failed to create booking: " + e.getMessage(), e);
         }
+        booking.setOthers(others);
+
+        // ==== Tính giá ====
+        int totalPrice = calculatePriceBooking(seatRooms, others, booking.getVoucher());
+        if (totalPrice <= 0) {
+            throw new IllegalArgumentException("Total price must be greater than 0");
+        }
+        booking.setTotalPrice(totalPrice);
+        booking.setStatus(BookingStatus.PENDING);
+
+        // ==== VNPay xử lý ====
+        String vnpTxnRef = null;
+        if ("VNPAY".equalsIgnoreCase(String.valueOf(request.getPaymentMethod()))) {
+            vnpTxnRef = VNPayConfig.getRandomNumber(8);
+            booking.setVnpTxnRef(vnpTxnRef);
+        }
+
+        Booking savedBooking = bookingRepository.save(booking);
+
+        // ==== Cập nhật trạng thái ghế ====
+        for (SeatRoom seatRoom : seatRooms) {
+            SeatBooked seatBooked = seatBookedRepository
+                    .findByShowTimeIdAndSeatRoomId(showTime.getId(), seatRoom.getId())
+                    .orElse(new SeatBooked());
+            seatBooked.setSeatRoom(seatRoom);
+            seatBooked.setShowTime(showTime);
+            seatBooked.setStatus(SeatBooked.SeatRoomStatus.BOOKED);
+            seatBookedRepository.save(seatBooked);
+        }
+
+        BookingDto bookingDto = new BookingDto(savedBooking);
+
+        // ==== Tạo link thanh toán nếu VNPay ====
+        if ("VNPAY".equalsIgnoreCase(String.valueOf(request.getPaymentMethod()))) {
+            try {
+                String orderInfo = "Thanh toan don hang #" + savedBooking.getId();
+                String redirectUrl = vnPayService.createOrder(
+                        totalPrice,
+                        orderInfo,
+                        vnPayConfig.getVnpReturnUrl(),
+                        httpServletRequest
+                );
+                if (redirectUrl == null || redirectUrl.isEmpty()) {
+                    throw new RuntimeException("Failed to generate VNPay payment URL");
+                }
+                bookingDto.setRedirectUrl(redirectUrl);
+            } catch (Exception e) {
+                bookingRepository.delete(savedBooking); // rollback
+                throw new RuntimeException("Failed to generate VNPay payment URL: " + e.getMessage(), e);
+            }
+        }
+
+        return bookingDto;
     }
 
     @Override

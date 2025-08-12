@@ -10,6 +10,7 @@ public interface RoomService {
     List<RoomDto> getAllRooms();
     RoomDto getRoomById(int id);
     List<RoomDto> getByGalaxy(int galaxyId);
+    RoomDto getRoomByShowTime(int movieId, int galaxyId, String startTime);
 
     // post
     RoomDto createRoom(RoomRequest request);

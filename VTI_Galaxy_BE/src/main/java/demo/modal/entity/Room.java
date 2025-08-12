@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @Entity
 @Table
 @Data
@@ -27,4 +29,7 @@ public class Room extends Time{
     @ManyToOne
     @JoinColumn
     private Galaxy galaxy;
+
+    @OneToMany(mappedBy = "room")
+    private List<SeatRoom> seatRooms;
 }

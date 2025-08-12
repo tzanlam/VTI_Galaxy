@@ -6,13 +6,13 @@ import lombok.Data;
 @Entity
 @Table
 @Data
-public class SeatRoom extends Time {
+public class SeatRoom{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column
-    private String name; // vd a1, a2
+    private String name;
 
     @ManyToOne
     @JoinColumn
@@ -20,19 +20,5 @@ public class SeatRoom extends Time {
 
     @ManyToOne
     @JoinColumn
-    private StartTime startTime;
-
-    @ManyToOne
-    @JoinColumn
     private Room room;
-
-    @Column
-    @Enumerated(EnumType.STRING)
-    private BookedStatus status;
-
-    public enum BookedStatus {
-        AVAILABLE,
-        BOOKED,
-        SELECTED
-    }
 }

@@ -14,7 +14,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Configuration
-@Order(4)
+@Order(2)
 public class MovieSeeder {
     @Bean
     CommandLineRunner seedMovies(MovieRepository movieRepo) {

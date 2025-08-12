@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,4 +15,7 @@ import java.util.Optional;
 public interface StartTimeRepository extends JpaRepository<StartTime, Integer> {
     @Query("select st from StartTime st where st.showTime.movie.id = :movieId and st.showTime.date = :date")
     Optional<List<StartTime>> findByMovieIdAndDate(@Param("movieId") int movieId, @Param("date") LocalDate date);
+
+    @Query("select st from StartTime st where st.time = :time")
+    Optional<StartTime> findByTime(@Param("time") LocalTime time);
 }
