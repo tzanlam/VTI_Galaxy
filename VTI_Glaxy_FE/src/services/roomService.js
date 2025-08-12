@@ -10,6 +10,9 @@ const roomService = {
   fetchRoomByGalaxy(galaxyId) {
     return axiosClient.get(`/getRoomByGalaxy?galaxyId=${galaxyId}`);
   },
+  fetchRoomByShowTime(movieId, galaxyId, time){
+    return axiosClient.get(`/getRoomByShowTime?movieId=${movieId}&galaxyId=${galaxyId}&time=${time}`)
+  },
   createRoom(roomRequest) {
     return axiosClient.post("/postRoom", roomRequest);
   },

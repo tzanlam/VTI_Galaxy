@@ -12,6 +12,14 @@ export const fetchRooms = createAsyncThunk(
   }
 );
 
+export const fetchRoomByShowTime = createAsyncThunk("room/fetchRoomByShowTime", async({movieId, galaxyId, time}, {rejectWithValue})=>{
+  try {
+    return (await (roomService.fetchRoomByShowTime(movieId, galaxyId, time))).data
+  } catch (error) {
+    return rejectWithValue(err.data?.message || "Không tìm thấy room")
+  }
+})
+
 export const fetchRoomById = createAsyncThunk(
   "room/fetchRoomById",
   async (roomId, { rejectWithValue }) => {
@@ -96,6 +104,19 @@ const roomSlice = createSlice({
         state.rooms = action.payload;
       })
       .addCase(fetchRooms.rejected, (state, action) => {
+        (state.loading = false), (state.error = action.payload);
+      })
+      // fetch Room by showtime
+      .addCase(fetchRoomByShowTime.pending, (state) => {
+        (state.loading = true), (state.error = null);
+      })
+      .addCase(fetchRoomByShowTime.fulfilled, (state, action) => {
+        (state.loading = false),
+          console.log("data reducer fetchRooms", action.payload);
+
+        state.rooms = action.payload;
+      })
+      .addCase(fetchRoomByShowTime.rejected, (state, action) => {
         (state.loading = false), (state.error = action.payload);
       })
       // fetchRoom ByID

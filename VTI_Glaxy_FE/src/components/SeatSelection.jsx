@@ -1,61 +1,99 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchSeatRoomByTime } from "../redux/slices/seatRoomSlice";
+import { fetchSeatRoomByRoomId } from "../redux/slices/seatRoomSlice";
+import { fetchRoomByShowTime } from "../redux/slices/roomSlice";
+import { fetchSeatBooked } from "../redux/slices/seatBookedSlice";
 
 const SeatSelection = () => {
   const { galaxyId, movieId, time } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { seatRooms, loading, error } = useSelector((state) => state.seatRoom);
+
+  const { seatRooms, loading: seatLoading, error: seatError } = useSelector((state) => state.seatRoom);
+  const { room, loading: roomLoading, error: roomError } = useSelector((state) => state.room);
+  const { seatBooked, loading: bookedLoading, error: bookedError } = useSelector((state) => state.seatBooked);
+
   const [selectedSeats, setSelectedSeats] = useState([]);
 
+  // 1. Lấy room theo movieId + galaxyId + time
   useEffect(() => {
-    if (!galaxyId || !time) {
+    if (!galaxyId || !movieId || !time) {
       navigate("/chon-suat-chieu");
       return;
     }
-    dispatch(fetchSeatRoomByTime({ time, galaxyId, movieId }));
-  }, [dispatch, galaxyId, time, movieId, navigate]);
+    dispatch(fetchRoomByShowTime({ movieId, galaxyId, time }));
+  }, [dispatch, galaxyId, movieId, time, navigate]);
 
+  // 2. Khi có room.id => Lấy danh sách ghế và ghế đã đặt
+  useEffect(() => {
+    if (room?.id) {
+      dispatch(fetchSeatRoomByRoomId(room.id));
+      dispatch(fetchSeatBooked({ roomId: room.id, time }));
+    }
+  }, [dispatch, room, time]);
+
+  // 3. Lấy danh sách ID ghế đã đặt
+  const bookedSeatIds = useMemo(
+    () => (Array.isArray(seatBooked) ? seatBooked.map(sb => String(sb.seatRoom.id)) : []),
+    [seatBooked]
+  );
+
+  // 4. Xác định trạng thái ghế
+  const getSeatStatus = (seat) => {
+    const seatIdStr = String(seat.id);
+    if (bookedSeatIds.includes(seatIdStr)) return "booked";
+    if (selectedSeats.includes(seatIdStr)) return "selected";
+    return "available";
+  };
+
+  // 5. Click chọn ghế
   const handleSeatClick = (seat) => {
-    if (seat.booked) return; // Không cho chọn ghế đã đặt
+    const seatIdStr = String(seat.id);
+    if (getSeatStatus(seat) === "booked") return;
     setSelectedSeats((prev) =>
-      prev.includes(seat.id)
-        ? prev.filter((s) => s !== seat.id)
-        : [...prev, seat.id]
+      prev.includes(seatIdStr)
+        ? prev.filter((id) => id !== seatIdStr)
+        : [...prev, seatIdStr]
     );
   };
 
-  if (loading) return <p className="text-center mt-4">Đang tải ghế...</p>;
-  if (error) return <p className="text-center mt-4 text-red-500">{error}</p>;
-  if (!Array.isArray(seatRooms)) {
-    console.error("seatRooms is not an array:", seatRooms);
-    return <p className="text-center mt-4 text-red-500">Dữ liệu ghế không hợp lệ</p>;
+  // Loading & error handling
+  if (roomLoading || seatLoading || bookedLoading) return <p className="text-center mt-4">Đang tải dữ liệu...</p>;
+  if (roomError) return <p className="text-center mt-4 text-red-500">{roomError}</p>;
+  if (seatError) return <p className="text-center mt-4 text-red-500">{seatError}</p>;
+  if (bookedError) return <p className="text-center mt-4 text-red-500">{bookedError}</p>;
+
+  if (!Array.isArray(seatRooms) || seatRooms.length === 0) {
+    return <p className="text-center mt-4">Không có ghế nào</p>;
   }
 
   return (
     <div className="p-6 flex flex-col items-center">
       <h2 className="text-2xl font-bold mb-4">Chọn ghế</h2>
+
+      {/* Màn hình */}
       <div className="bg-gray-800 text-white py-2 px-6 rounded-t-lg mb-6">
         Màn hình
       </div>
-      <div className="grid gap-3">
+
+      {/* Ghế */}
+      <div className="grid gap-3 grid-cols-8">
         {seatRooms.map((seat) => {
-          const isSelected = selectedSeats.includes(seat.id);
-          const seatClasses = seat.booked
-            ? "bg-red-500 cursor-not-allowed"
-            : isSelected
-            ? "bg-green-500 hover:bg-green-600"
-            : "bg-gray-300 hover:bg-gray-400";
+          const status = getSeatStatus(seat);
+          let seatClasses = "";
+          if (status === "booked") seatClasses = "bg-red-500 cursor-not-allowed";
+          else if (status === "selected") seatClasses = "bg-green-500 hover:bg-green-600";
+          else seatClasses = "bg-gray-300 hover:bg-gray-400";
+
           return (
             <button
               key={seat.id}
               onClick={() => handleSeatClick(seat)}
-              disabled={seat.booked}
+              disabled={status === "booked"}
               className={`w-10 h-10 rounded-md text-sm font-semibold transition-colors duration-200 ${seatClasses}`}
             >
-              {seat.label}
+              {seat.name}
             </button>
           );
         })}
@@ -63,21 +101,20 @@ const SeatSelection = () => {
 
       {/* Legend */}
       <div className="mt-6 flex gap-6">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-gray-300 rounded"></div>
-          <span>Trống</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-green-500 rounded"></div>
-          <span>Đang chọn</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-red-500 rounded"></div>
-          <span>Đã đặt</span>
-        </div>
+        <Legend color="bg-gray-300" label="Trống" />
+        <Legend color="bg-green-500" label="Đang chọn" />
+        <Legend color="bg-red-500" label="Đã đặt" />
       </div>
     </div>
   );
 };
+
+// Component nhỏ hiển thị chú thích
+const Legend = ({ color, label }) => (
+  <div className="flex items-center gap-2">
+    <div className={`w-6 h-6 ${color} rounded`}></div>
+    <span>{label}</span>
+  </div>
+);
 
 export default SeatSelection;
