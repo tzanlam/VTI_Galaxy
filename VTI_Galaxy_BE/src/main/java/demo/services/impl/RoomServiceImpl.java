@@ -9,9 +9,12 @@ import demo.services.interfaceClass.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static demo.support.MethodSupport.convertToLocalDate;
 import static demo.support.MethodSupport.convertToLocalTime;
 
 @Service
@@ -21,7 +24,6 @@ public class RoomServiceImpl implements RoomService {
     private final GalaxyRepository galaxyRepository;
     private final ShowTimeRepository showTimeRepository;
     private final MovieRepository movieRepository;
-    private final StartTimeRepository startTimeRepository;
 
     @Override
     public List<RoomDto> getAllRooms() {
@@ -42,21 +44,27 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RoomDto getRoomByShowTime(int movieId, int galaxyId, String startTime){
-        Movie movie = movieRepository.findById(movieId).orElseThrow(
-                () -> new NullPointerException("Movie not found with id: " + movieId)
+    public List<RoomDto> getRoomByShowTime(int movieId, int galaxyId, String startTime, String date) {
+        movieRepository.findById(movieId)
+                .orElseThrow(() -> new NullPointerException("Movie not found with id: " + movieId));
+        galaxyRepository.findById(galaxyId)
+                .orElseThrow(() -> new NullPointerException("Galaxy not found with id: " + galaxyId));
+
+        LocalTime start = convertToLocalTime(startTime);
+        LocalDate day = convertToLocalDate(date);
+
+        List<Room> rooms = showTimeRepository.findRoomsByMovieGalaxyDateAndStartTimeExists(
+                movieId, galaxyId, day, start
         );
-        Galaxy galaxy = galaxyRepository.findById(galaxyId).orElseThrow(
-                () -> new NullPointerException("Galaxy not found with id: " + galaxyId)
-        );
-        StartTime st = startTimeRepository.findByTime(convertToLocalTime(startTime)).orElseThrow(
-                ()  -> new NullPointerException("Start time not found with id: " + startTime)
-        );
-        Room room = showTimeRepository.findRoomByMovieGalaxyAndStartTimeId(movieId, galaxyId, st.getId()).orElseThrow(
-                () -> new RuntimeException("Room not found with your condition")
-        );
-        return new RoomDto(room);
+
+        if (rooms.isEmpty()) {
+            throw new RuntimeException("Room not found with your condition");
+        }
+
+        return rooms.stream().map(RoomDto::new).collect(Collectors.toList());
     }
+
+
 
     @Override
     public RoomDto createRoom(RoomRequest request) {
