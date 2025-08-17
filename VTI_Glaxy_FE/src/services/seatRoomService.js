@@ -5,8 +5,8 @@ const seatRoomService = {
     return axiosClient.get(`/getSeatRoomById?seatRoomId=${seatRoomId}`);
   },
   fetchSeatRoomByRoomId(roomId) {
-    return axiosClient.get(`/getSeatRoomByRoomId?roomId=${roomId}`)
+    return axiosClient.get(`/getSeatRoomsByRoomId?roomId=${roomId}`);
   },
-}
+};
 
 export default seatRoomService;

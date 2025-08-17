@@ -6,36 +6,54 @@ import { fetchRoomByShowTime } from "../redux/slices/roomSlice";
 import { fetchSeatBooked } from "../redux/slices/seatBookedSlice";
 
 const SeatSelection = () => {
-  const { galaxyId, movieId, time } = useParams();
+  const { galaxyId, movieId, time, date } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { seatRooms, loading: seatLoading, error: seatError } = useSelector((state) => state.seatRoom);
-  const { room, loading: roomLoading, error: roomError } = useSelector((state) => state.room);
-  const { seatBooked, loading: bookedLoading, error: bookedError } = useSelector((state) => state.seatBooked);
+  const {
+    seatRooms,
+    loading: seatLoading,
+    error: seatError,
+  } = useSelector((state) => state.seatRoom);
+  const {
+    room,
+    loading: roomLoading,
+    error: roomError,
+  } = useSelector((state) => state.room);
+  const {
+    seatBooked,
+    loading: bookedLoading,
+    error: bookedError,
+  } = useSelector((state) => state.seatBooked);
 
   const [selectedSeats, setSelectedSeats] = useState([]);
 
-  // 1. Lấy room theo movieId + galaxyId + time
+  // 1. Lấy room theo movieId + galaxyId + time + date
   useEffect(() => {
-    if (!galaxyId || !movieId || !time) {
+    console.log("Params:", { galaxyId, movieId, time, date });
+    if (!movieId || !galaxyId || !time || !date) {
+      console.error("Thiếu tham số URL:", { galaxyId, movieId, time, date });
       navigate("/chon-suat-chieu");
       return;
     }
-    dispatch(fetchRoomByShowTime({ movieId, galaxyId, time }));
-  }, [dispatch, galaxyId, movieId, time, navigate]);
+    dispatch(fetchRoomByShowTime({ movieId, galaxyId, time, date }));
+  }, [dispatch, galaxyId, movieId, time, date, navigate]);
 
   // 2. Khi có room.id => Lấy danh sách ghế và ghế đã đặt
   useEffect(() => {
     if (room?.id) {
+      console.log("Room:", room);
       dispatch(fetchSeatRoomByRoomId(room.id));
-      dispatch(fetchSeatBooked({ roomId: room.id, time }));
+      dispatch(fetchSeatBooked({ roomId: room.id, time, date }));
     }
-  }, [dispatch, room, time]);
+  }, [dispatch, room, time, date]);
 
   // 3. Lấy danh sách ID ghế đã đặt
   const bookedSeatIds = useMemo(
-    () => (Array.isArray(seatBooked) ? seatBooked.map(sb => String(sb.seatRoom.id)) : []),
+    () =>
+      Array.isArray(seatBooked)
+        ? seatBooked.map((sb) => String(sb.seatRoom.id))
+        : [],
     [seatBooked]
   );
 
@@ -59,10 +77,14 @@ const SeatSelection = () => {
   };
 
   // Loading & error handling
-  if (roomLoading || seatLoading || bookedLoading) return <p className="text-center mt-4">Đang tải dữ liệu...</p>;
-  if (roomError) return <p className="text-center mt-4 text-red-500">{roomError}</p>;
-  if (seatError) return <p className="text-center mt-4 text-red-500">{seatError}</p>;
-  if (bookedError) return <p className="text-center mt-4 text-red-500">{bookedError}</p>;
+  if (roomLoading || seatLoading || bookedLoading)
+    return <p className="text-center mt-4">Đang tải dữ liệu...</p>;
+  if (roomError)
+    return <p className="text-center mt-4 text-red-500">{roomError}</p>;
+  if (seatError)
+    return <p className="text-center mt-4 text-red-500">{seatError}</p>;
+  if (bookedError)
+    return <p className="text-center mt-4 text-red-500">{bookedError}</p>;
 
   if (!Array.isArray(seatRooms) || seatRooms.length === 0) {
     return <p className="text-center mt-4">Không có ghế nào</p>;
@@ -82,8 +104,10 @@ const SeatSelection = () => {
         {seatRooms.map((seat) => {
           const status = getSeatStatus(seat);
           let seatClasses = "";
-          if (status === "booked") seatClasses = "bg-red-500 cursor-not-allowed";
-          else if (status === "selected") seatClasses = "bg-green-500 hover:bg-green-600";
+          if (status === "booked")
+            seatClasses = "bg-red-500 cursor-not-allowed";
+          else if (status === "selected")
+            seatClasses = "bg-green-500 hover:bg-green-600";
           else seatClasses = "bg-gray-300 hover:bg-gray-400";
 
           return (

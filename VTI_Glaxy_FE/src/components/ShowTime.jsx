@@ -7,9 +7,11 @@ import { useNavigate } from "react-router-dom";
 const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { startTimes, loading: startTimeLoading, error: startTimeError } = useSelector(
-    (state) => state.startTime
-  );
+  const {
+    startTimes,
+    loading: startTimeLoading,
+    error: startTimeError,
+  } = useSelector((state) => state.startTime);
   const {
     galaxies,
     loading: galaxyLoading,
@@ -28,7 +30,12 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
 
   useEffect(() => {
     if (movieId && selectedDay) {
-      console.log("Dispatching fetchStartTimes with movieId:", movieId, "and date:", selectedDay.dateForApi);
+      console.log(
+        "Dispatching fetchStartTimes with movieId:",
+        movieId,
+        "and date:",
+        selectedDay.dateForApi
+      );
       dispatch(fetchStartTimes({ movieId, date: selectedDay.dateForApi }));
     }
   }, [dispatch, movieId, selectedDay]);
@@ -93,7 +100,7 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
 
   const getWeekDays = useMemo(() => {
     const weekDays = [];
-    const today = new Date("2025-08-09"); // Đặt ngày cố định là 9/8/2025 để kiểm tra
+    const today = new Date(); // Sử dụng ngày hiện tại thay vì ngày cố định
     for (let i = 0; i < 7; i++) {
       const day = new Date(today);
       day.setDate(today.getDate() + i);
@@ -188,25 +195,57 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
   }, [startTimes, selectedDay, selectedCinema]);
 
   const handleTimeClick = (showtime) => {
-    const { id, date, startTime, galaxyName, movieName } = showtime;
-    console.log("truyền dữ liệu để show ra ghế galaxy, movie, time", selectedGalaxyId, movieId, startTime);
-    
-    navigate(`/seat-selection/${selectedGalaxyId}/${movieId}/${startTime}`);
+    const startTime = showtime.startTime;
+    console.log(
+      "Truyền dữ liệu để show ra ghế: galaxyId, movieId, time, date",
+      selectedGalaxyId,
+      movieId,
+      startTime,
+      selectedDay.dateForApi
+    );
+
+    navigate(
+      `/seat-selection/${selectedGalaxyId}/${movieId}/${startTime}/${selectedDay.dateForApi}/`
+    );
   };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h2 className="text-2xl font-bold mb-4">Lịch Chiếu Phim</h2>
-      {galaxyLoading && <p className="text-gray-500">Đang tải danh sách rạp...</p>}
-      {galaxyError && <p className="text-red-500">Lỗi: {galaxyError.message || "Không thể tải danh sách rạp"}</p>}
+      {galaxyLoading && (
+        <p className="text-gray-500">Đang tải danh sách rạp...</p>
+      )}
+      {galaxyError && (
+        <p className="text-red-500">
+          Lỗi: {galaxyError.message || "Không thể tải danh sách rạp"}
+        </p>
+      )}
       <div className="flex flex-wrap gap-4 mb-6">
         <div className="relative inline-block text-left">
-          <DropdownButton label={selectedCity || "Chọn thành phố"} isOpen={isCityOpen} onClick={toggleCityDropdown} />
-          <DropdownMenu isOpen={isCityOpen} items={cities} onSelect={handleCitySelect} selectedItem={selectedCity} />
+          <DropdownButton
+            label={selectedCity || "Chọn thành phố"}
+            isOpen={isCityOpen}
+            onClick={toggleCityDropdown}
+          />
+          <DropdownMenu
+            isOpen={isCityOpen}
+            items={cities}
+            onSelect={handleCitySelect}
+            selectedItem={selectedCity}
+          />
         </div>
         <div className="relative inline-block text-left">
-          <DropdownButton label={selectedCinema} isOpen={isCinemaOpen} onClick={toggleCinemaDropdown} />
-          <DropdownMenu isOpen={isCinemaOpen} items={getCinemas} onSelect={handleCinemaSelect} selectedItem={selectedCinema} />
+          <DropdownButton
+            label={selectedCinema}
+            isOpen={isCinemaOpen}
+            onClick={toggleCinemaDropdown}
+          />
+          <DropdownMenu
+            isOpen={isCinemaOpen}
+            items={getCinemas}
+            onSelect={handleCinemaSelect}
+            selectedItem={selectedCinema}
+          />
         </div>
       </div>
       <div className="flex flex-wrap gap-2 mb-6">
@@ -214,7 +253,9 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
           <button
             key={idx}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              selectedDay?.date === day.date ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              selectedDay?.date === day.date
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
             }`}
             onClick={() => handleDaySelect(day)}
           >
@@ -224,12 +265,20 @@ const ShowTime = ({ selectedCity, onCityChange, movieId }) => {
           </button>
         ))}
       </div>
-      {startTimeLoading && <p className="text-gray-500">Đang tải thời gian bắt đầu...</p>}
-      {startTimeError && <p className="text-red-500">Lỗi: {startTimeError.message || "Không thể tải thời gian bắt đầu"}</p>}
+      {startTimeLoading && (
+        <p className="text-gray-500">Đang tải thời gian bắt đầu...</p>
+      )}
+      {startTimeError && (
+        <p className="text-red-500">
+          Lỗi: {startTimeError.message || "Không thể tải thời gian bắt đầu"}
+        </p>
+      )}
       {!startTimeLoading && !startTimeError && selectedShowtimes.length > 0 ? (
         selectedShowtimes.map((showtime, idx) => (
           <div key={idx} className="mb-4 p-4 bg-white rounded-lg shadow">
-            <h3 className="text-lg font-bold mb-2">{showtime.galaxyName} - {showtime.movieName}</h3>
+            <h3 className="text-lg font-bold mb-2">
+              {showtime.galaxyName} - {showtime.movieName}
+            </h3>
             <div className="flex flex-wrap gap-2">
               <button
                 key={idx}
