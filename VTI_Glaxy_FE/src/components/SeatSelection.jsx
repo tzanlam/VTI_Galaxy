@@ -4,6 +4,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { fetchSeatRoomByRoomId } from "../redux/slices/seatRoomSlice";
 import { fetchRoomByShowTime } from "../redux/slices/roomSlice";
 import { fetchSeatBooked } from "../redux/slices/seatBookedSlice";
+import { fetchMovieById } from "../redux/slices/movieSlice";
+import { fetchShowTimeByMovieDateAndGalaxy } from "../redux/slices/showTimeSlice";
+import { IoMdTime } from "react-icons/io";
+import { FaRegCalendar } from "react-icons/fa";
 
 const SeatSelection = () => {
   const { galaxyId, movieId, time, date } = useParams();
@@ -25,10 +29,27 @@ const SeatSelection = () => {
     loading: bookedLoading,
     error: bookedError,
   } = useSelector((state) => state.seatBooked);
+  const {
+    movie,
+    loading: movieLoading,
+    error: movieError,
+  } = useSelector((state) => state.movie);
+  const {
+    showTimes,
+    loading: showTimeLoading,
+    error: showTimeError,
+  } = useSelector((state) => state.showTime);
 
   const [selectedSeats, setSelectedSeats] = useState([]);
 
-  // 1. Lấy room theo movieId + galaxyId + time + date
+  // Fetch movie data
+  useEffect(() => {
+    if (movieId) {
+      dispatch(fetchMovieById(movieId));
+    }
+  }, [dispatch, movieId]);
+
+  // Fetch room data
   useEffect(() => {
     console.log("Params:", { galaxyId, movieId, time, date });
     if (!movieId || !galaxyId || !time || !date) {
@@ -39,7 +60,14 @@ const SeatSelection = () => {
     dispatch(fetchRoomByShowTime({ movieId, galaxyId, time, date }));
   }, [dispatch, galaxyId, movieId, time, date, navigate]);
 
-  // 2. Khi có room.id => Lấy danh sách ghế và ghế đã đặt
+  // Fetch showtimes
+  useEffect(() => {
+    if (movieId && galaxyId && date) {
+      dispatch(fetchShowTimeByMovieDateAndGalaxy({ galaxyId, movieId, date }));
+    }
+  }, [dispatch, galaxyId, movieId, date]);
+
+  // Fetch seats and booked seats
   useEffect(() => {
     if (room?.id) {
       console.log("Room:", room);
@@ -48,7 +76,7 @@ const SeatSelection = () => {
     }
   }, [dispatch, room, time, date]);
 
-  // 3. Lấy danh sách ID ghế đã đặt
+  // Memoize booked seat IDs
   const bookedSeatIds = useMemo(
     () =>
       Array.isArray(seatBooked)
@@ -57,7 +85,27 @@ const SeatSelection = () => {
     [seatBooked]
   );
 
-  // 4. Xác định trạng thái ghế
+  // Group seats by row
+  const seatsByRow = useMemo(() => {
+    if (!Array.isArray(seatRooms)) return {};
+
+    return seatRooms.reduce((acc, seat) => {
+      const row = seat.name.charAt(0);
+      if (!acc[row]) acc[row] = [];
+      acc[row].push(seat);
+      return acc;
+    }, {});
+  }, [seatRooms]);
+
+  // Find showtimeId
+  const showtime = useMemo(() => {
+    return showTimes.find(
+      (st) => st.startTime === time && st.room?.id === room?.id
+    );
+  }, [showTimes, time, room]);
+  const showtimeId = showtime?.id;
+
+  // Determine seat status
   const getSeatStatus = (seat) => {
     const seatIdStr = String(seat.id);
     if (bookedSeatIds.includes(seatIdStr)) return "booked";
@@ -65,7 +113,7 @@ const SeatSelection = () => {
     return "available";
   };
 
-  // 5. Click chọn ghế
+  // Handle seat click
   const handleSeatClick = (seat) => {
     const seatIdStr = String(seat.id);
     if (getSeatStatus(seat) === "booked") return;
@@ -76,8 +124,56 @@ const SeatSelection = () => {
     );
   };
 
+  // Handle continue to other
+  const handleContinue = () => {
+    if (selectedSeats.length === 0) {
+      // Optionally show a toast or alert
+      return;
+    }
+    if (!showtimeId) {
+      // Optionally handle error
+      return;
+    }
+
+    const fullSelectedSeats = selectedSeats
+      .map((id) => {
+        const seat = seatRooms.find((s) => String(s.id) === id);
+        if (seat) {
+          return {
+            id: seat.id,
+            name: seat.name,
+            price: seat.seat?.price || 100000,
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
+
+    const totalSeatPrice = fullSelectedSeats.reduce(
+      (sum, s) => sum + s.price,
+      0
+    );
+
+    const movieInfo = {
+      movieName: movie?.name || "Chưa có tiêu đề",
+      galaxyName: room?.galaxy?.name || "Chưa có thông tin",
+      date,
+      time,
+      galaxyId,
+    };
+
+    navigate("/other", {
+      state: {
+        showtimeId,
+        selectedSeats: fullSelectedSeats,
+        movieInfo,
+        totalSeatPrice,
+      },
+    });
+  };
+
   // Loading & error handling
-  if (roomLoading || seatLoading || bookedLoading)
+  if (roomLoading || seatLoading || bookedLoading || showTimeLoading)
     return <p className="text-center mt-4">Đang tải dữ liệu...</p>;
   if (roomError)
     return <p className="text-center mt-4 text-red-500">{roomError}</p>;
@@ -85,55 +181,204 @@ const SeatSelection = () => {
     return <p className="text-center mt-4 text-red-500">{seatError}</p>;
   if (bookedError)
     return <p className="text-center mt-4 text-red-500">{bookedError}</p>;
+  if (showTimeError)
+    return <p className="text-center mt-4 text-red-500">{showTimeError}</p>;
 
   if (!Array.isArray(seatRooms) || seatRooms.length === 0) {
     return <p className="text-center mt-4">Không có ghế nào</p>;
   }
 
   return (
-    <div className="p-6 flex flex-col items-center">
-      <h2 className="text-2xl font-bold mb-4">Chọn ghế</h2>
+    <div className="p-6 flex flex-col lg:flex-row gap-8 container mx-auto">
+      {/* Seat Selection Section */}
+      <div className="lg:w-2/3 flex flex-col items-center">
+        <h2 className="text-2xl font-bold mb-4">Chọn ghế</h2>
 
-      {/* Màn hình */}
-      <div className="bg-gray-800 text-white py-2 px-6 rounded-t-lg mb-6">
-        Màn hình
+        {/* Screen */}
+        <div className="bg-gray-800 text-white py-2 px-6 rounded-t-lg mb-6">
+          Màn hình
+        </div>
+
+        {/* Seats by Row */}
+        <div className="flex flex-col gap-4 w-full max-w-2xl">
+          {Object.keys(seatsByRow)
+            .sort()
+            .map((row) => (
+              <div key={row} className="flex items-center gap-3">
+                <span className="w-8 font-semibold">{row}</span>
+                <div className="grid gap-3 grid-cols-8">
+                  {seatsByRow[row]
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((seat) => {
+                      const status = getSeatStatus(seat);
+                      let seatClasses = "";
+                      if (status === "booked")
+                        seatClasses = "bg-red-500 cursor-not-allowed";
+                      else if (status === "selected")
+                        seatClasses = "bg-green-500 hover:bg-green-600";
+                      else seatClasses = "bg-gray-300 hover:bg-gray-400";
+
+                      return (
+                        <button
+                          key={seat.id}
+                          onClick={() => handleSeatClick(seat)}
+                          disabled={status === "booked"}
+                          className={`w-10 h-10 rounded-md text-sm font-semibold transition-colors duration-200 ${seatClasses}`}
+                        >
+                          {seat.name.slice(1)}
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+            ))}
+        </div>
+
+        {/* Legend */}
+        <div className="mt-6 flex gap-6">
+          <Legend color="bg-gray-300" label="Trống" />
+          <Legend color="bg-green-500" label="Đang chọn" />
+          <Legend color="bg-red-500" label="Đã đặt" />
+        </div>
       </div>
 
-      {/* Ghế */}
-      <div className="grid gap-3 grid-cols-8">
-        {seatRooms.map((seat) => {
-          const status = getSeatStatus(seat);
-          let seatClasses = "";
-          if (status === "booked")
-            seatClasses = "bg-red-500 cursor-not-allowed";
-          else if (status === "selected")
-            seatClasses = "bg-green-500 hover:bg-green-600";
-          else seatClasses = "bg-gray-300 hover:bg-gray-400";
-
-          return (
-            <button
-              key={seat.id}
-              onClick={() => handleSeatClick(seat)}
-              disabled={status === "booked"}
-              className={`w-10 h-10 rounded-md text-sm font-semibold transition-colors duration-200 ${seatClasses}`}
-            >
-              {seat.name}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Legend */}
-      <div className="mt-6 flex gap-6">
-        <Legend color="bg-gray-300" label="Trống" />
-        <Legend color="bg-green-500" label="Đang chọn" />
-        <Legend color="bg-red-500" label="Đã đặt" />
-      </div>
+      {/* Movie Information Section */}
+      {movie && !movieLoading && !movieError && (
+        <div className="lg:w-1/3 bg-gray-100 p-6 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            Thông tin phim
+          </h2>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <img
+              src={movie.imageURL || "https://placehold.co/150x225"}
+              alt={movie.name || "Phim"}
+              className="w-32 sm:w-40 h-auto rounded-lg shadow-md"
+              onError={(e) => {
+                e.target.src = "https://picsum.photos/150/225";
+                e.target.alt = "Hình ảnh không tải được";
+              }}
+            />
+            <div className="flex-1 text-md text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                {movie.name || "Chưa có tiêu đề"}
+              </h3>
+              {movie.duration && (
+                <div className="flex items-center mb-2">
+                  <IoMdTime className="mr-2" />
+                  <span>{movie.duration}</span>
+                </div>
+              )}
+              {movie.releaseDate && (
+                <div className="flex items-center mb-2">
+                  <FaRegCalendar className="mr-2" />
+                  <span>{movie.releaseDate}</span>
+                </div>
+              )}
+              {movie.country && (
+                <div className="mb-2">
+                  <p>
+                    <strong>Quốc gia:</strong> {movie.country}
+                  </p>
+                </div>
+              )}
+              {movie.producer && (
+                <div className="mb-2">
+                  <p>
+                    <strong>Nhà sản xuất:</strong> {movie.producer}
+                  </p>
+                </div>
+              )}
+              {movie.genre && (
+                <div className="mb-2">
+                  <p>
+                    <strong>Thể loại:</strong> {movie.genre}
+                  </p>
+                </div>
+              )}
+              {movie.director && (
+                <div className="mb-2">
+                  <p>
+                    <strong>Đạo diễn:</strong> {movie.director}
+                  </p>
+                </div>
+              )}
+              {movie.actor && (
+                <div className="mb-2">
+                  <p>
+                    <strong>Diễn viên:</strong> {movie.actor}
+                  </p>
+                </div>
+              )}
+              {movie.rating && (
+                <div className="mb-2">
+                  <p>
+                    <strong>Đánh giá:</strong> {movie.rating}
+                  </p>
+                </div>
+              )}
+              {/* Additional Information */}
+              <div className="mt-4 border-t pt-4">
+                <p>
+                  <strong>Rạp:</strong>{" "}
+                  {room?.galaxy?.name || "Chưa có thông tin"}
+                </p>
+                <p>
+                  <strong>Suất chiếu:</strong> {time}
+                </p>
+                <p>
+                  <strong>Ngày:</strong> {date}
+                </p>
+              </div>
+              {/* Selected Seats and Price */}
+              <div className="mt-4 border-t pt-4">
+                <h4 className="font-bold mb-2">Ghế đang chọn:</h4>
+                {selectedSeats.length === 0 ? (
+                  <p>Chưa chọn ghế nào</p>
+                ) : (
+                  <>
+                    {selectedSeats.map((id) => {
+                      const seat = seatRooms.find((s) => String(s.id) === id);
+                      return seat ? (
+                        <p key={id}>
+                          {seat.name} - Giá:{" "}
+                          {seat.seat?.price?.toLocaleString() || "100,000"} VND
+                        </p>
+                      ) : null;
+                    })}
+                    <p className="mt-2 font-bold">
+                      Tổng tiền:{" "}
+                      {selectedSeats
+                        .reduce((total, id) => {
+                          const seat = seatRooms.find(
+                            (s) => String(s.id) === id
+                          );
+                          return (
+                            total + (seat ? seat.seat?.price || 100000 : 0)
+                          );
+                        }, 0)
+                        .toLocaleString()}{" "}
+                      VND
+                    </p>
+                  </>
+                )}
+              </div>
+              {/* Continue Button */}
+              <button
+                className="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+                onClick={handleContinue}
+                disabled={selectedSeats.length === 0 || !showtimeId}
+              >
+                Tiếp tục
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-// Component nhỏ hiển thị chú thích
+// Legend Component
 const Legend = ({ color, label }) => (
   <div className="flex items-center gap-2">
     <div className={`w-6 h-6 ${color} rounded`}></div>
