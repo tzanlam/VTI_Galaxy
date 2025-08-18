@@ -8,6 +8,7 @@ import { fetchMovieById } from "../redux/slices/movieSlice";
 import { fetchShowTimeByMovieDateAndGalaxy } from "../redux/slices/showTimeSlice";
 import { IoMdTime } from "react-icons/io";
 import { FaRegCalendar } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 const SeatSelection = () => {
   const { galaxyId, movieId, time, date } = useParams();
@@ -42,16 +43,16 @@ const SeatSelection = () => {
 
   const [selectedSeats, setSelectedSeats] = useState([]);
 
-  // Fetch movie data
+  // Lấy dữ liệu phim
   useEffect(() => {
     if (movieId) {
       dispatch(fetchMovieById(movieId));
     }
   }, [dispatch, movieId]);
 
-  // Fetch room data
+  // Lấy dữ liệu phòng
   useEffect(() => {
-    console.log("Params:", { galaxyId, movieId, time, date });
+    console.log("Tham số:", { galaxyId, movieId, time, date });
     if (!movieId || !galaxyId || !time || !date) {
       console.error("Thiếu tham số URL:", { galaxyId, movieId, time, date });
       navigate("/chon-suat-chieu");
@@ -60,23 +61,29 @@ const SeatSelection = () => {
     dispatch(fetchRoomByShowTime({ movieId, galaxyId, time, date }));
   }, [dispatch, galaxyId, movieId, time, date, navigate]);
 
-  // Fetch showtimes
+  // Lấy lịch chiếu
   useEffect(() => {
     if (movieId && galaxyId && date) {
       dispatch(fetchShowTimeByMovieDateAndGalaxy({ galaxyId, movieId, date }));
+      console.log("Đang lấy lịch chiếu cho:", { galaxyId, movieId, date });
     }
   }, [dispatch, galaxyId, movieId, date]);
 
-  // Fetch seats and booked seats
+  // Lấy ghế và ghế đã đặt
   useEffect(() => {
     if (room?.id) {
-      console.log("Room:", room);
+      console.log("Phòng:", room);
       dispatch(fetchSeatRoomByRoomId(room.id));
       dispatch(fetchSeatBooked({ roomId: room.id, time, date }));
     }
   }, [dispatch, room, time, date]);
 
-  // Memoize booked seat IDs
+  // Ghi log showTimes để debug
+  useEffect(() => {
+    console.log("showTimes:", showTimes);
+  }, [showTimes]);
+
+  // Memoize ID ghế đã đặt
   const bookedSeatIds = useMemo(
     () =>
       Array.isArray(seatBooked)
@@ -85,7 +92,7 @@ const SeatSelection = () => {
     [seatBooked]
   );
 
-  // Group seats by row
+  // Nhóm ghế theo hàng
   const seatsByRow = useMemo(() => {
     if (!Array.isArray(seatRooms)) return {};
 
@@ -97,15 +104,50 @@ const SeatSelection = () => {
     }, {});
   }, [seatRooms]);
 
-  // Find showtimeId
+  // Hàm chuẩn hóa thời gian
+  const normalizeTime = (t) => {
+    if (!t || typeof t !== "string") {
+      console.warn("normalizeTime nhận đầu vào không hợp lệ:", t);
+      return "";
+    }
+    return t.split(":").slice(0, 2).join(":");
+  };
+
+  // Tìm showtimeId
   const showtime = useMemo(() => {
-    return showTimes.find(
-      (st) => st.startTime === time && st.room?.id === room?.id
-    );
+    if (!showTimes || !Array.isArray(showTimes) || !time || !room?.id) {
+      console.log("Thiếu dữ liệu cho suất chiếu:", {
+        showTimes,
+        time,
+        roomId: room?.id,
+      });
+      return null;
+    }
+
+    const result = showTimes.find((st) => {
+      if (!st.startTimes || !Array.isArray(st.startTimes)) return false;
+      const normalizedTime = normalizeTime(time);
+      const matchesTime = st.startTimes.some(
+        (startTime) => normalizeTime(startTime) === normalizedTime
+      );
+      const matchesRoom = st.roomId === room.id;
+      console.log("Kiểm tra suất chiếu:", {
+        startTimes: st.startTimes,
+        normalizedStartTimes: st.startTimes.map(normalizeTime),
+        time,
+        normalizedTime,
+        matchesTime,
+        matchesRoom,
+        roomId: st.roomId,
+      });
+      return matchesTime && matchesRoom;
+    });
+    console.log("Suất chiếu đã chọn:", result);
+    return result;
   }, [showTimes, time, room]);
   const showtimeId = showtime?.id;
 
-  // Determine seat status
+  // Xác định trạng thái ghế
   const getSeatStatus = (seat) => {
     const seatIdStr = String(seat.id);
     if (bookedSeatIds.includes(seatIdStr)) return "booked";
@@ -113,7 +155,7 @@ const SeatSelection = () => {
     return "available";
   };
 
-  // Handle seat click
+  // Xử lý khi click vào ghế
   const handleSeatClick = (seat) => {
     const seatIdStr = String(seat.id);
     if (getSeatStatus(seat) === "booked") return;
@@ -124,14 +166,21 @@ const SeatSelection = () => {
     );
   };
 
-  // Handle continue to other
+  // Xử lý nút tiếp tục
   const handleContinue = () => {
     if (selectedSeats.length === 0) {
-      // Optionally show a toast or alert
+      toast.error("Vui lòng chọn ít nhất một ghế");
       return;
     }
     if (!showtimeId) {
-      // Optionally handle error
+      toast.error(
+        "Không tìm thấy suất chiếu. Vui lòng kiểm tra lại ngày, giờ hoặc rạp."
+      );
+      console.log("Thiếu showtimeId. Dữ liệu hiện tại:", {
+        showTimes,
+        time,
+        roomId: room?.id,
+      });
       return;
     }
 
@@ -172,7 +221,7 @@ const SeatSelection = () => {
     });
   };
 
-  // Loading & error handling
+  // Xử lý trạng thái tải và lỗi
   if (roomLoading || seatLoading || bookedLoading || showTimeLoading)
     return <p className="text-center mt-4">Đang tải dữ liệu...</p>;
   if (roomError)
@@ -190,16 +239,16 @@ const SeatSelection = () => {
 
   return (
     <div className="p-6 flex flex-col lg:flex-row gap-8 container mx-auto">
-      {/* Seat Selection Section */}
+      {/* Phần chọn ghế */}
       <div className="lg:w-2/3 flex flex-col items-center">
         <h2 className="text-2xl font-bold mb-4">Chọn ghế</h2>
 
-        {/* Screen */}
+        {/* Màn hình */}
         <div className="bg-gray-800 text-white py-2 px-6 rounded-t-lg mb-6">
           Màn hình
         </div>
 
-        {/* Seats by Row */}
+        {/* Ghế theo hàng */}
         <div className="flex flex-col gap-4 w-full max-w-2xl">
           {Object.keys(seatsByRow)
             .sort()
@@ -234,7 +283,7 @@ const SeatSelection = () => {
             ))}
         </div>
 
-        {/* Legend */}
+        {/* Chú thích */}
         <div className="mt-6 flex gap-6">
           <Legend color="bg-gray-300" label="Trống" />
           <Legend color="bg-green-500" label="Đang chọn" />
@@ -242,7 +291,7 @@ const SeatSelection = () => {
         </div>
       </div>
 
-      {/* Movie Information Section */}
+      {/* Phần thông tin phim */}
       {movie && !movieLoading && !movieError && (
         <div className="lg:w-1/3 bg-gray-100 p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -316,7 +365,7 @@ const SeatSelection = () => {
                   </p>
                 </div>
               )}
-              {/* Additional Information */}
+              {/* Thông tin bổ sung */}
               <div className="mt-4 border-t pt-4">
                 <p>
                   <strong>Rạp:</strong>{" "}
@@ -329,7 +378,7 @@ const SeatSelection = () => {
                   <strong>Ngày:</strong> {date}
                 </p>
               </div>
-              {/* Selected Seats and Price */}
+              {/* Ghế đã chọn và giá */}
               <div className="mt-4 border-t pt-4">
                 <h4 className="font-bold mb-2">Ghế đang chọn:</h4>
                 {selectedSeats.length === 0 ? (
@@ -362,7 +411,7 @@ const SeatSelection = () => {
                   </>
                 )}
               </div>
-              {/* Continue Button */}
+              {/* Nút Tiếp tục */}
               <button
                 className="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
                 onClick={handleContinue}
@@ -378,7 +427,7 @@ const SeatSelection = () => {
   );
 };
 
-// Legend Component
+// Thành phần Chú thích
 const Legend = ({ color, label }) => (
   <div className="flex items-center gap-2">
     <div className={`w-6 h-6 ${color} rounded`}></div>
