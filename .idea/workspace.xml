@@ -1,22 +1,154 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="4323d14d-2480-475e-a78c-2fe5bf31b885" name="Changes" comment="">
-<<<<<<< HEAD
-      <change afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/repository/VnpayTransactionRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/config/VNPay/VNPayConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/config/VNPay/VNPayConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/config/VNPay/VNPayService.java" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/services/VNPayService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/config/jwt/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/config/jwt/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/constant/BookingStatus.java" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/constant/BookingStatus.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/dto/BookingDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/dto/BookingDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/entity/Booking.java" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/entity/Booking.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/entity/VnpayTransaction.java" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/entity/VnpayTransaction.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/request/BookingRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/modal/request/BookingRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/services/impl/BookingServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/java/demo/services/impl/BookingServiceImpl.java" afterDir="false" />
-=======
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/VTI_Galaxy_BE/src/main/resources/application.properties" afterDir="false" />
->>>>>>> f0e6505a108cd23cddc9a2af1c3d59dca4f17ee9
+    <list default="true" id="df7e00a7-98fc-4a0e-932e-c8b0f5c802b2" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/firebase-hosting-merge.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/firebase-hosting-pull-request.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/VTI_Galaxy.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/VTI_Galaxy_be.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/extensions.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/.firebaserc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/eslint.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/firebase.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/Các chức năng yêu cầu để tạo nên we.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/Các chức năng yêu cầu để tạo nên website đặt vé xem phim.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/Database vs Redis.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/Nên dùng kafka hay redis.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/docker.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/movie-query-postgressql.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/movie_query_mysql.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/showtime trong spring boot.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/techstalk-VTI-movie-booking-ticket.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/ví dụ kafka đặt vé xem phim.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/ví dụ redis đặt vé xem phim.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/ví dụ web socket đặt vé xem phim.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/ghi_chu/~$c chức năng yêu cầu để tạo nên website đặt vé xem phim.docx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/movie.mwb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/movie.mwb.bak" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/postcss.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/public/vite.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/App.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/ErrorPage-Dr8yzO2v.gif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/Untitled design.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/conan.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/last-stop.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/logo2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/logo3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/mickey-17.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/mua-he-kinh-hai.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/one-piece.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/profile-avatar.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/quy-nhap-trang.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/show-white.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/wolfoo.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/assets/xitrum.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/Banner.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/ErrorPage.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/Footer.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/Header.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/HomeContent.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/Layout.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/LoginModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/MovieDetails.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/Other.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/Payment.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/PaymentHistory.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/Promotions.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/QuickBooking.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/RegisterModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/SeatSelection.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/ShowTime.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/StartTime.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/TrailerModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/UserMenu.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/UserProfile.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/EmployeeManagement.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/GalaxyManagement.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/MovieManagement.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/OtherManagement.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/RoomManagement.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/VoucherManagement.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/details/EmployeeDetails.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/details/GalaxyDetails.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/details/MovieDetailsAdmin.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/details/OtherDetails.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/details/ProfileManagement.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/details/RoomDetails.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/details/VoucherDetails.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/model/CreateMovieModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/model/CreateRoomModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/model/EmploeeModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/model/GalaxyAdminModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/model/OtherModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/model/ShowTimeAdminModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/admin/model/VoucherAdminModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/components/modal/RoomModal.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/data/cinemaData.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/data/menuItems.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/data/moviesData.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/data/user.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/index.css" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/main.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/pages/HomeAdmin.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/pages/Homepage.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/accountSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/authSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/bookingSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/employeeSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/galaxySlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/modalSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/movieSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/otherSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/paymentHistorySlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/roomSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/seatBookedSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/seatRoomSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/showTimeSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/startTimeSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/supportSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/slices/voucherSlice.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/redux/store.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/routes/PrivateRouter.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/routes/RouterConfig.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/AuthService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/accountService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/axiosClient.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/bookingService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/employeeService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/galaxyService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/movieService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/otherService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/paymentService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/roomService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/seatBookedService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/seatRoomService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/seatService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/showTimeService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/startTimeService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/supportService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/services/voucherService.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/utils/CinemaDropdown.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/utils/CityDropdown.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/utils/LazyLoad.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/utils/SearchResult.jsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/src/utils/validation.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/tailwind.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/VTI_Glaxy_FE/vite.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,73 +158,54 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;tzanlam&quot;
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "hoang12343"
   }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/tzanlam/VTI_Galaxy.git&quot;,
-    &quot;accountId&quot;: &quot;8bdf43fc-fe84-4dbf-9aa1-2b7a4b14e9aa&quot;
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/tzanlam/VTI_Galaxy.git",
+    "accountId": "1102e52a-bdaa-472b-a6f6-211f3683b8d4"
   }
-}</component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 0
-}</component>
-  <component name="ProjectId" id="2vPZk3AGZFRDCNO5730ssIP7sHa" />
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="31RurVbcgJksqV2F0qVLmf5Nspw" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-<<<<<<< HEAD
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
-    "ignore.preview.features.used": "true",
     "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/Acer/Desktop/VTI_Galaxy_BE",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
-=======
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.preview.features.used&quot;: &quot;true&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/tzanl/project/VTI_Galaxy - Copy/VTI_Galaxy_BE&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
->>>>>>> f0e6505a108cd23cddc9a2af1c3d59dca4f17ee9
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.22562.145" />
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-IU-243.22562.145" />
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26927.53" />
+        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53" />
       </set>
     </attachedChunks>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="4323d14d-2480-475e-a78c-2fe5bf31b885" name="Changes" comment="" />
-      <created>1744048809276</created>
+      <changelist id="df7e00a7-98fc-4a0e-932e-c8b0f5c802b2" name="Changes" comment="" />
+      <created>1755499405982</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1744048809276</updated>
-      <workItem from="1744048810631" duration="32000" />
-      <workItem from="1751434557703" duration="43000" />
-      <workItem from="1751434613854" duration="1000" />
-      <workItem from="1751434623551" duration="2000" />
+      <updated>1755499405982</updated>
+      <workItem from="1755499407794" duration="31000" />
     </task>
     <servers />
   </component>

@@ -1,9 +1,0 @@
-VTI-Movie-Booking-ticket
-
-techstalk:
-FE:tailwind css, reactjs + vitejs
-tool: react-router-dom, toastify, axios, antd
-BE: java spring boot, JPA, auth, mail security
-SQL: PostgreSQL
-
-
