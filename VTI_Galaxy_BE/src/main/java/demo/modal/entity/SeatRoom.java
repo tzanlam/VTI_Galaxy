@@ -6,7 +6,7 @@ import lombok.Data;
 @Entity
 @Table
 @Data
-public class    SeatRoom{
+public class SeatRoom{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -21,4 +21,8 @@ public class    SeatRoom{
     @ManyToOne
     @JoinColumn
     private Room room;
+
+    @ManyToOne
+    @JoinColumn(name = "show_time_id")
+    private ShowTime showTime;
 }

@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +23,7 @@ public class RoomServiceImpl implements RoomService {
     private final GalaxyRepository galaxyRepository;
     private final ShowTimeRepository showTimeRepository;
     private final MovieRepository movieRepository;
+    private final StartTimeRepository startTimeRepository;
 
     @Override
     public List<RoomDto> getAllRooms() {
@@ -44,27 +44,33 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<RoomDto> getRoomByShowTime(int movieId, int galaxyId, String startTime, String date) {
-        movieRepository.findById(movieId)
-                .orElseThrow(() -> new NullPointerException("Movie not found with id: " + movieId));
-        galaxyRepository.findById(galaxyId)
-                .orElseThrow(() -> new NullPointerException("Galaxy not found with id: " + galaxyId));
-
-        LocalTime start = convertToLocalTime(startTime);
-        LocalDate day = convertToLocalDate(date);
-
-        List<Room> rooms = showTimeRepository.findRoomsByMovieGalaxyDateAndStartTimeExists(
-                movieId, galaxyId, day, start
+    public RoomDto getRoomByShowTime(int movieId, int galaxyId, String startTime, String date) {
+        Movie movie = movieRepository.findById(movieId).orElseThrow(
+                () -> new IllegalArgumentException("Phim không tồn tại với ID: " + movieId)
         );
-
-        if (rooms.isEmpty()) {
-            throw new RuntimeException("Room not found with your condition");
+        Galaxy galaxy = galaxyRepository.findById(galaxyId).orElseThrow(
+                () -> new IllegalArgumentException("Rạp không tồn tại với ID: " + galaxyId)
+        );
+        StartTime st = startTimeRepository.findByTime(convertToLocalTime(startTime)).orElseThrow(
+                () -> new IllegalArgumentException("Thời gian bắt đầu không tồn tại: " + startTime)
+        );
+        LocalDate localDate;
+        try {
+            localDate = convertToLocalDate(date);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Định dạng ngày không hợp lệ: " + date);
         }
-
-        return rooms.stream().map(RoomDto::new).collect(Collectors.toList());
+        List<Room> rooms = showTimeRepository.findRoomByMovieGalaxyAndStartTimeId(movieId, galaxyId, st.getId(), localDate);
+        if (rooms.isEmpty()) {
+            throw new IllegalArgumentException("Không tìm thấy phòng với điều kiện đã chọn");
+        }
+        if (rooms.size() > 1) {
+            // Log warning để debug, nhưng vẫn lấy room đầu tiên để tránh crash
+            System.err.println("Cảnh báo: Tìm thấy " + rooms.size() + " phòng trùng lặp cho params: movieId=" + movieId + ", galaxyId=" + galaxyId + ", startTime=" + startTime + ", date=" + date);
+        }
+        Room room = rooms.get(0);  // Lấy room đầu tiên
+        return new RoomDto(room);
     }
-
-
 
     @Override
     public RoomDto createRoom(RoomRequest request) {

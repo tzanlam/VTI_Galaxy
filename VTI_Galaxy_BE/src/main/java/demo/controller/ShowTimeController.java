@@ -62,6 +62,7 @@ public class ShowTimeController {
 
     @GetMapping("/getShowTimeByMovieDateAndGalaxy")
     public ResponseEntity<?> findByDateAndMovieAndGalaxy(
+            
             @RequestParam("movieId") int movieId,
             @RequestParam("date") String date,
             @RequestParam("galaxyId") int galaxyId

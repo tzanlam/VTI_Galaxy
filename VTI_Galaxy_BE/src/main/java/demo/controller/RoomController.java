@@ -1,12 +1,9 @@
 package demo.controller;
 
-import demo.modal.dto.RoomDto;
 import demo.modal.request.RoomRequest;
 import demo.services.interfaceClass.RoomService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin("*")
@@ -44,15 +41,16 @@ public class RoomController {
         }
     }
 
-    @GetMapping("/getRoomByMShowTime")
-    public ResponseEntity<?> getRoomByShowTime(@RequestParam("movieId") int movieId,
-                                               @RequestParam("galaxyId") int galaxyId,
-                                               @RequestParam("time") String time,
-                                               @RequestParam("date") String date) {
-        List<RoomDto>  res = (roomService.getRoomByShowTime(movieId, galaxyId, time, date));
-        try{
-            return ResponseEntity.ok(res);
-        }catch (Exception e){
+    @GetMapping("/getRoomByShowTime")
+    public ResponseEntity<?> getRoomByShowTime(
+            @RequestParam("movieId") int movieId,
+            @RequestParam("galaxyId") int galaxyId,
+            @RequestParam("time") String time,
+            @RequestParam("date") String date
+    ) {
+        try {
+            return ResponseEntity.ok(roomService.getRoomByShowTime(movieId, galaxyId, time, date));
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

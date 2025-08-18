@@ -3,6 +3,8 @@ package demo.modal.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 @Table
@@ -17,4 +19,7 @@ public class Seat {
 
     @Column
     private int price;
+
+    @OneToMany(mappedBy = "seat")
+    private List<SeatRoom> seatRooms;
 }

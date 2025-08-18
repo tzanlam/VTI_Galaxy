@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +21,7 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer> {
             @Param("movieId") int movieId,
             @Param("date") LocalDate date
     );
+
     @Query("SELECT s FROM ShowTime s WHERE (:galaxyId IS NULL OR s.galaxy.id = :galaxyId) " +
             "AND (:movieId IS NULL OR s.movie.id = :movieId) " +
             "AND (:date IS NULL OR s.date = :date)")
@@ -49,22 +49,19 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer> {
     boolean existsByDate(LocalDate now);
 
     @Query("""
-    SELECT r
-    FROM Room r
-    WHERE EXISTS (
-      SELECT 1 FROM ShowTime st JOIN st.startTimes s
-      WHERE st.room = r
-        AND st.movie.id = :movieId
-        AND st.galaxy.id = :galaxyId
-        AND st.date = :date
-        AND s.time = :startTime
-    )
+
+            SELECT DISTINCT st.room
+FROM ShowTime st
+JOIN st.startTimes s
+WHERE st.movie.id = :movieId
+  AND st.galaxy.id = :galaxyId
+  AND s.id = :startTimeId
+  AND st.date = :date
 """)
-    List<Room> findRoomsByMovieGalaxyDateAndStartTimeExists(
+    List<Room> findRoomByMovieGalaxyAndStartTimeId(
             @Param("movieId") int movieId,
             @Param("galaxyId") int galaxyId,
-            @Param("date") LocalDate date,
-            @Param("startTime") LocalTime startTime
+            @Param("startTimeId") int startTimeId,
+            @Param("date") LocalDate date
     );
-
-}
+    }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,10 +70,17 @@ public class ShowTimeServiceImpl implements ShowTimeService {
 
     @Override
     public List<ShowTimeDto> findShowTimeByRoom(int roomId) {
-        List<ShowTime> showTimes = showTimeRepository.findByRoom(roomId).orElseThrow(
-                () -> new RuntimeException("showtime is null with roomId you choose")
+        // Kiểm tra sự tồn tại của phòng
+        roomRepository.findById(roomId).orElseThrow(
+                () -> new IllegalArgumentException("Phòng chiếu không tồn tại với ID: " + roomId)
         );
-        return showTimes.stream().map(ShowTimeDto::new).collect(Collectors.toList());
+        // Lấy danh sách lịch chiếu
+        List<ShowTime> showTimes = showTimeRepository.findByRoom(roomId)
+                .orElse(Collections.emptyList());
+        // Chuyển đổi sang DTO
+        return showTimes.stream()
+                .map(ShowTimeDto::new)
+                .collect(Collectors.toList());
     }
 
     @Override

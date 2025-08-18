@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"movie_id", "galaxy_id", "room_id", "date"})
+})
 @Data
 public class ShowTime {
     @Id
@@ -20,16 +22,19 @@ public class ShowTime {
     private Galaxy galaxy;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(nullable = false)
     private Movie movie;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(nullable = false)
     private Room room;
 
     @Column
     private LocalDate date;
 
-    @OneToMany(mappedBy = "showTime")
+    @OneToMany(mappedBy = "showTime", fetch = FetchType.EAGER)
     private List<StartTime> startTimes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "showTime")
+    private List<SeatRoom> seatRoom;
 }

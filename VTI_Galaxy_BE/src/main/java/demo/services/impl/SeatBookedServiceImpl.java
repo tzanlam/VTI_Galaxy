@@ -24,7 +24,7 @@ public class SeatBookedServiceImpl implements SeatBookedService {
     private final StartTimeRepository startTimeRepository;
 
     @Override
-    public List<SeatBookedDTO> getByRoomAndTime(int roomId, String time) {
+    public List<SeatBookedDTO> getByRoomAndTime(int roomId, String time, String date) {
         Room room = roomRepository.findById(roomId).orElseThrow(()-> new RuntimeException("Room Not Found"));
         StartTime startTime = startTimeRepository.findByTime(convertToLocalTime(time)).orElseThrow(
                 () -> new RuntimeException("Start time not found")

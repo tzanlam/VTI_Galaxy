@@ -12,12 +12,16 @@ import org.springframework.web.bind.annotation.*;
 public class SeatBookedController {
     private final SeatBookedService seatBookedService;
 
-    @GetMapping("/roomId/{roomId}/time/{time}")
-    public ResponseEntity<?> getSeatBooked(@PathVariable int roomId, @PathVariable String time){
-        try{
-            return ResponseEntity.ok(seatBookedService.getByRoomAndTime(roomId, time));
-        }catch (Exception e){
-            return ResponseEntity.badRequest().build();
+    @GetMapping("getSeatBooked/{roomId}/{time}/{date}")
+    public ResponseEntity<?> getSeatBooked(
+            @PathVariable int roomId,
+            @PathVariable String time,
+            @PathVariable String date
+    ) {
+        try {
+            return ResponseEntity.ok(seatBookedService.getByRoomAndTime(roomId, time, date));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
         }
     }
 }

@@ -12,9 +12,9 @@ public class StartTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    
+
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "show_time_id")
     private ShowTime showTime;
 
     @Column
