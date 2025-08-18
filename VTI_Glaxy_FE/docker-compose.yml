@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"   # Map cổng 3000 của máy → cổng 80 trong container
+    volumes:
+      - .:/app      # Gắn thư mục code để phát triển (có thể bỏ nếu chỉ chạy build)
+    restart: unless-stopped
