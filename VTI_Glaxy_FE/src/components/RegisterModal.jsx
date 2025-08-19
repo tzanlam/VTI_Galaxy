@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { closeRegisterModal, openLoginModal } from "../redux/slices/modalSlice";
-import { validateRegister } from "../utils/Validation";
+import { validateRegister } from "../utils/validation";
 import { IoIosEyeOff, IoMdEye } from "react-icons/io";
 
 const RegisterModal = () => {

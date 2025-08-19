@@ -12,13 +12,39 @@ export const fetchRooms = createAsyncThunk(
   }
 );
 
-export const fetchRoomByShowTime = createAsyncThunk("room/fetchRoomByShowTime", async({movieId, galaxyId, time}, {rejectWithValue})=>{
-  try {
-    return (await (roomService.fetchRoomByShowTime(movieId, galaxyId, time))).data
-  } catch (error) {
-    return rejectWithValue(err.data?.message || "Không tìm thấy room")
+export const fetchRoomByShowTime = createAsyncThunk(
+  "room/fetchRoomByShowTime",
+  async ({ movieId, galaxyId, time, date }, { rejectWithValue }) => {
+    try {
+      console.log("fetchRoomByShowTime called with:", {
+        movieId,
+        galaxyId,
+        time,
+        date,
+      });
+
+      // Validate parameters
+      if (!galaxyId || !movieId || !time || !date) {
+        return rejectWithValue("Thiếu tham số bắt buộc");
+      }
+
+      if (!galaxyId || isNaN(galaxyId) || galaxyId === null || galaxyId <= 0) {
+        return rejectWithValue("galaxyId không hợp lệ");
+      }
+      if (!movieId || isNaN(movieId) || movieId === null || movieId <= 0) {
+        return rejectWithValue("movieId không hợp lệ");
+      }
+      return (
+        await roomService.fetchRoomByShowTime(movieId, galaxyId, time, date)
+      ).data;
+    } catch (error) {
+      console.error("API Error:", error.response?.data);
+      return rejectWithValue(
+        error.response?.data?.message || "Không tìm thấy phòng"
+      );
+    }
   }
-})
+);
 
 export const fetchRoomById = createAsyncThunk(
   "room/fetchRoomById",
@@ -111,10 +137,9 @@ const roomSlice = createSlice({
         (state.loading = true), (state.error = null);
       })
       .addCase(fetchRoomByShowTime.fulfilled, (state, action) => {
-        (state.loading = false),
-          console.log("data reducer fetchRooms", action.payload);
-
-        state.rooms = action.payload;
+        state.loading = false;
+        console.log("data reducer fetchRoomByShowTime", action.payload);
+        state.room = action.payload; // Sửa từ state.rooms thành state.room
       })
       .addCase(fetchRoomByShowTime.rejected, (state, action) => {
         (state.loading = false), (state.error = action.payload);

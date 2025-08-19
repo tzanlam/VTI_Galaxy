@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import tailwindcss from 'tailwindcss';
-import autoprefixer from 'autoprefixer';
-import history from 'connect-history-api-fallback';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "tailwindcss";
+import autoprefixer from "autoprefixer";
+import history from "connect-history-api-fallback";
 
 export default defineConfig({
   base: "./",
@@ -20,3 +20,8 @@ export default defineConfig({
     },
   },
 });
+
+// VITE_API_URL = "http://localhost:8082";
+
+// const api = import.meta.env.VITE_API_URL;
+// fetch(`${api}/api/bookings`);

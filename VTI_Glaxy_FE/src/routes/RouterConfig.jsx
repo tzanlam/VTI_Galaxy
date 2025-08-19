@@ -53,7 +53,7 @@ const router = createBrowserRouter([
         element: <ErrorPage />,
       },
       {
-        path: "/seat-selection/:galaxyId/:movieId/:time",
+        path: "/seat-selection/:galaxyId/:movieId/:time/:date/",
         element: <SeatSelection />,
       },
       {
