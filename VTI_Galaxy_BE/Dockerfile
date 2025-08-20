@@ -3,8 +3,8 @@ FROM maven:3.9.4-eclipse-temurin-21 AS build
 WORKDIR /app
 
 # Copy pom.xml và src để build
-COPY pom.xml .
-COPY src ./src
+COPY VTI_Galaxy_BE/pom.xml .
+COPY VTI_Galaxy_BE/src ./src
 
 # Build project (bỏ qua test cho nhanh)
 RUN mvn clean package -DskipTests
