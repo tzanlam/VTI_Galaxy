@@ -1,7 +1,13 @@
 import axios from "axios";
 
+// Nếu đang chạy local thì gọi BE localhost, còn lại thì gọi Render
+const baseURL =
+  window.location.hostname === "localhost"
+    ? "http://localhost:8082"
+    : "https://vti-galaxy.onrender.com";
+
 const axiosClient = axios.create({
-  baseURL: "http://localhost:8082",
+  baseURL,
   timeout: 5000,
   headers: { "Content-Type": "application/json" },
 });
@@ -26,47 +32,38 @@ axiosClient.interceptors.request.use(
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log("Axios interceptor error:", error);
-
     if (error.response) {
       const { status, data } = error.response;
 
-      // Tạo error object với thông tin chi tiết
       const enhancedError = new Error(data?.message || "Đã xảy ra lỗi");
       enhancedError.response = error.response;
       enhancedError.status = status;
       enhancedError.data = data;
 
-      console.log("Enhanced error:", {
-        status,
-        message: data?.message,
-        data: data,
-      });
-
       switch (status) {
         case 400:
-          // Chỉ dùng thông báo mặc định cho login endpoint
           if (error.config?.url?.includes("/login")) {
             enhancedError.message =
               data?.message || "Email hoặc mật khẩu không đúng";
           } else {
             enhancedError.message = data?.message || "Dữ liệu không hợp lệ";
           }
-          return Promise.reject(enhancedError);
+          break;
         case 401:
           enhancedError.message = data?.message || "Phiên đăng nhập đã hết hạn";
-          return Promise.reject(enhancedError);
+          break;
         case 403:
-          enhancedError.message =
-            data?.message || "Bạn không có quyền truy cập";
-          return Promise.reject(enhancedError);
+          enhancedError.message = data?.message || "Bạn không có quyền truy cập";
+          break;
         case 500:
           enhancedError.message =
             data?.message || "Lỗi máy chủ, vui lòng thử lại sau";
-          return Promise.reject(enhancedError);
+          break;
         default:
-          return Promise.reject(enhancedError);
+          break;
       }
+
+      return Promise.reject(enhancedError);
     }
     return Promise.reject(new Error("Kết nối mạng không ổn định"));
   }
