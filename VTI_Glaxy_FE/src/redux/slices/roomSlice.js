@@ -104,6 +104,7 @@ export const deleteRoom = createAsyncThunk(
 const roomSlice = createSlice({
   name: "room",
   initialState: {
+    roomId: null,
     room: null,
     rooms: [],
     loading: false,
@@ -111,7 +112,8 @@ const roomSlice = createSlice({
   },
   reducers: {
     clearRoomState: (state) => {
-      (state.room = null),
+      (state.roomId = null),
+        (state.room = null),
         (state.rooms = []),
         (state.loading = false),
         (state.error = null);
@@ -139,7 +141,7 @@ const roomSlice = createSlice({
       .addCase(fetchRoomByShowTime.fulfilled, (state, action) => {
         state.loading = false;
         console.log("data reducer fetchRoomByShowTime", action.payload);
-        state.room = action.payload; // Sửa từ state.rooms thành state.room
+        state.roomId = action.payload; // Sửa từ state.rooms thành state.room
       })
       .addCase(fetchRoomByShowTime.rejected, (state, action) => {
         (state.loading = false), (state.error = action.payload);

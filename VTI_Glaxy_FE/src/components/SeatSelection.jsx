@@ -21,7 +21,7 @@ const SeatSelection = () => {
     error: seatError,
   } = useSelector((state) => state.seatRoom);
   const {
-    room,
+    roomId,
     loading: roomLoading,
     error: roomError,
   } = useSelector((state) => state.room);
@@ -71,12 +71,12 @@ const SeatSelection = () => {
 
   // Lấy ghế và ghế đã đặt
   useEffect(() => {
-    if (room?.id) {
-      console.log("Phòng:", room);
-      dispatch(fetchSeatRoomByRoomId(room.id));
-      dispatch(fetchSeatBooked({ roomId: room.id, time, date }));
+    if (roomId) {
+      console.log("Phòng ID:", roomId);
+      dispatch(fetchSeatRoomByRoomId(roomId));
+      dispatch(fetchSeatBooked({ roomId, time, date }));
     }
-  }, [dispatch, room, time, date]);
+  }, [dispatch, roomId, time, date]);
 
   // Ghi log showTimes để debug
   useEffect(() => {
@@ -113,28 +113,82 @@ const SeatSelection = () => {
     return t.split(":").slice(0, 2).join(":");
   };
 
+  // Debug roomId
+  useEffect(() => {
+    console.log("roomId state changed:", roomId);
+  }, [roomId]);
+
   // Tìm showtimeId
   const showtime = useMemo(() => {
-    if (!showTimes || !Array.isArray(showTimes) || !time || !room?.id) {
+    console.log("showtime useMemo được gọi với:", {
+      showTimes: showTimes?.length,
+      time,
+      roomId,
+      hasShowTimes: !!(showTimes && Array.isArray(showTimes)),
+      hasTime: !!time,
+      hasRoomId: !!roomId,
+    });
+
+    if (!showTimes || !Array.isArray(showTimes) || !time || !roomId) {
       console.log("Thiếu dữ liệu cho suất chiếu:", {
         showTimes,
         time,
-        roomId: room?.id,
+        roomId,
       });
       return null;
     }
 
+    const normalizedTime = normalizeTime(time);
     const result = showTimes.find((st) => {
       if (!st.startTimes || !Array.isArray(st.startTimes)) return false;
-      const normalizedTime = normalizeTime(time);
-      const matchesTime = st.startTimes.some(
-        (startTime) => normalizeTime(startTime) === normalizedTime
+
+      // Debug chi tiết từng startTime
+      console.log("Debug từng startTime:", st.startTimes);
+      console.log(
+        "Debug chi tiết startTime:",
+        st.startTimes.map((startTime) => ({
+          fullStartTime: startTime,
+          originalTime: startTime.time,
+          startTimeKeys: Object.keys(startTime),
+          normalizedTime: normalizeTime(startTime.time),
+          targetTime: normalizedTime,
+          isEqual: normalizeTime(startTime.time) === normalizedTime,
+        }))
       );
-      const matchesRoom = st.roomId === room.id;
+
+      const matchesTime = st.startTimes.some((startTime) => {
+        // Kiểm tra nếu startTime là string
+        if (typeof startTime === "string") {
+          return normalizeTime(startTime) === normalizedTime;
+        }
+        // Kiểm tra nếu startTime là object có property time
+        if (startTime && typeof startTime === "object" && startTime.time) {
+          return normalizeTime(startTime.time) === normalizedTime;
+        }
+        // Kiểm tra các property khác có thể chứa thời gian
+        if (startTime && typeof startTime === "object") {
+          const timeFields = ["startTime", "time", "hour"];
+          for (const field of timeFields) {
+            if (startTime[field]) {
+              return normalizeTime(startTime[field]) === normalizedTime;
+            }
+          }
+        }
+        console.warn("Không thể xác định format của startTime:", startTime);
+        return false;
+      });
+      const matchesRoom = st.roomId === roomId;
       console.log("Kiểm tra suất chiếu:", {
         startTimes: st.startTimes,
-        normalizedStartTimes: st.startTimes.map(normalizeTime),
+        normalizedStartTimes: st.startTimes.map((startTime) => {
+          if (typeof startTime === "string") return normalizeTime(startTime);
+          if (startTime && startTime.time) return normalizeTime(startTime.time);
+          if (startTime && startTime.startTime)
+            return normalizeTime(startTime.startTime);
+          return "unknown";
+        }),
         time,
+
         normalizedTime,
         matchesTime,
         matchesRoom,
@@ -144,7 +198,8 @@ const SeatSelection = () => {
     });
     console.log("Suất chiếu đã chọn:", result);
     return result;
-  }, [showTimes, time, room]);
+  }, [showTimes, time, roomId]);
+
   const showtimeId = showtime?.id;
 
   // Xác định trạng thái ghế
@@ -179,7 +234,7 @@ const SeatSelection = () => {
       console.log("Thiếu showtimeId. Dữ liệu hiện tại:", {
         showTimes,
         time,
-        roomId: room?.id,
+        roomId,
       });
       return;
     }
@@ -205,7 +260,7 @@ const SeatSelection = () => {
 
     const movieInfo = {
       movieName: movie?.name || "Chưa có tiêu đề",
-      galaxyName: room?.galaxy?.name || "Chưa có thông tin",
+      galaxyName: showtime?.galaxy?.name || "Chưa có thông tin",
       date,
       time,
       galaxyId,
@@ -369,7 +424,7 @@ const SeatSelection = () => {
               <div className="mt-4 border-t pt-4">
                 <p>
                   <strong>Rạp:</strong>{" "}
-                  {room?.galaxy?.name || "Chưa có thông tin"}
+                  {showtime?.galaxy?.name || "Chưa có thông tin"}
                 </p>
                 <p>
                   <strong>Suất chiếu:</strong> {time}
