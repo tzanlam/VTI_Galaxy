@@ -49,19 +49,19 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer> {
     boolean existsByDate(LocalDate now);
 
     @Query("""
-    SELECT DISTINCT st.room
+    SELECT DISTINCT r
     FROM ShowTime st
     JOIN st.startTimes s
+    JOIN st.room r
     WHERE st.movie.id = :movieId
       AND st.galaxy.id = :galaxyId
       AND s.id = :startTimeId
       AND st.date = :date
-    
 """)
-    List<Room> findRoomByMovieGalaxyAndStartTimeId(
+    Room findRoomByMovieGalaxyAndStartTimeId(
             @Param("movieId") int movieId,
             @Param("galaxyId") int galaxyId,
             @Param("startTimeId") int startTimeId,
             @Param("date") LocalDate date
     );
-    }
+}

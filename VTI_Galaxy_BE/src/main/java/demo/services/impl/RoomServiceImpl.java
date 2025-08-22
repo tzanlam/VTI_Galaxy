@@ -54,22 +54,9 @@ public class RoomServiceImpl implements RoomService {
         StartTime st = startTimeRepository.findByTime(convertToLocalTime(startTime)).orElseThrow(
                 () -> new IllegalArgumentException("Thời gian bắt đầu không tồn tại: " + startTime)
         );
-        LocalDate localDate;
-        try {
-            localDate = convertToLocalDate(date);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Định dạng ngày không hợp lệ: " + date);
-        }
-        List<Room> rooms = showTimeRepository.findRoomByMovieGalaxyAndStartTimeId(movieId, galaxyId, st.getId(), localDate);
-        if (rooms.isEmpty()) {
-            throw new IllegalArgumentException("Không tìm thấy phòng với điều kiện đã chọn");
-        }
-        if (rooms.size() > 1) {
-            // Log warning để debug, nhưng vẫn lấy room đầu tiên để tránh crash
-            System.err.println("Cảnh báo: Tìm thấy " + rooms.size() + " phòng trùng lặp cho params: movieId=" + movieId + ", galaxyId=" + galaxyId + ", startTime=" + startTime + ", date=" + date);
-        }
-        Room room = rooms.get(0);  // Lấy room đầu tiên
-        return new RoomDto(room);
+            LocalDate localDate = convertToLocalDate(date);
+        Room rooms = showTimeRepository.findRoomByMovieGalaxyAndStartTimeId(movieId, galaxyId, st.getId(), localDate);
+        return new RoomDto(rooms);
     }
 
     @Override

@@ -10,7 +10,6 @@ public class RoomDto {
     private String typeScreen;
     private String status;
     private String galaxyName;
-    private int capacity;
 
     public RoomDto(Room room){
         this.id = room.getId();
