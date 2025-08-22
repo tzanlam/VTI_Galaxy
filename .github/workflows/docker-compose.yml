@@ -16,7 +16,7 @@ services:
 
   backend:
     build:
-      context: C:\Users\Acer\Desktop\VTI_Galaxy\VTI_Galaxy_BE
+      context: ../../VTI_Galaxy_BE
       dockerfile: Dockerfile
     ports:
       - "8082:8082"
@@ -58,7 +58,7 @@ services:
 
   frontend:
     build:
-      context: C:\Users\Acer\Desktop\VTI_Galaxy\VTI_Glaxy_FE  
+      context: ../../VTI_Glaxy_FE 
       dockerfile: Dockerfile
     ports:
       - "5173:80"
