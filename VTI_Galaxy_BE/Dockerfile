@@ -1,7 +1,7 @@
 FROM maven:3.9.4-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY pom.xml .
-COPY src ./src
+COPY VTI_Galaxy_BE/pom.xml .
+COPY VTI_Galaxy_BE/src ./src
 RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
