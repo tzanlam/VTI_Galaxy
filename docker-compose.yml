@@ -15,7 +15,7 @@ services:
 
   backend:
     build:
-      context: ../../VTI_Galaxy_BE
+      context: ./VTI_Galaxy_BE
       dockerfile: Dockerfile
     container_name: vti_galaxy_backend
     ports:
@@ -58,7 +58,7 @@ services:
 
   frontend:
     build:
-      context: ../../VTI_Glaxy_FE
+      context: ./VTI_Glaxy_FE
       dockerfile: Dockerfile
     container_name: vti_galaxy_frontend
     ports:
