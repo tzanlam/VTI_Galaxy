@@ -1,4 +1,3 @@
-
 version: "3.9"
 services:
   db:
@@ -18,6 +17,7 @@ services:
     build:
       context: ../../VTI_Galaxy_BE
       dockerfile: Dockerfile
+    container_name: vti_galaxy_backend
     ports:
       - "8082:8082"
     environment:
@@ -58,10 +58,13 @@ services:
 
   frontend:
     build:
-      context: ../../VTI_Glaxy_FE 
+      context: ../../VTI_Glaxy_FE
       dockerfile: Dockerfile
+    container_name: vti_galaxy_frontend
     ports:
       - "5173:80"
+    depends_on:
+      - backend
 
 volumes:
   postgres_data:
