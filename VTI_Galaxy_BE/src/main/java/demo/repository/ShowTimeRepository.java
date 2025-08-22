@@ -1,6 +1,5 @@
 package demo.repository;
 
-import demo.modal.entity.Room;
 import demo.modal.entity.ShowTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -50,7 +49,7 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer> {
     boolean existsByDate(LocalDate now);
 
     @Query("""
-    SELECT DISTINCT r
+    SELECT st.room.id
     FROM ShowTime st
     JOIN st.startTimes s
     JOIN st.room r
@@ -59,7 +58,7 @@ public interface ShowTimeRepository extends JpaRepository<ShowTime, Integer> {
       AND s.time = :time
       AND st.date = :date
 """)
-    Room findRoomByMovieGalaxyAndStartTimeId(
+    int findRoomByMovieGalaxyAndStartTimeId(
             @Param("movieId") int movieId,
             @Param("galaxyId") int galaxyId,
             @Param("time") LocalTime time,

@@ -43,7 +43,7 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public RoomDto getRoomByShowTime(int movieId, int galaxyId, String startTime, String date) {
+    public int getRoomByShowTime(int movieId, int galaxyId, String startTime, String date) {
         Movie movie = movieRepository.findById(movieId).orElseThrow(
                 () -> new IllegalArgumentException("Phim không tồn tại với ID: " + movieId)
         );
@@ -51,8 +51,7 @@ public class RoomServiceImpl implements RoomService {
                 () -> new IllegalArgumentException("Rạp không tồn tại với ID: " + galaxyId)
         );
             LocalDate localDate = convertToLocalDate(date);
-        Room rooms = showTimeRepository.findRoomByMovieGalaxyAndStartTimeId(movieId, galaxyId, convertToLocalTime(startTime), localDate);
-        return new RoomDto(rooms);
+        return showTimeRepository.findRoomByMovieGalaxyAndStartTimeId(movieId, galaxyId, convertToLocalTime(startTime), localDate);
     }
 
     @Override
