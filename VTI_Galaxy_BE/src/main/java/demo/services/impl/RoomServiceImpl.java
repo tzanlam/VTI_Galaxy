@@ -23,7 +23,6 @@ public class RoomServiceImpl implements RoomService {
     private final GalaxyRepository galaxyRepository;
     private final ShowTimeRepository showTimeRepository;
     private final MovieRepository movieRepository;
-    private final StartTimeRepository startTimeRepository;
 
     @Override
     public List<RoomDto> getAllRooms() {
@@ -51,11 +50,8 @@ public class RoomServiceImpl implements RoomService {
         Galaxy galaxy = galaxyRepository.findById(galaxyId).orElseThrow(
                 () -> new IllegalArgumentException("Rạp không tồn tại với ID: " + galaxyId)
         );
-        StartTime st = startTimeRepository.findByTime(convertToLocalTime(startTime)).orElseThrow(
-                () -> new IllegalArgumentException("Thời gian bắt đầu không tồn tại: " + startTime)
-        );
             LocalDate localDate = convertToLocalDate(date);
-        Room rooms = showTimeRepository.findRoomByMovieGalaxyAndStartTimeId(movieId, galaxyId, st.getId(), localDate);
+        Room rooms = showTimeRepository.findRoomByMovieGalaxyAndStartTimeId(movieId, galaxyId, convertToLocalTime(startTime), localDate);
         return new RoomDto(rooms);
     }
 
