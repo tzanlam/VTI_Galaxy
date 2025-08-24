@@ -1,5 +1,6 @@
 package demo.config.jwt;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,16 +23,11 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtAuthenticationPoint jwtAuthenticationPoint;
     private final JwtFilterRequest jwtFilterRequest;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
-
-    public SecurityConfig(JwtAuthenticationPoint jwtAuthenticationPoint, JwtFilterRequest jwtFilterRequest, CustomAccessDeniedHandler customAccessDeniedHandler) {
-        this.jwtAuthenticationPoint = jwtAuthenticationPoint;
-        this.jwtFilterRequest = jwtFilterRequest;
-        this.customAccessDeniedHandler = customAccessDeniedHandler;
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,7 +37,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedOriginPatterns(List.of(
                 "http://localhost:5173",
                 "https://galaxy-6ab6e.web.app",
@@ -72,53 +67,68 @@ public class SecurityConfig {
                 .sessionManagement(i->i.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(a->a
                         .requestMatchers(
+                                // Common / Static
                                 "/",
-                                "/getSeatRoomByTime/time/{time}/galaxyId/{galaxyId}/movieId/{movieId}",
-                                "/movieId/{movieId}/andDate/{date}",
                                 "/index.html",
                                 "/static/**",
-                                "/vnpay-payment/**", // Bao gồm tất cả endpoint con của /vnpay-payment
                                 "/error",
-                                "getEmployees",
-                                "/getAccountById",
-                                "/getVouchers",
-                                "/getVoucherById",
-                                "/postVoucher",
-                                "/postRoom",
-                                "/postImg",
-                                "/getMovieById",
-                                "/getGalaxyById ",
-                                "/getShowTimeByRoom",
-                                "/getRooms",
-                                "/registerUser",
-                                "/postMovie",
+
+                                // Auth & Account
                                 "/login",
-                                "/postImg",
-                                "/postMovie",
+                                "/registerUser",
+                                "/getAccountById",
+
+                                // Movies
                                 "/getMovies",
                                 "/getMovieById",
+                                "/postMovie",
                                 "/putStatusMovie",
+
+                                // Galaxy
                                 "/postGalaxy",
+                                "/getGalaxyById",
+
+                                // Rooms
+                                "/getRooms",
+                                "/getRoomById",
+                                "/postRoom",
+                                "/putRoom",
+                                "/getShowTimeByRoom",
+
+                                // Seats
+                                "/getSeat",
+                                "/postSeat",
+                                "/getSeatRooms",
+                                "/getSeatRoomById",
+                                "/postSeatRoom",
+                                "/getSeatRoomByTime/time/{time}/galaxyId/{galaxyId}/movieId/{movieId}",
+                                "/getSeatRoomStatus",
+                                "/putSeatRoomStatus",
+
+                                // ShowTimes
                                 "/getShowTimesByFilter",
                                 "/getShowTime",
                                 "/postShowTime",
                                 "/postStartTime",
                                 "/getStartTimes",
-                                "/postSeat",
-                                "/getSeat",
-                                "/postRoom",
-                                "/getRooms",
-                                "/postSeatRoom",
-                                "/getSeatRooms",
-                                "/getSeatRoomById",
-                                "/getSeatRoomStatus",
+
+                                // Booking
+                                "/getBookings",
+                                "/postBooking",
+
+                                // Voucher
+                                "/getVouchers",
+                                "/getVoucherById",
+                                "/postVoucher",
+
+                                // Payment
+                                "/vnpay-payment/**",
+
+                                // Others
                                 "/postOther",
                                 "/getOthers",
                                 "/getOtherByGalaxyId",
-                                "/getBookings",
-                                "/postBooking",
-                                "/getSeatRoomById",
-                                "/putSeatRoomStatus"
+                                "/postImg"
                                 ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilterRequest, UsernamePasswordAuthenticationFilter.class);
