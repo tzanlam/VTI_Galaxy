@@ -15,8 +15,8 @@ services:
 
   backend:
     build:
-      context: ./VTI_Galaxy_BE
-      dockerfile: Dockerfile
+      
+      dockerfile: VTI_Galaxy_BE/Dockerfile
     container_name: vti_galaxy_backend
     ports:
       - "8082:8082"
